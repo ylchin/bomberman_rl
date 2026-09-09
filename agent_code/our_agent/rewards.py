@@ -12,7 +12,7 @@ scalar training reward.
 import events as e
 from .features import (
     DIRECTIONS, DIRECTION_VECTORS,
-    danger_map, get_blast_coords, bfs_direction,
+    danger_map, get_blast_coords, bfs_direction, crate_approach_targets,
     MAX_DIST_NORM,
 )
 
@@ -163,15 +163,16 @@ def detect_custom_events(old_state, self_action, new_state):
 
 
 # ---------------------------------------------------------------------------
-# Potential-based shaping  (Lecture 36 sec.9)  --  F = gamma*Phi(s') - Phi(s)
+# Potential-based shaping  (Lecture 36)  --  F = gamma*Phi(s') - Phi(s)
 # ---------------------------------------------------------------------------
 def potential(game_state):
     """
-    Phi(s): higher is better. Purely a function of state (never of the action),
-    which is what makes the shaping term provably policy-invariant.
+    Phi(s): higher is better. Afunction of state (never of the action).
 
-    Current design (good for Tasks 1-2):
-      + closeness to the nearest reachable coin
+    Design:
+      + closeness to the nearest reachable coin        (weight 1.0)
+      + closeness to a tile from which a crate can be bombed, only when no
+        coin is currently visible                       (weight 0.5)
       - being in a blast path, scaled by how soon it detonates
     Extend with an opponent term for Tasks 3-4.
     """
@@ -180,12 +181,19 @@ def potential(game_state):
 
     phi = 0.0
     pos = _agent_pos(game_state)
+    field = game_state["field"]
 
     coins = game_state["coins"]
     if coins:
         _, dist = bfs_direction(game_state, coins)
         if dist is not None:
             phi += 1.0 - min(dist, MAX_DIST_NORM) / MAX_DIST_NORM  # in [0, 1]
+    else:
+        crate_tiles = crate_approach_targets(field)
+        if crate_tiles:
+            _, dist = bfs_direction(game_state, crate_tiles)
+            if dist is not None:
+                phi += 0.5 * (1.0 - min(dist, MAX_DIST_NORM) / MAX_DIST_NORM)
 
     dmap = danger_map(game_state)
     d = dmap[pos]
