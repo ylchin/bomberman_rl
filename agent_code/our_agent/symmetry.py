@@ -25,7 +25,7 @@ actually require "go left".
 """
 
 import numpy as np
-from features import ACTIONS, DIRECTIONS, DIRECTION_VECTORS, DIRECTIONAL_GROUPS
+from .features import ACTIONS, DIRECTIONS, DIRECTION_VECTORS, DIRECTIONAL_GROUPS
 
 # The 8 ops, as (flip_first: bool, n_rotations_cw: int).
 # flip = mirror across the vertical axis (x -> W-1-x) applied BEFORE rotating.
