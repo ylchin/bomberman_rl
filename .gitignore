@@ -111,3 +111,8 @@ screenshots/*.webm
 
 replays/
 results/
+
+agent_code/*/logs/
+agent_code/*/training_log.csv
+agent_code/*/weights/*.pkl
+agent_code/*/weights/*.pt
