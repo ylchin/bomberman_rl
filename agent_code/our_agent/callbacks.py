@@ -1,5 +1,5 @@
 """
-callbacks.py  --  our_agent  (Yi Ling Chin)
+callbacks.py  --  our_agent 
 
 Tournament entry point. Must stay importable with NO training-only deps
 (train.py is only imported by the framework when --train is set).
@@ -25,25 +25,29 @@ def setup(self):
     self.cfg = config
     self.model_kind = config.MODEL
 
-    weights_path = config.WEIGHTS_FILE[config.MODEL]
+    if self.model_kind != "linear":
+        raise NotImplementedError(f"model kind {self.model_kind!r} not wired up yet")
+    from .q_linear import LinearQ
 
-    if self.model_kind == "linear":
-        from .q_linear import LinearQ
-        if self.train and not config.TRAIN["resume"]:
+    if self.train:
+        resume_path = config.TRAIN["weights_out"]
+        if config.TRAIN["resume"] and os.path.isfile(resume_path):
+            self.logger.info(f"Resuming LinearQ from {resume_path}.")
+            self.model = LinearQ.load(resume_path)
+        else:
             self.logger.info("Fresh LinearQ model.")
             self.model = LinearQ()
-        elif os.path.isfile(weights_path):
-            self.logger.info(f"Loading LinearQ from {weights_path}.")
-            self.model = LinearQ.load(weights_path)
-        elif self.train:
-            self.logger.info("No checkpoint to resume; starting LinearQ from scratch.")
-            self.model = LinearQ()
+    else:
+        for path in config.EVAL_WEIGHTS:
+            if os.path.isfile(path):
+                self.logger.info(f"Loading LinearQ from {path}.")
+                self.model = LinearQ.load(path)
+                break
         else:
             raise FileNotFoundError(
-                f"{weights_path} missing and not in training mode -- train an agent first."
+                f"No checkpoint found (looked in {config.EVAL_WEIGHTS}) and not "
+                f"training -- train an agent first, or set AGENT_PRESET to match."
             )
-    else:
-        raise NotImplementedError(f"model kind {self.model_kind!r} not wired up yet")
 
     # act() reads this; train.py keeps it up to date during training.
     self.epsilon = 0.0

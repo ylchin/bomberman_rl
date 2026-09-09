@@ -1,10 +1,17 @@
 """
-config.py  --  Yi Ling Chin
+config.py
 
 One place for every knob. train.py and callbacks.py both read MODEL and TRAIN.
-For experiments, copy this file / override the dict from an env var or a JSON
-in experiments/ rather than editing in place.
+
+Per-task tuning lives in PRESETS below; select one without editing the file:
+
+    AGENT_PRESET=task2 uv run python main.py play --agents our_agent \
+        --scenario loot-crate --train 1 --no-gui --n-rounds 3000
+
+The chosen preset name is recorded in the training log so any run is reproducible.
 """
+
+import os
 
 # which model the agent runs. "linear" is the only one wired up so far;
 # "net" / "forest" land later and read the same TRAIN block where it applies.
@@ -47,4 +54,37 @@ TRAIN = dict(
     resume=False,            # True = keep training the existing checkpoint
     save_every=25,           # checkpoint every N episodes (also always at the end)
     log_csv="training_log.csv",
+    preset="task1",          # overwritten below when AGENT_PRESET is set
 )
+
+# ---------------------------------------------------------------------------
+# Per-task overrides. The bare TRAIN dict above is the tuned Task 1 config.
+# ---------------------------------------------------------------------------
+PRESETS = {
+    "task1": {},
+    "task2": dict(               # loot-crate: bomb crates, find coins, never suicide
+        gamma=0.97,             # longer horizon: bomb -> crate -> coin -> collect chains
+        n_step=3,
+        alpha=0.02, alpha_end=0.004,
+        eps_end=0.03,           # more residual exploration: bombing must keep being tried
+        eps_decay_episodes=1500,
+        buffer_capacity=200_000,  # ~400-step episodes fill the buffer ~3x faster
+        save_every=50,
+    ),
+}
+
+_preset = os.environ.get("AGENT_PRESET", "").strip()
+if _preset:
+    if _preset not in PRESETS:
+        raise KeyError(f"AGENT_PRESET={_preset!r} unknown; choose from {list(PRESETS)}")
+    TRAIN.update(PRESETS[_preset])
+    TRAIN["preset"] = _preset
+
+# keep each task's training log + checkpoint separate so parallel runs don't clash
+TRAIN["log_csv"] = f"training_{TRAIN['preset']}.csv"
+TRAIN["weights_out"] = f"weights/q_{MODEL}_{TRAIN['preset']}.pkl"
+
+# What callbacks.act() loads in eval / tournament mode: the preset-specific
+# checkpoint if it exists, else the stable path (copy your final model there
+# before submitting:  cp weights/q_linear_task4.pkl weights/q_linear.pkl).
+EVAL_WEIGHTS = [TRAIN["weights_out"], WEIGHTS_FILE[MODEL]]
