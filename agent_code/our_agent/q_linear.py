@@ -81,12 +81,15 @@ class LinearQ:
         return v * (1.0 - np.asarray(done, dtype=np.float64))
 
     # ------------------------------------------------------------------ learn
-    def update(self, Phi, actions, targets, alpha, weights=None):
+    def update(self, Phi, actions, targets, alpha, weights=None, td_clip=None):
         """
         One semi-gradient TD step over a batch.
           Phi: (N, D)   actions: (N,)   targets: (N,)  (the R_t values)
           weights: (N,) importance-sampling weights (prioritised replay); default 1
-        Returns the per-sample TD error (for updating replay priorities).
+          td_clip: if set, the TD error driving the gradient is clipped to
+                   [-td_clip, td_clip] (Huber-style: bounds the step a rare
+                   death spike (-10) can take). Priorities still see the raw error.
+        Returns the per-sample (unclipped) TD error, for replay priorities.
         """
         Phi = np.asarray(Phi, dtype=np.float64)
         actions = np.asarray(actions)
@@ -95,10 +98,11 @@ class LinearQ:
 
         q_pred = np.einsum("nd,nd->n", Phi, self.W[actions])   # Q(s_i, a_i)
         td_error = targets - q_pred
+        step_error = td_error if td_clip is None else np.clip(td_error, -td_clip, td_clip)
 
-        # accumulate per-action gradient:  dL/dw_a = -sum_i (td_i * weight_i) phi_i
+        # accumulate per-action gradient:  dL/dw_a = -sum_i (err_i * weight_i) phi_i
         grad = np.zeros_like(self.W)
-        np.add.at(grad, actions, (w * td_error)[:, None] * Phi)
+        np.add.at(grad, actions, (w * step_error)[:, None] * Phi)
         counts = np.bincount(actions, minlength=self.n_actions).astype(np.float64)
         counts[counts == 0] = 1.0
         self.W += alpha * grad / counts[:, None]

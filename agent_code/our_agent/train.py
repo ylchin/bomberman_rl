@@ -47,6 +47,7 @@ def setup_training(self):
     self.ep_reward = 0.0
 
     self.epsilon = _epsilon(self, 0)
+    self.alpha = _alpha(self, 0)
 
     os.makedirs("weights", exist_ok=True)
     self._weights_path = WEIGHTS_FILE[MODEL]
@@ -109,6 +110,7 @@ def end_of_round(self, last_game_state, last_action, events):
 
     # reset for next episode
     self.epsilon = _epsilon(self, self.episode)
+    self.alpha = _alpha(self, self.episode)
     self.traj = []
     self.ep_counts = Counter()
     self.ep_reward = 0.0
@@ -121,6 +123,15 @@ def _epsilon(self, episode):
     c = TRAIN
     frac = min(1.0, episode / max(1, c["eps_decay_episodes"]))
     return c["eps_end"] + (c["eps_start"] - c["eps_end"]) * (1.0 - frac)
+
+
+def _alpha(self, episode):
+    c = TRAIN
+    a0, a1 = c["alpha"], c.get("alpha_end")
+    if a1 is None:
+        return a0
+    frac = min(1.0, episode / max(1, c["eps_decay_episodes"]))
+    return a0 + (a1 - a0) * frac
 
 
 def _flush_episode_to_buffer(self):
@@ -178,7 +189,10 @@ def _learn(self, n_iters=1):
             rule=cfg["rule"],
         )
         targets = batch["reward"] + (cfg["gamma"] ** cfg["n_step"]) * v_next
-        td_err = self.model.update(batch["phi"], batch["action"], targets, cfg["alpha"], weights=w)
+        td_err = self.model.update(
+            batch["phi"], batch["action"], targets,
+            self.alpha, weights=w, td_clip=cfg.get("td_clip"),
+        )
         if cfg["priority_alpha"] > 0.0:
             self.buffer.update_priorities(idx, td_err)
 
@@ -188,7 +202,7 @@ def _learn(self, n_iters=1):
 # ---------------------------------------------------------------------------
 _CSV_FIELDS = [
     "episode", "steps", "total_reward", "coins", "crates", "invalid",
-    "killed_self", "killed_opponents", "survived", "epsilon", "buffer",
+    "killed_self", "killed_opponents", "survived", "epsilon", "alpha", "buffer",
 ]
 
 
@@ -212,6 +226,7 @@ def _write_csv_row(self, last_game_state):
         c[e.KILLED_OPPONENT],
         int(c[e.SURVIVED_ROUND] > 0),
         round(self.epsilon, 3),
+        round(self.alpha, 4),
         len(self.buffer),
     ]
     with open(self._csv_path, "a", newline="") as f:

@@ -23,17 +23,19 @@ TRAIN = dict(
     gamma=0.95,
     n_step=3,                # k in the k-step TD target; 1 = plain 1-step
     rule="q",                # "q" (Q-learning) or "sarsa"
-    alpha=0.05,              # linear-model learning rate
+    alpha=0.02,              # linear-model learning rate (start)
+    alpha_end=0.005,         # linear-annealed to this over eps_decay_episodes; None = constant
+    td_clip=8.0,             # clip |TD error| in the gradient step; None = off
 
     # --- exploration: linear anneal of epsilon, then hold ---
     eps_start=1.0,
-    eps_end=0.05,
-    eps_decay_episodes=400,
+    eps_end=0.01,            # low floor: coin-heaven needs little exploration once solved
+    eps_decay_episodes=500,
     softmax_beta=None,       # set a float to use softmax instead of eps-greedy
 
     # --- replay ---
     buffer_capacity=100_000,
-    batch_size=128,
+    batch_size=256,
     learn_every=4,           # learn once per this many env steps
     learn_iters_end=8,       # extra learn steps at end_of_round
     priority_alpha=0.0,      # 0 = uniform; try 0.5-0.7 once it trains
