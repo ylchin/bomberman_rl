@@ -23,7 +23,7 @@ import events as e
 from .features import ACTIONS, FEATURE_DIM, state_to_features
 from .replay_buffer import ReplayBuffer
 from .rewards import reward_from_events, detect_custom_events, potential_shaping
-from .config import TRAIN, WEIGHTS_FILE, MODEL
+from .config import TRAIN, MODEL
 
 _ACTION_ID = {name: i for i, name in enumerate(ACTIONS)}
 
@@ -50,7 +50,7 @@ def setup_training(self):
     self.alpha = _alpha(self, 0)
 
     os.makedirs("weights", exist_ok=True)
-    self._weights_path = WEIGHTS_FILE[MODEL]
+    self._weights_path = cfg["weights_out"]
     self._csv_path = cfg["log_csv"]
     _csv_header(self._csv_path)
 
@@ -62,8 +62,9 @@ def setup_training(self):
         self._sym = None
 
     self.logger.info(
-        f"training: model={MODEL} rule={cfg['rule']} k={cfg['n_step']} "
-        f"gamma={cfg['gamma']} alpha={cfg['alpha']}"
+        f"training: preset={cfg.get('preset')} model={MODEL} rule={cfg['rule']} "
+        f"k={cfg['n_step']} gamma={cfg['gamma']} alpha={cfg['alpha']}->{cfg.get('alpha_end')} "
+        f"eps_end={cfg['eps_end']} buffer={cfg['buffer_capacity']}"
     )
 
 
@@ -89,14 +90,25 @@ def game_events_occurred(self, old_game_state, self_action, new_game_state, even
 # ---------------------------------------------------------------------------
 def end_of_round(self, last_game_state, last_action, events):
     events = list(events)
-    reward = reward_from_events(events, self.logger)
-    # terminal: potential(terminal) := 0, so no shaping term on the last step
+    died = e.KILLED_SELF in events or e.GOT_KILLED in events
+    survived = e.SURVIVED_ROUND in events
 
-    if last_action is not None:
-        phi = state_to_features(last_game_state)
-        self.traj.append((phi, _ACTION_ID[last_action], reward))
-    self.ep_reward += reward
-    self.ep_counts.update(events)
+    # The framework delivers a survivor's final step to game_events_occurred AND
+    # again here (plus SURVIVED_ROUND). A dead agent's final step comes ONLY here.
+    if died or not survived or not self.traj:
+        reward = reward_from_events(events, self.logger)   # terminal: no shaping term
+        if last_action is not None:
+            phi = state_to_features(last_game_state)
+            self.traj.append((phi, _ACTION_ID[last_action], reward))
+        self.ep_reward += reward
+        self.ep_counts.update(events)
+    else:
+        # survivor: fold only the genuinely-new SURVIVED_ROUND into the last step
+        bonus = reward_from_events([e.SURVIVED_ROUND])
+        phi, a, r = self.traj[-1]
+        self.traj[-1] = (phi, a, r + bonus)
+        self.ep_reward += bonus
+        self.ep_counts[e.SURVIVED_ROUND] += 1
 
     _flush_episode_to_buffer(self)
     _learn(self, n_iters=self.t["learn_iters_end"])
