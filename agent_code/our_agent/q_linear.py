@@ -1,5 +1,5 @@
 """
-q_linear.py  --  Yi Ling Chin
+q_linear.py
 
 Model 1: linear action-value regression
 
