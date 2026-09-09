@@ -7,7 +7,7 @@ into inputs a model can consume. Two consumers:
   - state_to_features(game_state) -> flat vector      for Model 1 (linear/forest)
   - state_to_channels(game_state) -> (C, W, H) stack   for Model 2 (CNN / DQN)
 
-Both are built on top of `danger_map`, which is also imported by Person B's
+Both are built on top of `danger_map`, which is also imported by Yi Ling Chin's
 rewards.py (so bomb-danger logic lives in exactly one place).
 
 ACTIONS ORDER IS LAW. Every index below (in ACTIONS, in one-hot blocks, in
@@ -117,7 +117,7 @@ def danger_map(game_state):
       - currently active explosions (game_state['explosion_map']), valued at 1
     Takes the min across sources per tile (soonest danger wins).
     Used by features.py (IN_DANGER / DANGER_STEPS / SAFE_DIR) and by
-    Person B's rewards.py for shaping bomb-avoidance reward.
+    Yi Ling Chin's rewards.py for shaping bomb-avoidance reward.
     """
     field = game_state['field']
     w, h = field.shape
