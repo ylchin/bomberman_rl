@@ -202,6 +202,23 @@ def _one_hot_direction(direction):
     return vec
 
 
+def crate_approach_targets(field):
+    """
+    Free tiles adjacent to at least one crate -- i.e. tiles you can stand on to
+    bomb a crate. `bfs_direction` only reaches walkable tiles, so BFS-ing to
+    crate coords directly never matches (crates are field==1, not walkable).
+    Also imported by rewards.py so the definition lives in exactly one place.
+    """
+    w, h = field.shape
+    targets = set()
+    for cx, cy in np.argwhere(field == 1):
+        for dx, dy in DIRECTION_VECTORS.values():
+            nx, ny = int(cx + dx), int(cy + dy)
+            if 0 <= nx < w and 0 <= ny < h and field[nx, ny] == 0:
+                targets.add((nx, ny))
+    return targets
+
+
 # ---------------------------------------------------------------------------
 # Main entry point 1: flat feature vector for Model 1 (linear / boosted-tree)
 # ---------------------------------------------------------------------------
@@ -242,9 +259,9 @@ def state_to_features(game_state):
     feats[7:12] = _one_hot_direction(coin_dir)
     feats[12] = 0.0 if coin_dist is None else min(coin_dist, MAX_DIST_NORM) / MAX_DIST_NORM
 
-    # --- CRATE_DIR / CRATE_DIST (13-18) ---
-    crate_coords = list(zip(*np.where(field == 1)))
-    crate_dir, crate_dist = bfs_direction(game_state, crate_coords) if crate_coords else (None, None)
+    # --- CRATE_DIR / CRATE_DIST (13-18): route to a tile you can bomb a crate from ---
+    crate_targets = crate_approach_targets(field)
+    crate_dir, crate_dist = bfs_direction(game_state, crate_targets) if crate_targets else (None, None)
     feats[13:18] = _one_hot_direction(crate_dir)
     feats[18] = 0.0 if crate_dist is None else min(crate_dist, MAX_DIST_NORM) / MAX_DIST_NORM
 
