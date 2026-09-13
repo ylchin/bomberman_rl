@@ -13,6 +13,11 @@ rewards.py (so bomb-danger logic lives in exactly one place).
 ACTIONS ORDER IS LAW. Every index below (in ACTIONS, in one-hot blocks, in
 symmetry.py) assumes this exact order. Do not reorder without updating
 symmetry.py and every trained checkpoint.
+
+*** FEATURE_DIM CHANGED 32 -> 34 (added OPP_TRAPPED, OPP_NEAR_DEADEND at the
+end, indices 32-33). Existing indices 0-31 are UNCHANGED. Any q_linear.pkl
+trained against the old 32-dim vector is now incompatible and must be
+retrained -- ping Person B before pulling this in. ***
 """
 
 from collections import deque
@@ -44,8 +49,10 @@ MAX_DANGER_NORM = float(BOMB_TIMER + EXPLOSION_LINGER)  # cap for danger-step no
 
 
 # ---------------------------------------------------------------------------
-# Feature vector layout (D = 32). Keep this list and the code that fills it
-# in sync — symmetry.py's DIRECTIONAL_GROUPS depends on these exact offsets.
+# Feature vector layout (D = 34). Keep this list and the code that fills it
+# in sync — symmetry.py's DIRECTIONAL_GROUPS depends on these exact offsets
+# for indices 0-31; indices 32-33 are new, non-directional, appended at the
+# end so nothing above them shifts.
 # ---------------------------------------------------------------------------
 FEATURE_NAMES = (
     ['WALL_UP', 'WALL_RIGHT', 'WALL_DOWN', 'WALL_LEFT']       # 0-3   blocked neighbor?
@@ -61,13 +68,17 @@ FEATURE_NAMES = (
     + ['OPP_DIR_UP', 'OPP_DIR_RIGHT', 'OPP_DIR_DOWN', 'OPP_DIR_LEFT', 'OPP_DIR_NONE']  # 25-29
     + ['OPP_DIST']                                               # 30
     + ['WOULD_HIT_OPPONENT']                                     # 31    bombing now would hit an opponent
+    + ['OPP_TRAPPED']                                            # 32    NEW: nearest opp has no bomb-escape route
+    + ['OPP_NEAR_DEADEND']                                       # 33    NEW: nearest opp is standing in a dead end
 )
-FEATURE_DIM = len(FEATURE_NAMES)  # 32
+FEATURE_DIM = len(FEATURE_NAMES)  # 34
 
 # Directional one-hot blocks, used by symmetry.py to know which slices to
 # permute under rotation/flip. Each tuple = (start_index, has_none_slot).
 # The first 4 entries starting at `start_index` are [UP, RIGHT, DOWN, LEFT];
 # if has_none_slot, a 5th "NONE" entry follows and is left untouched.
+# UNCHANGED by this update -- OPP_TRAPPED/OPP_NEAR_DEADEND are scalars, not
+# directional, so they need no entry here.
 DIRECTIONAL_GROUPS = [
     (0, False),   # WALL_*
     (7, True),    # COIN_DIR_*
@@ -202,6 +213,83 @@ def _one_hot_direction(direction):
     return vec
 
 
+def crate_approach_targets(field):
+    """
+    Free tiles adjacent to at least one crate -- i.e. tiles you can stand on to
+    bomb a crate. `bfs_direction` only reaches walkable tiles, so BFS-ing to
+    crate coords directly never matches (crates are field==1, not walkable).
+    Also imported by rewards.py so the definition lives in exactly one place.
+    """
+    w, h = field.shape
+    targets = set()
+    for cx, cy in np.argwhere(field == 1):
+        for dx, dy in DIRECTION_VECTORS.values():
+            nx, ny = int(cx + dx), int(cy + dy)
+            if 0 <= nx < w and 0 <= ny < h and field[nx, ny] == 0:
+                targets.add((nx, ny))
+    return targets
+
+
+# ---------------------------------------------------------------------------
+# NEW: opponent trapped / dead-end detection, for Tasks 3-4 aggression.
+# ---------------------------------------------------------------------------
+def local_degree(field, x, y):
+    """Number of walkable neighbors of a walkable tile (0-4). A tile with
+    degree <=1 is a dead end (one way in, same way out)."""
+    w, h = field.shape
+    if not _walkable(field, x, y):
+        return 0
+    degree = 0
+    for dx, dy in DIRECTION_VECTORS.values():
+        nx, ny = x + dx, y + dy
+        if _walkable(field, nx, ny):
+            degree += 1
+    return degree
+
+
+def is_dead_end(field, x, y):
+    """True if (x, y) is a walkable pocket with at most one walkable exit."""
+    return _walkable(field, x, y) and local_degree(field, x, y) <= 1
+
+
+def opponent_trapped(field, opp_pos, bomb_timer=BOMB_TIMER):
+    """
+    True if, assuming a bomb detonates at the opponent's current tile
+    (worst-case: they've just been cornered and bombed there), the opponent
+    cannot reach any tile outside that blast within `bomb_timer` steps.
+
+    Reuses get_blast_coords (same blast geometry as danger_map, so this
+    can't silently disagree with how danger is computed elsewhere). Ignores
+    other agents' bodies blocking the opponent's path (a mild
+    underestimate of how trapped they really are -- fine for a feature,
+    would need tightening for exact tournament-accurate danger).
+
+    Does not account for bombs already on the board independently of this
+    hypothetical one; a genuinely thorough version would merge with
+    danger_map, but that couples this function to the *current* danger
+    state rather than the "if I bomb them right now" hypothetical we
+    actually want here.
+    """
+    blast = set(get_blast_coords(opp_pos, field))
+    visited = {opp_pos: 0}
+    queue = deque([opp_pos])
+
+    while queue:
+        (x, y) = queue.popleft()
+        dist = visited[(x, y)]
+        if (x, y) not in blast:
+            return False  # found a safe tile reachable in time -> not trapped
+        if dist >= bomb_timer:
+            continue  # out of time to search further from here
+        for dx, dy in DIRECTION_VECTORS.values():
+            nx, ny = x + dx, y + dy
+            if _walkable(field, nx, ny) and (nx, ny) not in visited:
+                visited[(nx, ny)] = dist + 1
+                queue.append((nx, ny))
+
+    return True  # exhausted every reachable tile within the time window, all lethal
+
+
 # ---------------------------------------------------------------------------
 # Main entry point 1: flat feature vector for Model 1 (linear / boosted-tree)
 # ---------------------------------------------------------------------------
@@ -242,9 +330,9 @@ def state_to_features(game_state):
     feats[7:12] = _one_hot_direction(coin_dir)
     feats[12] = 0.0 if coin_dist is None else min(coin_dist, MAX_DIST_NORM) / MAX_DIST_NORM
 
-    # --- CRATE_DIR / CRATE_DIST (13-18) ---
-    crate_coords = list(zip(*np.where(field == 1)))
-    crate_dir, crate_dist = bfs_direction(game_state, crate_coords) if crate_coords else (None, None)
+    # --- CRATE_DIR / CRATE_DIST (13-18): route to a tile you can bomb a crate from ---
+    crate_targets = crate_approach_targets(field)
+    crate_dir, crate_dist = bfs_direction(game_state, crate_targets) if crate_targets else (None, None)
     feats[13:18] = _one_hot_direction(crate_dir)
     feats[18] = 0.0 if crate_dist is None else min(crate_dist, MAX_DIST_NORM) / MAX_DIST_NORM
 
@@ -259,18 +347,27 @@ def state_to_features(game_state):
     feats[19:24] = _one_hot_direction(safe_dir)
 
     # --- OPP_NEARBY / OPP_DIR / OPP_DIST / WOULD_HIT_OPPONENT (24-31) ---
+    # --- OPP_TRAPPED / OPP_NEAR_DEADEND (32-33), NEW ---
     others = game_state['others']
     opp_coords = [pos for (_, _, _, pos) in others]
     if opp_coords:
         opp_dir, opp_dist = bfs_direction(game_state, opp_coords)
-        manhattan_min = min(abs(sx - ox) + abs(sy - oy) for ox, oy in opp_coords)
+        # nearest opponent by Manhattan distance -- also used as the target
+        # for the two new trapped/dead-end features below, so they describe
+        # the SAME opponent that OPP_DIR/OPP_DIST point at.
+        nearest_opp = min(opp_coords, key=lambda p: abs(sx - p[0]) + abs(sy - p[1]))
+        manhattan_min = abs(sx - nearest_opp[0]) + abs(sy - nearest_opp[1])
         feats[24] = float(manhattan_min <= (2 * BOMB_POWER + 1))
         feats[25:30] = _one_hot_direction(opp_dir)
         feats[30] = 0.0 if opp_dist is None else min(opp_dist, MAX_DIST_NORM) / MAX_DIST_NORM
         blast_if_bombed_here = set(get_blast_coords((sx, sy), field))
         feats[31] = float(bool(blast_if_bombed_here & set(opp_coords)))
-    # else: leave OPP_* block as zeros / NONE-implicit (index 29 stays 0 too —
-    # acceptable since OPP_NEARBY=0 already signals "no opponents visible")
+
+        feats[32] = float(opponent_trapped(field, nearest_opp))
+        feats[33] = float(is_dead_end(field, *nearest_opp))
+    # else: leave OPP_* and OPP_TRAPPED/OPP_NEAR_DEADEND as zeros / NONE-implicit
+    # (index 29 stays 0 too — acceptable since OPP_NEARBY=0 already signals
+    # "no opponents visible", and trapped/dead-end are meaningless without one)
 
     return feats
 
@@ -284,6 +381,12 @@ def state_to_channels(game_state):
     Channel order (see CHANNEL_NAMES): walls, crates, coins, self, others,
     bomb_danger (normalized), explosion (normalized).
     Returns None only if game_state is None.
+
+    NOTE: unaffected by the OPP_TRAPPED/OPP_NEAR_DEADEND addition -- those
+    are scalar features for Model 1 only. If Model 2 wants this signal too,
+    it would need a new spatial channel; not added here since it wasn't
+    requested and changing N_CHANNELS has the same "retrain from scratch"
+    cost as changing FEATURE_DIM did -- flag to Person B before doing it.
     """
     if game_state is None:
         return None
