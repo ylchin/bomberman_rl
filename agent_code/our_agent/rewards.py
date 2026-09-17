@@ -13,7 +13,7 @@ import events as e
 from .features import (
     DIRECTIONS, DIRECTION_VECTORS,
     danger_map, get_blast_coords, bfs_direction, crate_approach_targets,
-    MAX_DIST_NORM,
+    opponent_trapped, MAX_DIST_NORM,
 )
 
 # ---------------------------------------------------------------------------
@@ -195,8 +195,11 @@ def potential(game_state):
       + closeness to the nearest reachable coin        (weight 1.0)
       + closeness to a tile from which a crate can be bombed, only when no
         coin is currently visible                       (weight 0.5)
+      + closeness to the nearest opponent               (weight 1.0, Tasks 3-4)
+      + a flat bonus while that opponent is currently trapped -- reuses
+        features.opponent_trapped so "worth attacking now" can never
+        silently disagree between the feature and the reward
       - being in a blast path, scaled by how soon it detonates
-    Extend with an opponent term for Tasks 3-4.
     """
     if game_state is None:
         return 0.0
@@ -216,6 +219,16 @@ def potential(game_state):
             _, dist = bfs_direction(game_state, crate_tiles)
             if dist is not None:
                 phi += 0.5 * (1.0 - min(dist, MAX_DIST_NORM) / MAX_DIST_NORM)
+
+    others = game_state["others"]
+    if others:
+        opp_coords = [p for (_, _, _, p) in others]
+        _, opp_dist = bfs_direction(game_state, opp_coords)
+        if opp_dist is not None:
+            phi += 1.0 - min(opp_dist, MAX_DIST_NORM) / MAX_DIST_NORM
+        nearest_opp = min(opp_coords, key=lambda p: abs(pos[0] - p[0]) + abs(pos[1] - p[1]))
+        if opponent_trapped(field, nearest_opp):
+            phi += 1.5  # kill opportunity right now -- worth a strong nudge
 
     dmap = danger_map(game_state)
     d = dmap[pos]

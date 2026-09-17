@@ -74,6 +74,28 @@ PRESETS = {
         # penalties together -- official eval coins 28.1 -> 9.7, reverted.
         # This is the confirmed-good config. Retry the ideas one at a time.
     ),
+    "task3": dict(               # classic vs peaceful_agent + coin_collector_agent
+        gamma=0.97,
+        n_step=4,               # approach -> corner -> bomb -> escape -> kill is a longer chain
+        alpha=0.02, alpha_end=0.004,
+        eps_end=0.05,           # opponents move -- keep more exploration than task2
+        eps_decay_episodes=2000,
+        buffer_capacity=200_000,
+        save_every=50,
+        # needs FEATURE_DIM=34 (OPP_TRAPPED/OPP_NEAR_DEADEND) -- first preset
+        # that does. Any checkpoint trained before the opponent-features
+        # merge (2026-09-17) is 32-dim and will NOT load under this preset.
+        #
+        # 2026-09-17: 4000 rounds -> eval coins 0.75/9, 8% kill rate, 3%
+        # self-kill. Doubled to 8000 rounds (everything else identical):
+        # coins 1.09/9, 6% kill rate, but self-kill worsened to 6% -- and
+        # the training curve plateaued by ep~4000-5000, so the back half of
+        # the run bought almost nothing. Same lesson as Task 2: more time
+        # isn't the lever here. Still far short of the win-rate targets
+        # (>=70% vs peaceful_agent, >=55% vs coin_collector_agent) --
+        # next step is a reward/feature tuning pass (single variable at a
+        # time), not more rounds.
+    ),
 }
 
 _preset = os.environ.get("AGENT_PRESET", "").strip()
