@@ -34,9 +34,20 @@ def setup_training(self):
     cfg = TRAIN
     self.t = cfg  # shorthand
 
+    if MODEL == "net":
+        from .model_net import INPUT_DIM, encode_state, transform_input
+        self.feature_dim = INPUT_DIM
+        self.encode_state = encode_state
+        self.transform_input = transform_input
+    else:
+        from .symmetry import apply_to_features
+        self.feature_dim = FEATURE_DIM
+        self.encode_state = state_to_features
+        self.transform_input = apply_to_features
+
     self.buffer = ReplayBuffer(
         capacity=cfg["buffer_capacity"],
-        feature_dim=FEATURE_DIM,
+        feature_dim=self.feature_dim,
         rng=self.rng,
         alpha=cfg["priority_alpha"],
     )
@@ -81,7 +92,7 @@ def game_events_occurred(self, old_game_state, self_action, new_game_state, even
     reward = reward_from_events(events, self.logger)
     reward += potential_shaping(old_game_state, new_game_state, self.t["gamma"])
 
-    phi = state_to_features(old_game_state)
+    phi = self.encode_state(old_game_state)
     self.traj.append((phi, _ACTION_ID[self_action], reward))
     self.ep_reward += reward
     self.ep_counts.update(events)
@@ -102,7 +113,7 @@ def end_of_round(self, last_game_state, last_action, events):
     if died or not survived or not self.traj:
         reward = reward_from_events(events, self.logger)   # terminal: no shaping term
         if last_action is not None:
-            phi = state_to_features(last_game_state)
+            phi = self.encode_state(last_game_state)
             self.traj.append((phi, _ACTION_ID[last_action], reward))
         self.ep_reward += reward
         self.ep_counts.update(events)
@@ -176,7 +187,7 @@ def _flush_episode_to_buffer(self):
     if T == 0:
         return
     gamma, k = self.t["gamma"], self.t["n_step"]
-    zeros = np.zeros(FEATURE_DIM, dtype=np.float32)
+    zeros = np.zeros(self.feature_dim, dtype=np.float32)
 
     for t in range(T):
         R, discount = 0.0, 1.0
@@ -203,10 +214,10 @@ def _push(self, phi, a, R, boot_phi, boot_a, done):
             if op == (False, 0):
                 continue
             self.buffer.push(
-                self._sym.apply_to_features(phi, op),
+                self.transform_input(phi, op),
                 self._sym.apply_to_action(a, op),
                 R,
-                self._sym.apply_to_features(boot_phi, op),
+                self.transform_input(boot_phi, op),
                 self._sym.apply_to_action(boot_a, op),
                 done,
                 ep,

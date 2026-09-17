@@ -13,9 +13,10 @@ The chosen preset name is recorded in the training log so any run is reproducibl
 
 import os
 
-# which model the agent runs. "linear" is the only one wired up so far;
-# "net" / "forest" land later and read the same TRAIN block where it applies.
-MODEL = "linear"
+# Select Model 1 (linear) or Model 2 (convolutional Double DQN).
+MODEL = os.environ.get("AGENT_MODEL", "linear").strip()
+if MODEL not in ("linear", "net"):
+    raise ValueError("AGENT_MODEL must be linear or net")
 
 # path (relative to the agent dir -- cwd is set there by the framework) where
 # act() loads weights from when self.train is False.
@@ -52,6 +53,8 @@ TRAIN = dict(
 
     # --- bookkeeping ---
     resume=False,            # True = keep training the existing checkpoint
+    init_checkpoint=os.environ.get("AGENT_INIT_CHECKPOINT", "").strip(),
+    seed=int(os.environ["AGENT_SEED"]) if "AGENT_SEED" in os.environ else None,
     save_every=25,           # checkpoint every N episodes (also always at the end)
     log_csv="training_log.csv",
     preset="task1",          # overwritten below when AGENT_PRESET is set
@@ -72,7 +75,6 @@ PRESETS = {
         save_every=50,
         # 2026-09-17: tried n_step=5 + use_symmetry=True + doubled escape
         # penalties together -- official eval coins 28.1 -> 9.7, reverted.
-        # This is the confirmed-good config. Retry the ideas one at a time.
     ),
     "task3": dict(               # classic vs peaceful_agent + coin_collector_agent
         gamma=0.97,
@@ -83,18 +85,12 @@ PRESETS = {
         buffer_capacity=200_000,
         save_every=50,
         # needs FEATURE_DIM=34 (OPP_TRAPPED/OPP_NEAR_DEADEND) -- first preset
-        # that does. Any checkpoint trained before the opponent-features
-        # merge (2026-09-17) is 32-dim and will NOT load under this preset.
+        # that does. AGENT_INIT_CHECKPOINT explicitly permits padding old 32-dim weights.
         #
         # 2026-09-17: 4000 rounds -> eval coins 0.75/9, 8% kill rate, 3%
         # self-kill. Doubled to 8000 rounds (everything else identical):
         # coins 1.09/9, 6% kill rate, but self-kill worsened to 6% -- and
-        # the training curve plateaued by ep~4000-5000, so the back half of
-        # the run bought almost nothing. Same lesson as Task 2: more time
-        # isn't the lever here. Still far short of the win-rate targets
-        # (>=70% vs peaceful_agent, >=55% vs coin_collector_agent) --
-        # next step is a reward/feature tuning pass (single variable at a
-        # time), not more rounds.
+        # the training curve plateaued by ep~4000-5000.
     ),
 }
 
@@ -106,9 +102,20 @@ if _preset:
     TRAIN["preset"] = _preset
 
 # keep each task's training log + checkpoint separate so parallel runs don't clash
-TRAIN["log_csv"] = f"training_{TRAIN['preset']}.csv"
-TRAIN["weights_out"] = f"weights/q_{MODEL}_{TRAIN['preset']}.pkl"          # always the LATEST episode
-TRAIN["best_weights_out"] = f"weights/q_{MODEL}_{TRAIN['preset']}_best.pkl"  # best rolling-avg-coins seen so far
+_run_name = os.environ.get("AGENT_RUN", TRAIN["preset"]).strip()
+if not _run_name or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-" for c in _run_name):
+    raise ValueError("AGENT_RUN must contain only letters, digits, underscores or hyphens")
+if MODEL == "net":
+    # Spatial replay needs substantially more memory than flat features.
+    TRAIN.update(alpha=1e-4, alpha_end=1e-4, batch_size=64,
+                 buffer_capacity=10_000, target_update_every=500,
+                 grad_clip=10.0, torch_threads=1,
+                 device=os.environ.get("AGENT_DEVICE", "cpu"))
+_extension = "pt" if MODEL == "net" else "pkl"
+_log_prefix = "training_net" if MODEL == "net" else "training"
+TRAIN["log_csv"] = f"{_log_prefix}_{_run_name}.csv"
+TRAIN["weights_out"] = f"weights/q_{MODEL}_{_run_name}.{_extension}"
+TRAIN["best_weights_out"] = f"weights/q_{MODEL}_{_run_name}_best.{_extension}"
 
 # What callbacks.act() loads in eval / tournament mode: prefer the best
 # checkpoint (a training run can get WORSE after a bad hyperparameter change
