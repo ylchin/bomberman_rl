@@ -15,6 +15,8 @@ import numpy as np
 from .features import ACTIONS, state_to_features
 from . import config
 
+STUCK_AFTER = 2  # consecutive ineffective repeats of the same move before we force a change
+
 
 def setup(self):
     """
@@ -51,6 +53,9 @@ def setup(self):
 
     # act() reads this; train.py keeps it up to date during training.
     self.epsilon = 0.0
+    self._last_pos = None
+    self._last_action_id = None
+    self._repeat_count = 0
 
 
 def act(self, game_state: dict) -> str:
@@ -58,11 +63,40 @@ def act(self, game_state: dict) -> str:
     if phi is None:
         return "WAIT"
 
+    if game_state["step"] == 1:
+        # new round -- don't compare across the round boundary
+        self._last_pos = None
+        self._repeat_count = 0
+
     if self.train:
         beta = config.TRAIN["softmax_beta"]
         action_id = self.model.act(phi, epsilon=self.epsilon, beta=beta, rng=self.rng)
     else:
         action_id = self.model.act(phi, epsilon=0.0, rng=self.rng)
+
+    # Safety net: a greedy (eps=0) policy that picks an action the game rejects
+    # (wall/crate/out of bounds) sees an unchanged game_state next step, so it
+    # picks the exact same losing action again -- forever, silently, at score 0.
+    # If we're about to repeat a move that already failed to move us last step,
+    # break the loop with a random action instead of trusting the model again.
+    pos = game_state["self"][3]
+    ineffective_repeat = (
+        pos == self._last_pos
+        and action_id == self._last_action_id
+        and ACTIONS[action_id] != "WAIT"
+    )
+    self._repeat_count = self._repeat_count + 1 if ineffective_repeat else 0
+    if self._repeat_count >= STUCK_AFTER:
+        stuck_on = ACTIONS[action_id]
+        action_id = int(self.rng.integers(len(ACTIONS)))
+        self.logger.warning(
+            f"step {game_state['step']}: stuck at {pos} repeating {stuck_on!r} "
+            f"with no effect; forcing random action {ACTIONS[action_id]!r} instead"
+        )
+        self._repeat_count = 0
+
+    self._last_pos = pos
+    self._last_action_id = action_id
 
     action = ACTIONS[action_id]
     self.logger.debug(f"step {game_state['step']}: {action} (eps={getattr(self, 'epsilon', 0):.2f})")
