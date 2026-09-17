@@ -61,7 +61,29 @@ GAME_REWARDS = {
     ESCAPED_DANGER: 0.30,
     BOMB_NEXT_TO_CRATE: 0.05,
     USELESS_BOMB: -0.10,
-    BOMB_WITH_NO_ESCAPE: -0.40,
+    BOMB_WITH_NO_ESCAPE: -0.55,
+    # Tried doubling these (0.60/0.45/0.80) + n_step=5 + symmetry together on
+    # 2026-09-17: official eval coins dropped 28.1 -> 9.7, training curve
+    # plateaued at ep~3000/8000. Reverted. If retrying, change ONE of these
+    # three things at a time so a regression is attributable.
+    #
+    # 2026-09-17, second finding: with -0.40 unchanged, more training time
+    # alone (3000 -> 6000 rounds, nothing else changed) raised coins
+    # 35.55->37.90 but self-kill 6%->11% -- self-kill is a structural issue,
+    # not an undertraining issue.
+    #
+    # 2026-09-17, third: -0.40 -> -0.55 alone (n_step=3, no symmetry, 3000
+    # rounds, otherwise = baseline): coins 35.55->37.42, self-kill 6%->4%.
+    # Both moved the right way together -- confirmed single-variable win.
+    #
+    # 2026-09-17, fourth: pushed -0.55 -> -0.70. Self-kill kept improving
+    # (4%->1%) but coins collapsed 37.42->21.98 (variance 11.9->18.6) --
+    # model got too bomb-shy to clear crates. Overshoot. REVERTED to -0.55,
+    # the best coins/safety point found on this single lever. Neither -0.55
+    # nor -0.70 clears both exit-criteria thresholds simultaneously (<2%
+    # self-kill AND >=40/50 coins) -- this axis alone won't get there; the
+    # remaining self-kill gap likely needs a feature/execution fix (better
+    # escape routing), not just a bigger penalty. -0.55 is current best.
 }
 
 
