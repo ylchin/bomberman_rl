@@ -23,27 +23,51 @@ def setup(self):
     self.train is set by the framework. When training, train.setup_training()
     runs right after this and may replace self.model with a fresh one.
     """
-    self.rng = np.random.default_rng()
+    self.rng = np.random.default_rng(config.TRAIN.get("seed"))
     self.cfg = config
     self.model_kind = config.MODEL
 
-    if self.model_kind != "linear":
-        raise NotImplementedError(f"model kind {self.model_kind!r} not wired up yet")
-    from .q_linear import LinearQ
+    if self.model_kind == "net":
+        from .model_net import NetQ, encode_state
+        options = {key: config.TRAIN[key] for key in (
+            "seed", "device", "target_update_every", "grad_clip", "torch_threads")}
+        create_model = lambda: NetQ(**options)
+        load_model = lambda path, initialize=False: NetQ.load(
+            path, training=self.train and not initialize, **options)
+        self.encode_state = encode_state
+    else:
+        from .q_linear import LinearQ
+        create_model = LinearQ
+        load_model = lambda path, initialize=False: LinearQ.load(
+            path, allow_legacy_padding=initialize)
+        self.encode_state = state_to_features
 
     if self.train:
         resume_path = config.TRAIN["weights_out"]
-        if config.TRAIN["resume"] and os.path.isfile(resume_path):
-            self.logger.info(f"Resuming LinearQ from {resume_path}.")
-            self.model = LinearQ.load(resume_path)
+        init_checkpoint = config.TRAIN.get("init_checkpoint")
+        if config.TRAIN["resume"] and init_checkpoint:
+            raise ValueError("Choose resume or init_checkpoint, not both")
+        if init_checkpoint:
+            for output in (resume_path, config.TRAIN["best_weights_out"]):
+                if os.path.abspath(init_checkpoint) == os.path.abspath(output):
+                    raise ValueError("Initialization checkpoint must differ from output checkpoints")
+                if os.path.exists(output):
+                    raise FileExistsError(f"Training output already exists: {output}. Set a new AGENT_RUN.")
+            if os.path.exists(config.TRAIN["log_csv"]):
+                raise FileExistsError("Training log already exists. Set a new AGENT_RUN.")
+            self.logger.info(f"Initializing {self.model_kind} from checkpoint {init_checkpoint}.")
+            self.model = load_model(init_checkpoint, initialize=True)
+        elif config.TRAIN["resume"]:
+            self.logger.info(f"Loading {self.model_kind} for further training from {resume_path}.")
+            self.model = load_model(resume_path)
         else:
-            self.logger.info("Fresh LinearQ model.")
-            self.model = LinearQ()
+            self.logger.info(f"Fresh {self.model_kind} model.")
+            self.model = create_model()
     else:
         for path in config.EVAL_WEIGHTS:
             if os.path.isfile(path):
-                self.logger.info(f"Loading LinearQ from {path}.")
-                self.model = LinearQ.load(path)
+                self.logger.info(f"Loading {self.model_kind} from {path}.")
+                self.model = load_model(path)
                 break
         else:
             raise FileNotFoundError(
@@ -59,7 +83,7 @@ def setup(self):
 
 
 def act(self, game_state: dict) -> str:
-    phi = state_to_features(game_state)
+    phi = self.encode_state(game_state)
     if phi is None:
         return "WAIT"
 
