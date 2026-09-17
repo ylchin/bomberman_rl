@@ -68,8 +68,11 @@ PRESETS = {
         alpha=0.02, alpha_end=0.004,
         eps_end=0.03,           # more residual exploration: bombing must keep being tried
         eps_decay_episodes=1500,
-        buffer_capacity=200_000,  # ~400-step episodes fill the buffer ~3x faster
+        buffer_capacity=200_000,
         save_every=50,
+        # 2026-09-17: tried n_step=5 + use_symmetry=True + doubled escape
+        # penalties together -- official eval coins 28.1 -> 9.7, reverted.
+        # This is the confirmed-good config. Retry the ideas one at a time.
     ),
 }
 
@@ -82,9 +85,12 @@ if _preset:
 
 # keep each task's training log + checkpoint separate so parallel runs don't clash
 TRAIN["log_csv"] = f"training_{TRAIN['preset']}.csv"
-TRAIN["weights_out"] = f"weights/q_{MODEL}_{TRAIN['preset']}.pkl"
+TRAIN["weights_out"] = f"weights/q_{MODEL}_{TRAIN['preset']}.pkl"          # always the LATEST episode
+TRAIN["best_weights_out"] = f"weights/q_{MODEL}_{TRAIN['preset']}_best.pkl"  # best rolling-avg-coins seen so far
 
-# What callbacks.act() loads in eval / tournament mode: the preset-specific
-# checkpoint if it exists, else the stable path (copy your final model there
-# before submitting:  cp weights/q_linear_task4.pkl weights/q_linear.pkl).
-EVAL_WEIGHTS = [TRAIN["weights_out"], WEIGHTS_FILE[MODEL]]
+# What callbacks.act() loads in eval / tournament mode: prefer the best
+# checkpoint (a training run can get WORSE after a bad hyperparameter change
+# -- this bit us once already, don't silently ship the latest instead of the
+# best), then the latest, then the stable path (copy your final model there
+# before submitting:  cp weights/q_linear_task4_best.pkl weights/q_linear.pkl).
+EVAL_WEIGHTS = [TRAIN["best_weights_out"], TRAIN["weights_out"], WEIGHTS_FILE[MODEL]]

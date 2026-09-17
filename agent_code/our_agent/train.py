@@ -15,7 +15,8 @@ end_of_round. See config.TRAIN for every knob.
 
 import csv
 import os
-from collections import Counter
+import shutil
+from collections import Counter, deque
 
 import numpy as np
 
@@ -51,6 +52,9 @@ def setup_training(self):
 
     os.makedirs("weights", exist_ok=True)
     self._weights_path = cfg["weights_out"]
+    self._best_weights_path = cfg["best_weights_out"]
+    self._best_coins_avg = -1.0
+    self._recent_coins = deque(maxlen=100)  # rolling window used to detect "best so far"
     self._csv_path = cfg["log_csv"]
     _csv_header(self._csv_path)
 
@@ -114,9 +118,8 @@ def end_of_round(self, last_game_state, last_action, events):
     _learn(self, n_iters=self.t["learn_iters_end"])
 
     self.episode += 1
-    if self.episode % self.t["save_every"] == 0:
-        self.model.save(self._weights_path)
     self.model.save(self._weights_path)  # always keep the latest
+    _update_best_checkpoint(self)
 
     _write_csv_row(self, last_game_state)
 
@@ -131,6 +134,27 @@ def end_of_round(self, last_game_state, last_action, events):
 # ---------------------------------------------------------------------------
 # internals
 # ---------------------------------------------------------------------------
+def _update_best_checkpoint(self):
+    """
+    Keep a `*_best.pkl` copy of the checkpoint whose trailing-100-episode
+    average coins is the best seen so far, alongside the always-overwritten
+    `*_latest.pkl`. A run CAN get worse after it was already good (bad
+    hyperparameter change, late-training instability) -- without this, the
+    only checkpoint on disk is whatever the run happened to end on.
+    Uses training-time coins (epsilon > 0, so noisier than a real eval) as a
+    cheap proxy -- it's for "don't lose a good run", not a substitute for
+    evaluate.py before actually shipping a model.
+    """
+    self._recent_coins.append(self.ep_counts[e.COIN_COLLECTED])
+    if len(self._recent_coins) < self._recent_coins.maxlen:
+        return  # not enough history yet to trust the average
+    avg = sum(self._recent_coins) / len(self._recent_coins)
+    if avg > self._best_coins_avg:
+        self._best_coins_avg = avg
+        shutil.copyfile(self._weights_path, self._best_weights_path)
+        self.logger.info(f"new best checkpoint: {avg:.1f} avg coins/ep (last 100) -> {self._best_weights_path}")
+
+
 def _epsilon(self, episode):
     c = TRAIN
     frac = min(1.0, episode / max(1, c["eps_decay_episodes"]))
