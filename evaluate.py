@@ -1,10 +1,10 @@
 """
 evaluate.py
 
-Headless evaluation harness (Person A). Runs a fixed, documented set of
+Headless evaluation harness . Runs a fixed, documented set of
 seeded rounds against a chosen opponent lineup and writes one CSV row per
 round, so every claimed improvement in the report is measured identically
-(assignment Sec. 04: held-out seeds, >=100 rounds, exploration off,
+(project evaluation protocol: held-out seeds, >=100 rounds, exploration off,
 original settings.py, no auxiliary reward -- true game score only).
 
 Confirmed against a real --save-stats output (2026-09-12):
@@ -22,13 +22,14 @@ NOTE: by_round is a TOTAL across all agents in that round, not per-agent --
 it cannot tell you how YOUR agent specifically did. by_agent is the primary
 source for per-agent metrics (score/coins/self-kill for `our_agent`); the
 by_round totals are pulled in as extra context columns (round_total_*).
-There is no per-agent "kills" field -- score = coins*1 + kills*5 (assignment
-Sec. 3), so per-agent kills is derived as (score - coins) / 5.
+Per-agent "kills" is used when present; older stats can derive it from
+score = coins*1 + kills*5 (assignment Sec. 3).
 
 CSV columns (fixed -- do not rename without updating downstream plotting):
     seed, round, task, agent_name, score, coins, kills, self_kill,
     steps_survived, invalid_actions, round_total_coins, round_total_kills,
-    round_total_suicides
+    round_total_suicides, opponent_scores (JSON), max_opponent_score,
+    score_margin, win, tie, loss (blank for solo games)
 
 Usage:
     # ad-hoc scenario/opponents
@@ -45,6 +46,7 @@ Usage:
 import argparse
 import csv
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -56,6 +58,7 @@ CSV_COLUMNS = [
     "seed", "round", "task", "agent_name", "score", "coins", "kills", "self_kill",
     "steps_survived", "invalid_actions",
     "round_total_coins", "round_total_kills", "round_total_suicides",
+    "opponent_scores", "max_opponent_score", "score_margin", "win", "tie", "loss",
 ]
 
 # ---------------------------------------------------------------------------
@@ -88,7 +91,7 @@ TASK_PRESETS = {
 }
 
 
-def run_single_seed(agent: str, opponents: list, scenario: str, seed: int) -> Path:
+def run_single_seed(agent: str, opponents: list, scenario: str, seed: int, checkpoint=None) -> Path:
     """
     Runs one seeded, single-round game with --agents (agent first, then
     opponents -- empty opponents list is valid, for solo Task 1/2 runs) and
@@ -107,7 +110,11 @@ def run_single_seed(agent: str, opponents: list, scenario: str, seed: int) -> Pa
         "--save-stats", str(stats_path),
     ]
 
-    proc = subprocess.run(cmd, cwd=REPO_ROOT, capture_output=True, text=True)
+    env = os.environ.copy()
+    env["AGENT_SEED"] = str(seed)  # our_agent RNG; supplied opponents remain stochastic
+    if checkpoint is not None:
+        env["AGENT_EVAL_CHECKPOINT"] = str(Path(checkpoint).resolve())
+    proc = subprocess.run(cmd, cwd=REPO_ROOT, capture_output=True, text=True, env=env)
     if proc.returncode != 0:
         raise RuntimeError(
             f"main.py exited with code {proc.returncode} for seed {seed}.\n"
@@ -126,16 +133,21 @@ def parse_result_file(path: Path, agent_name: str, seed: int, round_num: int, ta
         data = json.load(f)
 
     by_agent = data.get("by_agent", {})
-    agent_data = by_agent.get(agent_name) or by_agent.get(f"{agent_name}_0")
-    if agent_data is None:
+    agent_key = agent_name if agent_name in by_agent else f"{agent_name}_0"
+    if agent_key not in by_agent:
         raise KeyError(
             f"agent '{agent_name}' not found in by_agent keys: {list(by_agent.keys())}"
         )
+    agent_data = by_agent[agent_key]
+    opponent_scores = {name: stats.get("score", 0)
+                       for name, stats in by_agent.items() if name != agent_key}
 
     score = agent_data.get("score", 0)
     coins = agent_data.get("coins", 0)      # key absent when 0
-    kills = round((score - coins) / 5)      # score = coins*1 + kills*5 (assignment Sec.3)
+    kills = agent_data.get("kills", round((score - coins) / 5))
     self_kill = int(agent_data.get("suicides", 0) > 0)  # key absent when 0
+    max_opponent_score = max(opponent_scores.values()) if opponent_scores else ""
+    margin = score - max_opponent_score if opponent_scores else ""
 
     by_round = data.get("by_round", {})
     round_totals = next(iter(by_round.values()), {}) if by_round else {}
@@ -149,6 +161,12 @@ def parse_result_file(path: Path, agent_name: str, seed: int, round_num: int, ta
         "coins": coins,
         "kills": kills,
         "self_kill": self_kill,
+        "opponent_scores": json.dumps(opponent_scores, sort_keys=True),
+        "max_opponent_score": max_opponent_score,
+        "score_margin": margin,
+        "win": int(margin > 0) if opponent_scores else "",
+        "tie": int(margin == 0) if opponent_scores else "",
+        "loss": int(margin < 0) if opponent_scores else "",
         "steps_survived": agent_data.get("steps", 0),
         "invalid_actions": agent_data.get("invalid", 0),
         "round_total_coins": round_totals.get("coins", ""),
@@ -158,12 +176,13 @@ def parse_result_file(path: Path, agent_name: str, seed: int, round_num: int, ta
 
 
 def run_evaluation(agent, opponents, scenario, n_rounds, seed_start, out_csv: Path,
-                    task=None, keep_stats_files: bool = False) -> Path:
+                    task=None, keep_stats_files: bool = False, checkpoint=None) -> Path:
     """
     Runs n_rounds separate seeded games (seed_start, seed_start+1, ...) and
     writes every round's result as one CSV row. Re-running with the same
-    seed_start reproduces the identical evaluation -- this IS the
-    held-out-seed protocol: always evaluate this way, never compare runs
+    seed_start reproduces world seeds; supplied opponents use independent
+    unseeded randomness, so repeat evaluations to measure that variation.
+    Follow the held-out-seed protocol: never compare runs
     on different seeds or eyeball a single game.
     """
     out_csv.parent.mkdir(parents=True, exist_ok=True)
@@ -171,7 +190,7 @@ def run_evaluation(agent, opponents, scenario, n_rounds, seed_start, out_csv: Pa
 
     for i in range(n_rounds):
         seed = seed_start + i
-        stats_path = run_single_seed(agent, opponents, scenario, seed)
+        stats_path = run_single_seed(agent, opponents, scenario, seed, checkpoint=checkpoint)
         row = parse_result_file(stats_path, agent, seed, round_num=i, task=task)
         rows.append(row)
         print(f"[{i + 1}/{n_rounds}] seed={seed} score={row['score']} "
@@ -207,6 +226,14 @@ def summarize(csv_path: Path):
     print(f"mean coins:      {st.mean(coins):.2f}")
     print(f"mean kills:      {st.mean(kills):.2f}")
     print(f"self-kill rate:  {100 * st.mean(self_kills):.1f}%")
+    competitive = [r for r in rows if r.get("win", "") != ""]
+    if competitive:
+        for field in ("win", "tie", "loss"):
+            rate = st.mean(int(r[field]) for r in competitive)
+            print(f"{field} rate:       {100 * rate:.1f}%")
+        print("Wins strictly exceed every opponent's score; ties share the top score.")
+    else:
+        print("win rate:       unavailable (solo run or legacy CSV without opponent scores)")
 
 
 def main():
@@ -224,6 +251,8 @@ def main():
                          help="Overrides the task preset's seed range if given. "
                               "Never reuse a seed also used during training.")
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--checkpoint", type=Path, default=None,
+                         help="Evaluate this exact checkpoint instead of config's best/latest fallback.")
     parser.add_argument("--keep-stats-files", action="store_true",
                          help="Keep the per-seed raw JSON in results/ instead of deleting after parsing.")
     args = parser.parse_args()
@@ -241,7 +270,7 @@ def main():
     csv_path = run_evaluation(
         agent=args.agent, opponents=opponents, scenario=scenario,
         n_rounds=args.n_rounds, seed_start=seed_start, out_csv=args.out,
-        task=args.task, keep_stats_files=args.keep_stats_files,
+        task=args.task, keep_stats_files=args.keep_stats_files, checkpoint=args.checkpoint,
     )
     summarize(csv_path)
 

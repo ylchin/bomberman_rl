@@ -55,7 +55,7 @@ TRAIN = dict(
     resume=False,            # True = keep training the existing checkpoint
     init_checkpoint=os.environ.get("AGENT_INIT_CHECKPOINT", "").strip(),
     seed=int(os.environ["AGENT_SEED"]) if "AGENT_SEED" in os.environ else None,
-    save_every=25,           # checkpoint every N episodes (also always at the end)
+    save_every=25,           # preserve a candidate checkpoint every N episodes for validation
     log_csv="training_log.csv",
     preset="task1",          # overwritten below when AGENT_PRESET is set
 )
@@ -116,10 +116,23 @@ _log_prefix = "training_net" if MODEL == "net" else "training"
 TRAIN["log_csv"] = f"{_log_prefix}_{_run_name}.csv"
 TRAIN["weights_out"] = f"weights/q_{MODEL}_{_run_name}.{_extension}"
 TRAIN["best_weights_out"] = f"weights/q_{MODEL}_{_run_name}_best.{_extension}"
+TRAIN["candidate_dir"] = f"weights/candidates/{MODEL}_{_run_name}"
 
-# What callbacks.act() loads in eval / tournament mode: prefer the best
-# checkpoint (a training run can get WORSE after a bad hyperparameter change
-# -- this bit us once already, don't silently ship the latest instead of the
-# best), then the latest, then the stable path (copy your final model there
-# before submitting:  cp weights/q_linear_task4_best.pkl weights/q_linear.pkl).
-EVAL_WEIGHTS = [TRAIN["best_weights_out"], TRAIN["weights_out"], WEIGHTS_FILE[MODEL]]
+# Evaluation checkpoint selection.
+# During experiments with an explicit run/preset, prefer that run's best model.
+# In tournament/submission mode, where no environment variables are supplied,
+# always load the stable submission checkpoint only.
+_eval_override = os.environ.get("AGENT_EVAL_CHECKPOINT", "").strip()
+_explicit_run = os.environ.get("AGENT_RUN", "").strip()
+_explicit_preset = os.environ.get("AGENT_PRESET", "").strip()
+
+if _eval_override:
+    EVAL_WEIGHTS = [_eval_override]
+elif _explicit_run or _explicit_preset:
+    EVAL_WEIGHTS = [
+        TRAIN["best_weights_out"],
+        TRAIN["weights_out"],
+        WEIGHTS_FILE[MODEL],
+    ]
+else:
+    EVAL_WEIGHTS = [WEIGHTS_FILE[MODEL]]

@@ -64,8 +64,8 @@ def setup_training(self):
     os.makedirs("weights", exist_ok=True)
     self._weights_path = cfg["weights_out"]
     self._best_weights_path = cfg["best_weights_out"]
-    self._best_coins_avg = -1.0
-    self._recent_coins = deque(maxlen=100)  # rolling window used to detect "best so far"
+    self._best_checkpoint_key = None
+    self._recent_metrics = deque(maxlen=100)  # task-aware rolling proxy; final choice uses validation
     self._csv_path = cfg["log_csv"]
     _csv_header(self._csv_path)
 
@@ -88,7 +88,10 @@ def game_events_occurred(self, old_game_state, self_action, new_game_state, even
     if old_game_state is None or self_action is None:
         return
 
-    events = list(events) + detect_custom_events(old_game_state, self_action, new_game_state)
+    framework_events = list(events)
+    events = framework_events + detect_custom_events(
+        old_game_state, self_action, new_game_state, framework_events
+    )
     reward = reward_from_events(events, self.logger)
     reward += potential_shaping(old_game_state, new_game_state, self.t["gamma"])
 
@@ -130,6 +133,7 @@ def end_of_round(self, last_game_state, last_action, events):
 
     self.episode += 1
     self.model.save(self._weights_path)  # always keep the latest
+    _save_periodic_candidate(self)
     _update_best_checkpoint(self)
 
     _write_csv_row(self, last_game_state)
@@ -145,25 +149,59 @@ def end_of_round(self, last_game_state, last_action, events):
 # ---------------------------------------------------------------------------
 # internals
 # ---------------------------------------------------------------------------
+def _save_periodic_candidate(self):
+    """Preserve validation candidates; `save_every` used to be configured but unused."""
+    every = int(self.t.get("save_every", 0) or 0)
+    if every <= 0 or self.episode % every != 0:
+        return
+    candidate_dir = self.t.get("candidate_dir", "weights/candidates")
+    os.makedirs(candidate_dir, exist_ok=True)
+    _, ext = os.path.splitext(self._weights_path)
+    path = os.path.join(candidate_dir, f"ep_{self.episode:05d}{ext}")
+    shutil.copyfile(self._weights_path, path)
+    self.logger.info(f"saved validation candidate -> {path}")
+
+
 def _update_best_checkpoint(self):
     """
-    Keep a `*_best.pkl` copy of the checkpoint whose trailing-100-episode
-    average coins is the best seen so far, alongside the always-overwritten
-    `*_latest.pkl`. A run CAN get worse after it was already good (bad
-    hyperparameter change, late-training instability) -- without this, the
-    only checkpoint on disk is whatever the run happened to end on.
-    Uses training-time coins (epsilon > 0, so noisier than a real eval) as a
-    cheap proxy -- it's for "don't lose a good run", not a substitute for
-    evaluate.py before actually shipping a model.
+    Keep a cheap training-time best checkpoint without pretending it is final
+    model selection. Task 1/2 prioritise coins; Task 3/4 prioritise true game
+    score (coins + 5*kills), then kills, then lower self-kill rate, then coins.
+
+    Because epsilon is non-zero during training, use the periodic candidates +
+    validate_checkpoints.py for the final choice on separate validation seeds.
     """
-    self._recent_coins.append(self.ep_counts[e.COIN_COLLECTED])
-    if len(self._recent_coins) < self._recent_coins.maxlen:
-        return  # not enough history yet to trust the average
-    avg = sum(self._recent_coins) / len(self._recent_coins)
-    if avg > self._best_coins_avg:
-        self._best_coins_avg = avg
+    metrics = (
+        self.ep_counts[e.COIN_COLLECTED],
+        self.ep_counts[e.KILLED_OPPONENT],
+        int(self.ep_counts[e.KILLED_SELF] > 0),
+    )
+    self._recent_metrics.append(metrics)
+    if len(self._recent_metrics) < self._recent_metrics.maxlen:
+        return
+
+    n = len(self._recent_metrics)
+    avg_coins = sum(m[0] for m in self._recent_metrics) / n
+    avg_kills = sum(m[1] for m in self._recent_metrics) / n
+    self_kill_rate = sum(m[2] for m in self._recent_metrics) / n
+    preset = self.t.get("preset", "task1")
+
+    if preset in ("task3", "task4"):
+        avg_score = avg_coins + 5.0 * avg_kills
+        key = (avg_score, avg_kills, -self_kill_rate, avg_coins)
+        label = (f"score={avg_score:.2f}, kills={avg_kills:.3f}, "
+                 f"self_kill={100*self_kill_rate:.1f}%, coins={avg_coins:.2f}")
+    elif preset == "task2":
+        key = (avg_coins, -self_kill_rate)
+        label = f"coins={avg_coins:.2f}, self_kill={100*self_kill_rate:.1f}%"
+    else:
+        key = (avg_coins,)
+        label = f"coins={avg_coins:.2f}"
+
+    if self._best_checkpoint_key is None or key > self._best_checkpoint_key:
+        self._best_checkpoint_key = key
         shutil.copyfile(self._weights_path, self._best_weights_path)
-        self.logger.info(f"new best checkpoint: {avg:.1f} avg coins/ep (last 100) -> {self._best_weights_path}")
+        self.logger.info(f"new training-proxy best ({label}, last 100) -> {self._best_weights_path}")
 
 
 def _epsilon(self, episode):
