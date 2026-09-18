@@ -86,7 +86,7 @@ class LinearQ:
         V(s') for a batch, masked to 0 where done.
         next_Phi: (N, D), done: (N,), next_actions: (N,) needed for SARSA.
         """
-        q_next = self.q_values_batch(next_Phi)           # (N, n_actions)
+        q_next = self.q_values_batch(next_Phi)  # (N, n_actions)
         if rule == "sarsa":
             if next_actions is None:
                 raise ValueError("SARSA target needs next_actions")
@@ -109,11 +109,17 @@ class LinearQ:
         Phi = np.asarray(Phi, dtype=np.float64)
         actions = np.asarray(actions)
         targets = np.asarray(targets, dtype=np.float64)
-        w = np.ones(len(Phi)) if weights is None else np.asarray(weights, dtype=np.float64)
+        w = (
+            np.ones(len(Phi))
+            if weights is None
+            else np.asarray(weights, dtype=np.float64)
+        )
 
-        q_pred = np.einsum("nd,nd->n", Phi, self.W[actions])   # Q(s_i, a_i)
+        q_pred = np.einsum("nd,nd->n", Phi, self.W[actions])  # Q(s_i, a_i)
         td_error = targets - q_pred
-        step_error = td_error if td_clip is None else np.clip(td_error, -td_clip, td_clip)
+        step_error = (
+            td_error if td_clip is None else np.clip(td_error, -td_clip, td_clip)
+        )
 
         # accumulate per-action gradient:  dL/dw_a = -sum_i (err_i * weight_i) phi_i
         grad = np.zeros_like(self.W)
@@ -127,8 +133,15 @@ class LinearQ:
     # ------------------------------------------------------------------ io
     def save(self, path):
         with open(path, "wb") as f:
-            pickle.dump({"W": self.W, "feature_dim": self.feature_dim,
-                         "n_actions": self.n_actions, "actions": ACTIONS}, f)
+            pickle.dump(
+                {
+                    "W": self.W,
+                    "feature_dim": self.feature_dim,
+                    "n_actions": self.n_actions,
+                    "actions": ACTIONS,
+                },
+                f,
+            )
 
     @classmethod
     def load(cls, path, *, allow_legacy_padding=False):
@@ -142,7 +155,9 @@ class LinearQ:
             raise ValueError("Checkpoint weight shape or action count is invalid")
         if not np.isfinite(weights).all():
             raise ValueError("Checkpoint contains non-finite weights")
-        legacy_ok = allow_legacy_padding and old_dim in (32, 34, 37) and old_dim < FEATURE_DIM
+        legacy_ok = (
+            allow_legacy_padding and old_dim in (32, 34, 37) and old_dim < FEATURE_DIM
+        )
         if old_dim != FEATURE_DIM and not legacy_ok:
             raise ValueError(
                 f"Checkpoint has {old_dim} features; expected {FEATURE_DIM}. "

@@ -2,7 +2,7 @@
 rewards.py
 
 Turns the framework's event list (+ the game states around a step) into a
-scalar training reward. 
+scalar training reward.
 
   1. reward_from_events(events)      base reward from predefined + custom events
   2. detect_custom_events(old, a, new)   our own events, appended before (1)
@@ -11,9 +11,15 @@ scalar training reward.
 
 import events as e
 from .features import (
-    DIRECTIONS, DIRECTION_VECTORS,
-    danger_map, bfs_direction, crate_approach_targets,
-    select_opponent_target, proposed_bomb_analysis, MAX_DIST_NORM, _escape_route_from,
+    DIRECTIONS,
+    DIRECTION_VECTORS,
+    danger_map,
+    bfs_direction,
+    crate_approach_targets,
+    select_opponent_target,
+    proposed_bomb_analysis,
+    MAX_DIST_NORM,
+    _escape_route_from,
 )
 
 # ---------------------------------------------------------------------------
@@ -40,23 +46,19 @@ GAME_REWARDS = {
     # --- real objective (matches settings.py REWARD_COIN / REWARD_KILL) ---
     e.COIN_COLLECTED: 1.0,
     e.KILLED_OPPONENT: 5.0,
-
     # --- staying alive ---
     e.KILLED_SELF: -5.0,
     e.GOT_KILLED: -5.0,
     e.SURVIVED_ROUND: 0.5,
-
     # --- progress toward opening the board ---
     e.CRATE_DESTROYED: 0.10,
     e.COIN_FOUND: 0.05,
-
     # --- anti-dithering / anti-noop ---
     e.INVALID_ACTION: -0.10,
     e.WAITED: -0.02,
-
     # --- custom (see detect_custom_events) ---
     MOVED_TOWARD_COIN: 0.06,
-    MOVED_AWAY_FROM_COIN: -0.07,     # slightly harsher than the reward: no oscillation gain
+    MOVED_AWAY_FROM_COIN: -0.07,  # slightly harsher than the reward: no oscillation gain
     MOVED_TOWARD_SAFETY: 0.30,
     MOVED_INTO_DANGER: -0.35,
     STAYED_IN_DANGER: -0.25,
@@ -142,7 +144,9 @@ def detect_custom_events(old_state, self_action, new_state, framework_events=())
         opp_positions = {pos for (_, _, _, pos) in old_state["others"]}
         bomb_positions = {pos for pos, _ in old_state["bombs"]}
         blocked = opp_positions | bomb_positions
-        can_escape, safe_dir, _ = _escape_route_from(old_state, old_pos, blocked=blocked)
+        can_escape, safe_dir, _ = _escape_route_from(
+            old_state, old_pos, blocked=blocked
+        )
         moved = _moved_action(self_action, old_state, new_state)
 
         if not in_danger_after:
@@ -164,22 +168,24 @@ def detect_custom_events(old_state, self_action, new_state, framework_events=())
             coin_dir, _ = bfs_direction(old_state, coins)
             moved = _moved_action(self_action, old_state, new_state)
             if moved is not None and coin_dir is not None:
-                ev.append(MOVED_TOWARD_COIN if moved == coin_dir else MOVED_AWAY_FROM_COIN)
+                ev.append(
+                    MOVED_TOWARD_COIN if moved == coin_dir else MOVED_AWAY_FROM_COIN
+                )
 
     # --- bomb quality, judged only after a SUCCESSFUL placement ---
     if self_action == "BOMB" and e.BOMB_DROPPED in framework_events:
         info = proposed_bomb_analysis(old_state)
 
-        if info['hits_crate']:
+        if info["hits_crate"]:
             ev.append(BOMB_NEXT_TO_CRATE)
-        if not info['hits_crate'] and not info['hits_opponent']:
+        if not info["hits_crate"] and not info["hits_opponent"]:
             ev.append(USELESS_BOMB)
 
-        if not info['can_escape']:
+        if not info["can_escape"]:
             ev.append(BOMB_WITH_NO_ESCAPE)
-        elif info['hits_opponent']:
+        elif info["hits_opponent"]:
             ev.append(SAFE_BOMB_THREATENS_OPPONENT)
-            if info['target_trapped']:
+            if info["target_trapped"]:
                 ev.append(SAFE_BOMB_TRAPS_OPPONENT)
 
     return ev
@@ -232,7 +238,7 @@ def potential(game_state):
     dmap = danger_map(game_state)
     d = dmap[pos]
     if d > 0:
-        phi -= (1.0 + 1.0 / d)  # -2 when about to explode, ~-1.2 when far off
+        phi -= 1.0 + 1.0 / d  # -2 when about to explode, ~-1.2 when far off
 
     return float(phi)
 

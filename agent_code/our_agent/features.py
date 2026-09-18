@@ -22,25 +22,24 @@ from collections import deque
 
 import numpy as np
 
-
 # ---------------------------------------------------------------------------
 # Fixed action order. index = action id, used everywhere (features, symmetry,
 # model outputs). WAIT and BOMB are not directional and are never permuted
 # by symmetry transforms.
 # ---------------------------------------------------------------------------
-ACTIONS = ['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']
+ACTIONS = ["UP", "RIGHT", "DOWN", "LEFT", "WAIT", "BOMB"]
 
 
 # (dx, dy) in game_state['field'] coordinates (x, y), matching the framework's
 # image-coordinate convention noted in the assignment PDF.
 DIRECTION_VECTORS = {
-    'UP': (0, -1),
-    'RIGHT': (1, 0),
-    'DOWN': (0, 1),
-    'LEFT': (-1, 0),
+    "UP": (0, -1),
+    "RIGHT": (1, 0),
+    "DOWN": (0, 1),
+    "LEFT": (-1, 0),
 }
 
-DIRECTIONS = ['UP', 'RIGHT', 'DOWN', 'LEFT']
+DIRECTIONS = ["UP", "RIGHT", "DOWN", "LEFT"]
 
 
 BOMB_POWER = 3
@@ -55,55 +54,48 @@ MAX_DANGER_NORM = float(BOMB_TIMER + EXPLOSION_LINGER)
 # Feature vector layout (D = 37).
 # ---------------------------------------------------------------------------
 FEATURE_NAMES = (
-    ['WALL_UP', 'WALL_RIGHT', 'WALL_DOWN', 'WALL_LEFT']
-    + ['BOMB_POSSIBLE']
-    + ['IN_DANGER']
-    + ['DANGER_STEPS']
-
+    ["WALL_UP", "WALL_RIGHT", "WALL_DOWN", "WALL_LEFT"]
+    + ["BOMB_POSSIBLE"]
+    + ["IN_DANGER"]
+    + ["DANGER_STEPS"]
     + [
-        'COIN_DIR_UP',
-        'COIN_DIR_RIGHT',
-        'COIN_DIR_DOWN',
-        'COIN_DIR_LEFT',
-        'COIN_DIR_NONE',
+        "COIN_DIR_UP",
+        "COIN_DIR_RIGHT",
+        "COIN_DIR_DOWN",
+        "COIN_DIR_LEFT",
+        "COIN_DIR_NONE",
     ]
-    + ['COIN_DIST']
-
+    + ["COIN_DIST"]
     + [
-        'CRATE_DIR_UP',
-        'CRATE_DIR_RIGHT',
-        'CRATE_DIR_DOWN',
-        'CRATE_DIR_LEFT',
-        'CRATE_DIR_NONE',
+        "CRATE_DIR_UP",
+        "CRATE_DIR_RIGHT",
+        "CRATE_DIR_DOWN",
+        "CRATE_DIR_LEFT",
+        "CRATE_DIR_NONE",
     ]
-    + ['CRATE_DIST']
-
+    + ["CRATE_DIST"]
     + [
-        'SAFE_DIR_UP',
-        'SAFE_DIR_RIGHT',
-        'SAFE_DIR_DOWN',
-        'SAFE_DIR_LEFT',
-        'SAFE_DIR_NONE',
+        "SAFE_DIR_UP",
+        "SAFE_DIR_RIGHT",
+        "SAFE_DIR_DOWN",
+        "SAFE_DIR_LEFT",
+        "SAFE_DIR_NONE",
     ]
-
-    + ['OPP_NEARBY']
-
+    + ["OPP_NEARBY"]
     + [
-        'OPP_DIR_UP',
-        'OPP_DIR_RIGHT',
-        'OPP_DIR_DOWN',
-        'OPP_DIR_LEFT',
-        'OPP_DIR_NONE',
+        "OPP_DIR_UP",
+        "OPP_DIR_RIGHT",
+        "OPP_DIR_DOWN",
+        "OPP_DIR_LEFT",
+        "OPP_DIR_NONE",
     ]
-    + ['OPP_DIST']
-
-    + ['WOULD_HIT_OPPONENT']
-    + ['OPP_TRAPPED']
-    + ['OPP_NEAR_DEADEND']
-
-    + ['SAFE_BOMB_HITS_OPPONENT']
-    + ['SAFE_BOMB_TRAPS_OPPONENT']
-    + ['SAFE_BOMB_HITS_CRATE']
+    + ["OPP_DIST"]
+    + ["WOULD_HIT_OPPONENT"]
+    + ["OPP_TRAPPED"]
+    + ["OPP_NEAR_DEADEND"]
+    + ["SAFE_BOMB_HITS_OPPONENT"]
+    + ["SAFE_BOMB_TRAPS_OPPONENT"]
+    + ["SAFE_BOMB_HITS_CRATE"]
 )
 
 FEATURE_DIM = len(FEATURE_NAMES)  # 37
@@ -111,11 +103,11 @@ FEATURE_DIM = len(FEATURE_NAMES)  # 37
 
 # Directional one-hot blocks used by symmetry.py.
 DIRECTIONAL_GROUPS = [
-    (0, False),   # WALL_*
-    (7, True),    # COIN_DIR_*
-    (13, True),   # CRATE_DIR_*
-    (19, True),   # SAFE_DIR_*
-    (25, True),   # OPP_DIR_*
+    (0, False),  # WALL_*
+    (7, True),  # COIN_DIR_*
+    (13, True),  # CRATE_DIR_*
+    (19, True),  # SAFE_DIR_*
+    (25, True),  # OPP_DIR_*
 ]
 
 
@@ -123,13 +115,13 @@ DIRECTIONAL_GROUPS = [
 # Model 2 channel layout.
 # ---------------------------------------------------------------------------
 CHANNEL_NAMES = [
-    'walls',
-    'crates',
-    'coins',
-    'self',
-    'others',
-    'bomb_danger',
-    'explosion',
+    "walls",
+    "crates",
+    "coins",
+    "self",
+    "others",
+    "bomb_danger",
+    "explosion",
 ]
 
 N_CHANNELS = len(CHANNEL_NAMES)  # 7
@@ -178,7 +170,7 @@ def danger_map(game_state):
         0   -> currently safe
         N>0 -> becomes/remains lethal in N steps
     """
-    field = game_state['field']
+    field = game_state["field"]
 
     w, h = field.shape
 
@@ -187,7 +179,7 @@ def danger_map(game_state):
         dtype=np.int32,
     )
 
-    for (bx, by), countdown in game_state['bombs']:
+    for (bx, by), countdown in game_state["bombs"]:
 
         steps_to_blast = countdown + 1
 
@@ -196,23 +188,17 @@ def danger_map(game_state):
             field,
         ):
 
-            if (
-                dmap[x, y] == 0
-                or steps_to_blast < dmap[x, y]
-            ):
+            if dmap[x, y] == 0 or steps_to_blast < dmap[x, y]:
                 dmap[x, y] = steps_to_blast
 
-    explosion_map = game_state.get(
-        'explosion_map'
-    )
+    explosion_map = game_state.get("explosion_map")
 
     if explosion_map is not None:
 
         live = explosion_map > 0
 
         dmap[live] = np.where(
-            (dmap[live] == 0)
-            | (dmap[live] > 1),
+            (dmap[live] == 0) | (dmap[live] > 1),
             1,
             dmap[live],
         )
@@ -226,11 +212,7 @@ def danger_map(game_state):
 def _walkable(field, x, y):
     w, h = field.shape
 
-    return (
-        0 <= x < w
-        and 0 <= y < h
-        and field[x, y] == 0
-    )
+    return 0 <= x < w and 0 <= y < h and field[x, y] == 0
 
 
 def bfs_direction_and_target(
@@ -248,15 +230,13 @@ def bfs_direction_and_target(
         distance,
         target_coord
     """
-    _, _, _, (sx, sy) = game_state['self']
+    _, _, _, (sx, sy) = game_state["self"]
 
-    field = game_state['field']
+    field = game_state["field"]
 
     target_set = set(targets)
 
-    blocked = set(
-        blocked or ()
-    )
+    blocked = set(blocked or ())
 
     def _unsafe_at(x, y, depth):
 
@@ -279,17 +259,13 @@ def bfs_direction_and_target(
             (sx, sy),
         )
 
-    visited = {
-        (sx, sy)
-    }
+    visited = {(sx, sy)}
 
     queue = deque()
 
     for direction in DIRECTIONS:
 
-        dx, dy = DIRECTION_VECTORS[
-            direction
-        ]
+        dx, dy = DIRECTION_VECTORS[direction]
 
         nx = sx + dx
         ny = sy + dy
@@ -300,9 +276,7 @@ def bfs_direction_and_target(
             1,
         ):
 
-            visited.add(
-                (nx, ny)
-            )
+            visited.add((nx, ny))
 
             queue.append(
                 (
@@ -335,19 +309,14 @@ def bfs_direction_and_target(
             nx = x + dx
             ny = y + dy
 
-            if (
-                (nx, ny) in visited
-                or _unsafe_at(
-                    nx,
-                    ny,
-                    dist + 1,
-                )
+            if (nx, ny) in visited or _unsafe_at(
+                nx,
+                ny,
+                dist + 1,
             ):
                 continue
 
-            visited.add(
-                (nx, ny)
-            )
+            visited.add((nx, ny))
 
             queue.append(
                 (
@@ -377,14 +346,12 @@ def bfs_direction(
     direction and distance.
     """
 
-    direction, distance, _ = (
-        bfs_direction_and_target(
-            game_state,
-            targets,
-            avoid_danger=avoid_danger,
-            danger=danger,
-            blocked=blocked,
-        )
+    direction, distance, _ = bfs_direction_and_target(
+        game_state,
+        targets,
+        avoid_danger=avoid_danger,
+        danger=danger,
+        blocked=blocked,
     )
 
     return (
@@ -412,11 +379,7 @@ def _one_hot_direction(direction):
 
     else:
 
-        vec[
-            DIRECTIONS.index(
-                direction
-            )
-        ] = 1
+        vec[DIRECTIONS.index(direction)] = 1
 
     return vec
 
@@ -433,28 +396,16 @@ def crate_approach_targets(field):
 
     targets = set()
 
-    for cx, cy in np.argwhere(
-        field == 1
-    ):
+    for cx, cy in np.argwhere(field == 1):
 
         for dx, dy in DIRECTION_VECTORS.values():
 
-            nx = int(
-                cx + dx
-            )
+            nx = int(cx + dx)
 
-            ny = int(
-                cy + dy
-            )
+            ny = int(cy + dy)
 
-            if (
-                0 <= nx < w
-                and 0 <= ny < h
-                and field[nx, ny] == 0
-            ):
-                targets.add(
-                    (nx, ny)
-                )
+            if 0 <= nx < w and 0 <= ny < h and field[nx, ny] == 0:
+                targets.add((nx, ny))
 
     return targets
 
@@ -506,7 +457,8 @@ def is_dead_end(field, x, y):
             field,
             x,
             y,
-        ) <= 1
+        )
+        <= 1
     )
 
 
@@ -551,7 +503,7 @@ def select_opponent_target(game_state):
             _,
             _,
             pos,
-        ) in game_state['others']
+        ) in game_state["others"]
     ]
 
     if not opp_coords:
@@ -573,16 +525,11 @@ def select_opponent_target(game_state):
 
     if target is None:
 
-        sx, sy = game_state[
-            'self'
-        ][3]
+        sx, sy = game_state["self"][3]
 
         target = min(
             opp_coords,
-            key=lambda p: (
-                abs(sx - p[0])
-                + abs(sy - p[1])
-            ),
+            key=lambda p: (abs(sx - p[0]) + abs(sy - p[1])),
         )
 
     return (
@@ -604,18 +551,14 @@ def proposed_bomb_analysis(
     place at its current tile.
     """
 
-    field = game_state[
-        'field'
-    ]
+    field = game_state["field"]
 
     (
         _,
         _,
         bomb_possible,
         self_pos,
-    ) = game_state[
-        'self'
-    ]
+    ) = game_state["self"]
 
     opp_coords = [
         pos
@@ -624,23 +567,16 @@ def proposed_bomb_analysis(
             _,
             _,
             pos,
-        ) in game_state[
-            'others'
-        ]
+        ) in game_state["others"]
     ]
 
-    if (
-        target_opp is None
-        and opp_coords
-    ):
+    if target_opp is None and opp_coords:
 
         (
             target_opp,
             _,
             _,
-        ) = select_opponent_target(
-            game_state
-        )
+        ) = select_opponent_target(game_state)
 
     blast = set(
         get_blast_coords(
@@ -649,70 +585,40 @@ def proposed_bomb_analysis(
         )
     )
 
-    hits_crate = any(
-        field[x, y] == 1
-        for x, y in blast
-    )
+    hits_crate = any(field[x, y] == 1 for x, y in blast)
 
-    hit_opponents = (
-        set(opp_coords)
-        & blast
-    )
+    hit_opponents = set(opp_coords) & blast
 
     result = {
-        'can_drop': bool(
-            bomb_possible
-        ),
-        'blast': blast,
-        'hits_crate': hits_crate,
-        'hit_opponents': hit_opponents,
-        'hits_opponent': bool(
-            hit_opponents
-        ),
-        'target': target_opp,
-        'target_hit': (
-            target_opp in blast
-            if target_opp is not None
-            else False
-        ),
-        'can_escape': False,
-        'escape_dir': None,
-        'escape_dist': None,
-        'target_trapped': False,
+        "can_drop": bool(bomb_possible),
+        "blast": blast,
+        "hits_crate": hits_crate,
+        "hit_opponents": hit_opponents,
+        "hits_opponent": bool(hit_opponents),
+        "target": target_opp,
+        "target_hit": (target_opp in blast if target_opp is not None else False),
+        "can_escape": False,
+        "escape_dir": None,
+        "escape_dist": None,
+        "target_trapped": False,
     }
 
     if not bomb_possible:
 
         return result
 
-    hypothetical = dict(
-        game_state
-    )
+    hypothetical = dict(game_state)
 
-    hypothetical[
-        'bombs'
-    ] = (
-        list(
-            game_state['bombs']
+    hypothetical["bombs"] = list(game_state["bombs"]) + [
+        (
+            self_pos,
+            BOMB_TIMER,
         )
-        + [
-            (
-                self_pos,
-                BOMB_TIMER,
-            )
-        ]
-    )
+    ]
 
-    bomb_positions = {
-        pos
-        for pos, _ in hypothetical[
-            'bombs'
-        ]
-    }
+    bomb_positions = {pos for pos, _ in hypothetical["bombs"]}
 
-    opp_positions = set(
-        opp_coords
-    )
+    opp_positions = set(opp_coords)
 
     (
         can_escape,
@@ -721,28 +627,17 @@ def proposed_bomb_analysis(
     ) = _escape_route_from(
         hypothetical,
         self_pos,
-        blocked=(
-            bomb_positions
-            | opp_positions
-        ),
+        blocked=(bomb_positions | opp_positions),
         placement_turn=True,
     )
 
-    result[
-        'can_escape'
-    ] = can_escape
+    result["can_escape"] = can_escape
 
-    result[
-        'escape_dir'
-    ] = escape_dir
+    result["escape_dir"] = escape_dir
 
-    result[
-        'escape_dist'
-    ] = escape_dist
+    result["escape_dist"] = escape_dist
 
-    if result[
-        'target_hit'
-    ]:
+    if result["target_hit"]:
 
         (
             target_can_escape,
@@ -754,9 +649,7 @@ def proposed_bomb_analysis(
             blocked=bomb_positions,
         )
 
-        result[
-            'target_trapped'
-        ] = not target_can_escape
+        result["target_trapped"] = not target_can_escape
 
     return result
 
@@ -774,9 +667,7 @@ def opponent_trapped(
         proposed_bomb_analysis(
             game_state,
             target_opp=opp_pos,
-        )[
-            'target_trapped'
-        ]
+        )["target_trapped"]
     )
 
 
@@ -793,55 +684,32 @@ def state_to_features(game_state):
     if game_state is None:
         return None
 
-    field = game_state[
-        'field'
-    ]
+    field = game_state["field"]
 
     (
         _,
         _,
         bomb_possible,
         (sx, sy),
-    ) = game_state[
-        'self'
-    ]
+    ) = game_state["self"]
 
-    dmap = danger_map(
-        game_state
-    )
+    dmap = danger_map(game_state)
 
     feats = np.zeros(
         FEATURE_DIM,
         dtype=np.float32,
     )
 
-
     # ---------------------------------------------------------
     # WALL_* (0-3)
     # ---------------------------------------------------------
-    occupied = (
-        {
-            pos
-            for pos, _ in game_state[
-                'bombs'
-            ]
-        }
-        |
-        {
-            a[3]
-            for a in game_state[
-                'others'
-            ]
-        }
-    )
+    occupied = {pos for pos, _ in game_state["bombs"]} | {
+        a[3] for a in game_state["others"]
+    }
 
-    for i, direction in enumerate(
-        DIRECTIONS
-    ):
+    for i, direction in enumerate(DIRECTIONS):
 
-        dx, dy = DIRECTION_VECTORS[
-            direction
-        ]
+        dx, dy = DIRECTION_VECTORS[direction]
 
         nx = sx + dx
         ny = sy + dy
@@ -849,36 +717,25 @@ def state_to_features(game_state):
         w, h = field.shape
 
         blocked = (
-            not (
-                0 <= nx < w
-                and 0 <= ny < h
-            )
+            not (0 <= nx < w and 0 <= ny < h)
             or field[
                 nx,
                 ny,
-            ] != 0
+            ]
+            != 0
             or (
                 nx,
                 ny,
-            ) in occupied
+            )
+            in occupied
         )
 
-        feats[
-            i
-        ] = float(
-            blocked
-        )
-
+        feats[i] = float(blocked)
 
     # ---------------------------------------------------------
     # BOMB_POSSIBLE (4)
     # ---------------------------------------------------------
-    feats[
-        4
-    ] = float(
-        bomb_possible
-    )
-
+    feats[4] = float(bomb_possible)
 
     # ---------------------------------------------------------
     # IN_DANGER / DANGER_STEPS (5-6)
@@ -888,15 +745,9 @@ def state_to_features(game_state):
         sy,
     ]
 
-    feats[
-        5
-    ] = float(
-        my_danger > 0
-    )
+    feats[5] = float(my_danger > 0)
 
-    feats[
-        6
-    ] = (
+    feats[6] = (
         min(
             my_danger,
             MAX_DANGER_NORM,
@@ -904,13 +755,10 @@ def state_to_features(game_state):
         / MAX_DANGER_NORM
     )
 
-
     # ---------------------------------------------------------
     # COIN_DIR / COIN_DIST (7-12)
     # ---------------------------------------------------------
-    coins = game_state[
-        'coins'
-    ]
+    coins = game_state["coins"]
 
     if coins:
 
@@ -927,15 +775,9 @@ def state_to_features(game_state):
         coin_dir = None
         coin_dist = None
 
-    feats[
-        7:12
-    ] = _one_hot_direction(
-        coin_dir
-    )
+    feats[7:12] = _one_hot_direction(coin_dir)
 
-    feats[
-        12
-    ] = (
+    feats[12] = (
         0.0
         if coin_dist is None
         else (
@@ -947,15 +789,10 @@ def state_to_features(game_state):
         )
     )
 
-
     # ---------------------------------------------------------
     # CRATE_DIR / CRATE_DIST (13-18)
     # ---------------------------------------------------------
-    crate_targets = (
-        crate_approach_targets(
-            field
-        )
-    )
+    crate_targets = crate_approach_targets(field)
 
     if crate_targets:
 
@@ -972,15 +809,9 @@ def state_to_features(game_state):
         crate_dir = None
         crate_dist = None
 
-    feats[
-        13:18
-    ] = _one_hot_direction(
-        crate_dir
-    )
+    feats[13:18] = _one_hot_direction(crate_dir)
 
-    feats[
-        18
-    ] = (
+    feats[18] = (
         0.0
         if crate_dist is None
         else (
@@ -991,7 +822,6 @@ def state_to_features(game_state):
             / MAX_DIST_NORM
         )
     )
-
 
     # ---------------------------------------------------------
     # SAFE_DIR (19-23)
@@ -1005,22 +835,12 @@ def state_to_features(game_state):
                 _,
                 _,
                 pos,
-            ) in game_state[
-                'others'
-            ]
+            ) in game_state["others"]
         }
 
-        bomb_positions = {
-            pos
-            for pos, _ in game_state[
-                'bombs'
-            ]
-        }
+        bomb_positions = {pos for pos, _ in game_state["bombs"]}
 
-        blocked = (
-            opp_positions
-            | bomb_positions
-        )
+        blocked = opp_positions | bomb_positions
 
         (
             _,
@@ -1036,19 +856,12 @@ def state_to_features(game_state):
 
         safe_dir = None
 
-    feats[
-        19:24
-    ] = _one_hot_direction(
-        safe_dir
-    )
-
+    feats[19:24] = _one_hot_direction(safe_dir)
 
     # ---------------------------------------------------------
     # Opponent target features (24-33)
     # ---------------------------------------------------------
-    others = game_state[
-        'others'
-    ]
+    others = game_state["others"]
 
     opp_coords = [
         pos
@@ -1060,11 +873,7 @@ def state_to_features(game_state):
         ) in others
     ]
 
-    bomb_info = (
-        proposed_bomb_analysis(
-            game_state
-        )
-    )
+    bomb_info = proposed_bomb_analysis(game_state)
 
     if opp_coords:
 
@@ -1072,49 +881,21 @@ def state_to_features(game_state):
             target_opp,
             opp_dir,
             opp_dist,
-        ) = select_opponent_target(
-            game_state
-        )
+        ) = select_opponent_target(game_state)
 
         if opp_dist is not None:
 
-            nearby_dist = (
-                opp_dist
-            )
+            nearby_dist = opp_dist
 
         else:
 
-            nearby_dist = (
-                abs(
-                    sx
-                    - target_opp[0]
-                )
-                +
-                abs(
-                    sy
-                    - target_opp[1]
-                )
-            )
+            nearby_dist = abs(sx - target_opp[0]) + abs(sy - target_opp[1])
 
-        feats[
-            24
-        ] = float(
-            nearby_dist
-            <= (
-                2 * BOMB_POWER
-                + 1
-            )
-        )
+        feats[24] = float(nearby_dist <= (2 * BOMB_POWER + 1))
 
-        feats[
-            25:30
-        ] = _one_hot_direction(
-            opp_dir
-        )
+        feats[25:30] = _one_hot_direction(opp_dir)
 
-        feats[
-            30
-        ] = (
+        feats[30] = (
             0.0
             if opp_dist is None
             else (
@@ -1126,25 +907,11 @@ def state_to_features(game_state):
             )
         )
 
-        feats[
-            31
-        ] = float(
-            bomb_info[
-                'hits_opponent'
-            ]
-        )
+        feats[31] = float(bomb_info["hits_opponent"])
 
-        feats[
-            32
-        ] = float(
-            bomb_info[
-                'target_trapped'
-            ]
-        )
+        feats[32] = float(bomb_info["target_trapped"])
 
-        feats[
-            33
-        ] = float(
+        feats[33] = float(
             is_dead_end(
                 field,
                 *target_opp,
@@ -1153,58 +920,27 @@ def state_to_features(game_state):
 
     else:
 
-        feats[
-            29
-        ] = 1.0
-
+        feats[29] = 1.0
 
     # ---------------------------------------------------------
     # Explicit Model-1 interaction features (34-36)
     # ---------------------------------------------------------
 
     # Bomb is safe and would hit an opponent.
-    feats[
-        34
-    ] = float(
-        bomb_info[
-            'can_drop'
-        ]
-        and bomb_info[
-            'can_escape'
-        ]
-        and bomb_info[
-            'hits_opponent'
-        ]
+    feats[34] = float(
+        bomb_info["can_drop"] and bomb_info["can_escape"] and bomb_info["hits_opponent"]
     )
 
     # Bomb is safe and would trap selected opponent.
-    feats[
-        35
-    ] = float(
-        bomb_info[
-            'can_drop'
-        ]
-        and bomb_info[
-            'can_escape'
-        ]
-        and bomb_info[
-            'target_trapped'
-        ]
+    feats[35] = float(
+        bomb_info["can_drop"]
+        and bomb_info["can_escape"]
+        and bomb_info["target_trapped"]
     )
 
     # Bomb is safe and would hit at least one crate.
-    feats[
-        36
-    ] = float(
-        bomb_info[
-            'can_drop'
-        ]
-        and bomb_info[
-            'can_escape'
-        ]
-        and bomb_info[
-            'hits_crate'
-        ]
+    feats[36] = float(
+        bomb_info["can_drop"] and bomb_info["can_escape"] and bomb_info["hits_crate"]
     )
 
     return feats
@@ -1224,9 +960,7 @@ def state_to_channels(game_state):
 
         return None
 
-    field = game_state[
-        'field'
-    ]
+    field = game_state["field"]
 
     w, h = field.shape
 
@@ -1239,31 +973,14 @@ def state_to_channels(game_state):
         dtype=np.float32,
     )
 
-
     # walls
-    channels[
-        0
-    ] = (
-        field == -1
-    ).astype(
-        np.float32
-    )
-
+    channels[0] = (field == -1).astype(np.float32)
 
     # crates
-    channels[
-        1
-    ] = (
-        field == 1
-    ).astype(
-        np.float32
-    )
-
+    channels[1] = (field == 1).astype(np.float32)
 
     # coins
-    for cx, cy in game_state[
-        'coins'
-    ]:
+    for cx, cy in game_state["coins"]:
 
         channels[
             2,
@@ -1271,16 +988,13 @@ def state_to_channels(game_state):
             cy,
         ] = 1.0
 
-
     # self
     (
         _,
         _,
         _,
         (sx, sy),
-    ) = game_state[
-        'self'
-    ]
+    ) = game_state["self"]
 
     channels[
         3,
@@ -1288,16 +1002,13 @@ def state_to_channels(game_state):
         sy,
     ] = 1.0
 
-
     # opponents
     for (
         _,
         _,
         _,
         (ox, oy),
-    ) in game_state[
-        'others'
-    ]:
+    ) in game_state["others"]:
 
         channels[
             4,
@@ -1305,57 +1016,32 @@ def state_to_channels(game_state):
             oy,
         ] = 1.0
 
-
     # bomb danger
-    dmap = danger_map(
-        game_state
-    )
+    dmap = danger_map(game_state)
 
-    channels[
-        5
-    ] = (
+    channels[5] = (
         np.minimum(
             dmap,
             MAX_DANGER_NORM,
-        ).astype(
-            np.float32
-        )
+        ).astype(np.float32)
         / MAX_DANGER_NORM
     )
 
-
     # active explosions
-    explosion_map = (
-        game_state.get(
-            'explosion_map'
-        )
-    )
+    explosion_map = game_state.get("explosion_map")
 
     if explosion_map is not None:
 
-        channels[
-            6
-        ] = np.clip(
+        channels[6] = np.clip(
             explosion_map,
             0,
             None,
-        ).astype(
-            np.float32
-        )
+        ).astype(np.float32)
 
-        max_val = channels[
-            6
-        ].max()
+        max_val = channels[6].max()
 
         if max_val > 0:
 
-            channels[
-                6
-            ] = (
-                channels[
-                    6
-                ]
-                / max_val
-            )
+            channels[6] = channels[6] / max_val
 
     return channels

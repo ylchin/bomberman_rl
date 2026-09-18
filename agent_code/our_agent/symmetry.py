@@ -1,5 +1,5 @@
 """
-symmetry.py 
+symmetry.py
 
 The Bomberman board has 8 symmetries (4 rotations x optional mirror = the
 dihedral group D4). Any transition (state, action, reward, next_state) can be
@@ -27,6 +27,7 @@ actually require "go left".
 import numpy as np
 from .features import ACTIONS, DIRECTIONS, DIRECTION_VECTORS, DIRECTIONAL_GROUPS
 
+
 # The 8 ops, as (flip_first: bool, n_rotations_cw: int).
 # flip = mirror across the vertical axis (x -> W-1-x) applied BEFORE rotating.
 def sym_transforms():
@@ -38,8 +39,10 @@ def sym_transforms():
 def _flip_vec(dx, dy):
     return (-dx, dy)
 
+
 def _rot90_vec(dx, dy):
     return (dy, -dx)
+
 
 def _transform_vec(dx, dy, op):
     flip, k = op
@@ -90,17 +93,17 @@ def apply_to_features(vec, op):
     everything else (scalars, distances) is copied unchanged, since those
     are rotation/flip-invariant magnitudes.
     """
-    out = np.array(vec, dtype=vec.dtype if hasattr(vec, 'dtype') else np.float32)
+    out = np.array(vec, dtype=vec.dtype if hasattr(vec, "dtype") else np.float32)
 
     # Build the direction permutation implied by op once, reuse for every group.
     perm = [DIRECTIONS.index(apply_to_action(d, op)) for d in DIRECTIONS]
 
     for start, has_none in DIRECTIONAL_GROUPS:
-        block = vec[start:start + 4]
+        block = vec[start : start + 4]
         new_block = [0] * 4
         for old_i, new_i in enumerate(perm):
             new_block[new_i] = block[old_i]
-        out[start:start + 4] = new_block
+        out[start : start + 4] = new_block
         # NONE slot (start+4), if present, is unaffected by rotation/flip.
         if has_none:
             out[start + 4] = vec[start + 4]
@@ -118,7 +121,7 @@ def apply_to_state(game_state, op):
     Note: 'round', 'step', 'user_input' pass through unchanged; only spatial
     fields are transformed.
     """
-    field = game_state['field']
+    field = game_state["field"]
     w, h = field.shape
 
     new_field = np.zeros_like(field)
@@ -128,8 +131,8 @@ def apply_to_state(game_state, op):
             new_field[nx, ny] = field[x, y]
 
     new_explosion_map = None
-    if game_state.get('explosion_map') is not None:
-        em = game_state['explosion_map']
+    if game_state.get("explosion_map") is not None:
+        em = game_state["explosion_map"]
         new_explosion_map = np.zeros_like(em)
         for x in range(w):
             for y in range(h):
@@ -141,18 +144,23 @@ def apply_to_state(game_state, op):
         return (name, score, can_bomb, apply_to_coord(x, y, op, w, h))
 
     new_state = dict(game_state)  # shallow copy; overwrite spatial fields below
-    new_state['field'] = new_field
-    new_state['bombs'] = [(apply_to_coord(x, y, op, w, h), t) for (x, y), t in game_state['bombs']]
-    new_state['explosion_map'] = new_explosion_map
-    new_state['coins'] = [apply_to_coord(x, y, op, w, h) for (x, y) in game_state['coins']]
-    new_state['self'] = transform_agent_tuple(game_state['self'])
-    new_state['others'] = [transform_agent_tuple(a) for a in game_state['others']]
+    new_state["field"] = new_field
+    new_state["bombs"] = [
+        (apply_to_coord(x, y, op, w, h), t) for (x, y), t in game_state["bombs"]
+    ]
+    new_state["explosion_map"] = new_explosion_map
+    new_state["coins"] = [
+        apply_to_coord(x, y, op, w, h) for (x, y) in game_state["coins"]
+    ]
+    new_state["self"] = transform_agent_tuple(game_state["self"])
+    new_state["others"] = [transform_agent_tuple(a) for a in game_state["others"]]
 
     return new_state
 
 
-def augment_transition(state, action, reward, next_state, use_state_transform=True,
-                        feature_fn=None):
+def augment_transition(
+    state, action, reward, next_state, use_state_transform=True, feature_fn=None
+):
     """
     Convenience wrapper: given one (state, action, reward, next_state)
     transition, returns a list of 8 augmented transitions.
@@ -170,10 +178,18 @@ def augment_transition(state, action, reward, next_state, use_state_transform=Tr
     for op in sym_transforms():
         new_action = apply_to_action(action, op)
         if use_state_transform:
-            new_state = feature_fn(apply_to_state(state, op)) if state is not None else None
-            new_next_state = feature_fn(apply_to_state(next_state, op)) if next_state is not None else None
+            new_state = (
+                feature_fn(apply_to_state(state, op)) if state is not None else None
+            )
+            new_next_state = (
+                feature_fn(apply_to_state(next_state, op))
+                if next_state is not None
+                else None
+            )
         else:
             new_state = apply_to_features(state, op) if state is not None else None
-            new_next_state = apply_to_features(next_state, op) if next_state is not None else None
+            new_next_state = (
+                apply_to_features(next_state, op) if next_state is not None else None
+            )
         out.append((new_state, new_action, reward, new_next_state))
     return out

@@ -36,11 +36,13 @@ def setup_training(self):
 
     if MODEL == "net":
         from .model_net import INPUT_DIM, encode_state, transform_input
+
         self.feature_dim = INPUT_DIM
         self.encode_state = encode_state
         self.transform_input = transform_input
     else:
         from .symmetry import apply_to_features
+
         self.feature_dim = FEATURE_DIM
         self.encode_state = state_to_features
         self.transform_input = apply_to_features
@@ -53,9 +55,9 @@ def setup_training(self):
     )
 
     self.episode = 0
-    self.step_count = 0                 # global env steps, for learn_every
-    self.traj = []                     # [(phi, action_id, reward), ...] for the current episode
-    self.ep_counts = Counter()         # event tally for the CSV row
+    self.step_count = 0  # global env steps, for learn_every
+    self.traj = []  # [(phi, action_id, reward), ...] for the current episode
+    self.ep_counts = Counter()  # event tally for the CSV row
     self.ep_reward = 0.0
 
     self.epsilon = _epsilon(self, 0)
@@ -65,14 +67,17 @@ def setup_training(self):
     self._weights_path = cfg["weights_out"]
     self._best_weights_path = cfg["best_weights_out"]
     self._best_checkpoint_key = None
-    self._recent_metrics = deque(maxlen=100)  # task-aware rolling proxy; final choice uses validation
+    self._recent_metrics = deque(
+        maxlen=100
+    )  # task-aware rolling proxy; final choice uses validation
     self._csv_path = cfg["log_csv"]
     _csv_header(self._csv_path)
 
     try:
         from . import symmetry as _sym
+
         self._sym = _sym
-    except Exception as exc:                       # pragma: no cover
+    except Exception as exc:  # pragma: no cover
         self.logger.warning(f"symmetry.py unavailable ({exc}); augmentation off")
         self._sym = None
 
@@ -114,7 +119,7 @@ def end_of_round(self, last_game_state, last_action, events):
     # The framework delivers a survivor's final step to game_events_occurred AND
     # again here (plus SURVIVED_ROUND). A dead agent's final step comes ONLY here.
     if died or not survived or not self.traj:
-        reward = reward_from_events(events, self.logger)   # terminal: no shaping term
+        reward = reward_from_events(events, self.logger)  # terminal: no shaping term
         if last_action is not None:
             phi = self.encode_state(last_game_state)
             self.traj.append((phi, _ACTION_ID[last_action], reward))
@@ -189,8 +194,10 @@ def _update_best_checkpoint(self):
     if preset in ("task3", "task4"):
         avg_score = avg_coins + 5.0 * avg_kills
         key = (avg_score, avg_kills, -self_kill_rate, avg_coins)
-        label = (f"score={avg_score:.2f}, kills={avg_kills:.3f}, "
-                 f"self_kill={100*self_kill_rate:.1f}%, coins={avg_coins:.2f}")
+        label = (
+            f"score={avg_score:.2f}, kills={avg_kills:.3f}, "
+            f"self_kill={100*self_kill_rate:.1f}%, coins={avg_coins:.2f}"
+        )
     elif preset == "task2":
         key = (avg_coins, -self_kill_rate)
         label = f"coins={avg_coins:.2f}, self_kill={100*self_kill_rate:.1f}%"
@@ -201,7 +208,9 @@ def _update_best_checkpoint(self):
     if self._best_checkpoint_key is None or key > self._best_checkpoint_key:
         self._best_checkpoint_key = key
         shutil.copyfile(self._weights_path, self._best_weights_path)
-        self.logger.info(f"new training-proxy best ({label}, last 100) -> {self._best_weights_path}")
+        self.logger.info(
+            f"new training-proxy best ({label}, last 100) -> {self._best_weights_path}"
+        )
 
 
 def _epsilon(self, episode):
@@ -269,14 +278,19 @@ def _learn(self, n_iters=1):
     for _ in range(n_iters):
         batch, idx, w = self.buffer.sample(cfg["batch_size"])
         v_next = self.model.bootstrap_value(
-            batch["next_phi"], batch["done"],
+            batch["next_phi"],
+            batch["done"],
             next_actions=batch["next_action"] if cfg["rule"] == "sarsa" else None,
             rule=cfg["rule"],
         )
         targets = batch["reward"] + (cfg["gamma"] ** cfg["n_step"]) * v_next
         td_err = self.model.update(
-            batch["phi"], batch["action"], targets,
-            self.alpha, weights=w, td_clip=cfg.get("td_clip"),
+            batch["phi"],
+            batch["action"],
+            targets,
+            self.alpha,
+            weights=w,
+            td_clip=cfg.get("td_clip"),
         )
         if cfg["priority_alpha"] > 0.0:
             self.buffer.update_priorities(idx, td_err)
@@ -286,8 +300,18 @@ def _learn(self, n_iters=1):
 # CSV logging
 # ---------------------------------------------------------------------------
 _CSV_FIELDS = [
-    "episode", "steps", "total_reward", "coins", "crates", "invalid",
-    "killed_self", "killed_opponents", "survived", "epsilon", "alpha", "buffer",
+    "episode",
+    "steps",
+    "total_reward",
+    "coins",
+    "crates",
+    "invalid",
+    "killed_self",
+    "killed_opponents",
+    "survived",
+    "epsilon",
+    "alpha",
+    "buffer",
 ]
 
 

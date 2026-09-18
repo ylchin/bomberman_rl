@@ -1,7 +1,7 @@
 """
-replay_buffer.py 
+replay_buffer.py
 
-Experience replay for the value-based models. 
+Experience replay for the value-based models.
 
 Design follows lecture:
   - sample a batch to decorrelate the online updates
@@ -28,13 +28,15 @@ class ReplayBuffer:
         self.capacity = int(capacity)
         self.feature_dim = int(feature_dim)
         self.rng = rng or np.random.default_rng()
-        self.alpha = float(alpha)          # 0 -> uniform, >0 -> prioritised
-        self.eps = float(eps)              # floor added to every priority
+        self.alpha = float(alpha)  # 0 -> uniform, >0 -> prioritised
+        self.eps = float(eps)  # floor added to every priority
 
         self.phi = np.zeros((self.capacity, feature_dim), dtype=np.float32)
         self.next_phi = np.zeros((self.capacity, feature_dim), dtype=np.float32)
         self.action = np.zeros(self.capacity, dtype=np.int64)
-        self.next_action = np.zeros(self.capacity, dtype=np.int64)   # for SARSA bootstrap
+        self.next_action = np.zeros(
+            self.capacity, dtype=np.int64
+        )  # for SARSA bootstrap
         self.reward = np.zeros(self.capacity, dtype=np.float32)
         self.done = np.zeros(self.capacity, dtype=np.float32)
         self.episode = np.zeros(self.capacity, dtype=np.int64)
@@ -57,7 +59,7 @@ class ReplayBuffer:
         self.reward[i] = reward
         self.done[i] = float(done)
         self.episode[i] = episode
-        self.priority[i] = self._max_priority       # new samples: max priority
+        self.priority[i] = self._max_priority  # new samples: max priority
 
         self._next = (self._next + 1) % self.capacity
         self._size = min(self._size + 1, self.capacity)
@@ -111,7 +113,9 @@ class ReplayBuffer:
                 break
         # early training: too few distinct episodes -> relax to fill the batch
         if len(chosen) < batch_size:
-            chosen.extend(int(i) for i in self.rng.integers(0, n, size=batch_size - len(chosen)))
+            chosen.extend(
+                int(i) for i in self.rng.integers(0, n, size=batch_size - len(chosen))
+            )
         return np.array(chosen, dtype=np.int64)
 
     def update_priorities(self, indices, td_errors):

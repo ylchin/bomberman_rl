@@ -19,12 +19,21 @@ class Task3Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             source = root / "task2.pkl"
-            source.write_bytes(pickle.dumps(dict(W=np.ones((6, 32)), feature_dim=32,
-                                                 n_actions=6, actions=ACTIONS)))
-            cfg = dict(init_checkpoint=str(source), resume=False, seed=1,
-                       weights_out=str(root / "task3.pkl"),
-                       best_weights_out=str(root / "task3_best.pkl"),
-                       log_csv=str(root / "training.csv"))
+            source.write_bytes(
+                pickle.dumps(
+                    dict(
+                        W=np.ones((6, 32)), feature_dim=32, n_actions=6, actions=ACTIONS
+                    )
+                )
+            )
+            cfg = dict(
+                init_checkpoint=str(source),
+                resume=False,
+                seed=1,
+                weights_out=str(root / "task3.pkl"),
+                best_weights_out=str(root / "task3_best.pkl"),
+                log_csv=str(root / "training.csv"),
+            )
             agent = SimpleNamespace(train=True, logger=Mock())
             with patch.dict(callbacks.config.TRAIN, cfg):
                 callbacks.setup(agent)
@@ -37,8 +46,11 @@ class Task3Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "legacy.pkl"
             weights = np.arange(6 * 32, dtype=float).reshape(6, 32)
-            path.write_bytes(pickle.dumps(dict(W=weights, feature_dim=32,
-                                              n_actions=6, actions=ACTIONS)))
+            path.write_bytes(
+                pickle.dumps(
+                    dict(W=weights, feature_dim=32, n_actions=6, actions=ACTIONS)
+                )
+            )
             original = path.read_bytes()
             with self.assertRaises(ValueError):
                 LinearQ.load(path)
@@ -48,7 +60,9 @@ class Task3Tests(unittest.TestCase):
             np.testing.assert_array_equal(model.W[:, 32:], 0)
             self.assertEqual(path.read_bytes(), original)
             model.save(Path(folder) / "new.pkl")
-            np.testing.assert_array_equal(LinearQ.load(Path(folder) / "new.pkl").W, model.W)
+            np.testing.assert_array_equal(
+                LinearQ.load(Path(folder) / "new.pkl").W, model.W
+            )
 
     def test_incompatible_checkpoints_rejected(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -59,8 +73,11 @@ class Task3Tests(unittest.TestCase):
                 (34, ACTIONS, np.zeros((5, 34))),
                 (34, ACTIONS, np.full((6, 34), np.nan)),
             ):
-                path.write_bytes(pickle.dumps(dict(W=weights, feature_dim=dim,
-                                                  n_actions=6, actions=actions)))
+                path.write_bytes(
+                    pickle.dumps(
+                        dict(W=weights, feature_dim=dim, n_actions=6, actions=actions)
+                    )
+                )
                 with self.assertRaises(ValueError):
                     LinearQ.load(path, allow_legacy_padding=True)
 
@@ -68,11 +85,21 @@ class Task3Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "stats.json"
             for score, expected in [(7, (1, 0, 0)), (5, (0, 1, 0)), (0, (0, 0, 1))]:
-                path.write_text(json.dumps({"by_agent": {
-                    "our_agent_0": {"score": score},
-                    "opponent_0": {"score": 5}, "opponent_1": {"score": 2}}}))
+                path.write_text(
+                    json.dumps(
+                        {
+                            "by_agent": {
+                                "our_agent_0": {"score": score},
+                                "opponent_0": {"score": 5},
+                                "opponent_1": {"score": 2},
+                            }
+                        }
+                    )
+                )
                 row = parse_result_file(path, "our_agent", 22000, 0, 3)
-                self.assertEqual(tuple(row[k] for k in ("win", "tie", "loss")), expected)
+                self.assertEqual(
+                    tuple(row[k] for k in ("win", "tie", "loss")), expected
+                )
                 self.assertEqual(len(json.loads(row["opponent_scores"])), 2)
             path.write_text(json.dumps({"by_agent": {"our_agent": {}}}))
             self.assertEqual(parse_result_file(path, "our_agent", 1, 0, 2)["win"], "")

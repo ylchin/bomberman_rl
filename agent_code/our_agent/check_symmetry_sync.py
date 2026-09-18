@@ -2,7 +2,7 @@
 check_symmetry_sync.py
 
 Verifies that features.DIRECTIONAL_GROUPS still matches the actual layout
-of features.FEATURE_NAMES, and that symmetry.apply_to_features / 
+of features.FEATURE_NAMES, and that symmetry.apply_to_features /
 apply_to_action form a consistent, invertible group action (i.e. augmenting
 a transition doesn't silently mislabel it).
 
@@ -16,7 +16,13 @@ known parent package".)
 """
 
 import numpy as np
-from .features import FEATURE_NAMES, FEATURE_DIM, DIRECTIONAL_GROUPS, DIRECTIONS, ACTIONS
+from .features import (
+    FEATURE_NAMES,
+    FEATURE_DIM,
+    DIRECTIONAL_GROUPS,
+    DIRECTIONS,
+    ACTIONS,
+)
 from .symmetry import sym_transforms, apply_to_features, apply_to_action
 
 
@@ -30,23 +36,29 @@ def check_groups_match_names():
     problems = []
     for start, has_none in DIRECTIONAL_GROUPS:
         span = 5 if has_none else 4
-        names = FEATURE_NAMES[start:start + span]
+        names = FEATURE_NAMES[start : start + span]
         if len(names) != span:
-            problems.append(f"offset {start}: expected {span} names, only {len(names)} exist "
-                             f"(FEATURE_DIM={FEATURE_DIM})")
+            problems.append(
+                f"offset {start}: expected {span} names, only {len(names)} exist "
+                f"(FEATURE_DIM={FEATURE_DIM})"
+            )
             continue
 
-        prefixes = [n.rsplit('_', 1)[0] for n in names[:4]]
+        prefixes = [n.rsplit("_", 1)[0] for n in names[:4]]
         if len(set(prefixes)) != 1:
             problems.append(f"offset {start}: inconsistent prefixes {names[:4]}")
             continue
         prefix = prefixes[0]
 
-        expected_suffixes = ['UP', 'RIGHT', 'DOWN', 'LEFT'] + (['NONE'] if has_none else [])
-        actual_suffixes = [n.rsplit('_', 1)[1] for n in names]
+        expected_suffixes = ["UP", "RIGHT", "DOWN", "LEFT"] + (
+            ["NONE"] if has_none else []
+        )
+        actual_suffixes = [n.rsplit("_", 1)[1] for n in names]
         if actual_suffixes != expected_suffixes:
-            problems.append(f"offset {start} ('{prefix}'): expected suffix order "
-                             f"{expected_suffixes}, got {actual_suffixes}")
+            problems.append(
+                f"offset {start} ('{prefix}'): expected suffix order "
+                f"{expected_suffixes}, got {actual_suffixes}"
+            )
 
     if problems:
         print("MISMATCHES FOUND between DIRECTIONAL_GROUPS and FEATURE_NAMES:")
@@ -54,8 +66,10 @@ def check_groups_match_names():
             print(f"  - {p}")
         return False
 
-    print(f"OK: all {len(DIRECTIONAL_GROUPS)} DIRECTIONAL_GROUPS entries match "
-          f"FEATURE_NAMES layout (FEATURE_DIM={FEATURE_DIM}).")
+    print(
+        f"OK: all {len(DIRECTIONAL_GROUPS)} DIRECTIONAL_GROUPS entries match "
+        f"FEATURE_NAMES layout (FEATURE_DIM={FEATURE_DIM})."
+    )
     return True
 
 
@@ -102,11 +116,15 @@ def check_symmetry_group_consistency():
                     found_inverse = True
                     break
         if not found_inverse:
-            print(f"FAIL: op '{op.get('name', op)}' has no consistent inverse among the 8 ops")
+            print(
+                f"FAIL: op '{op.get('name', op)}' has no consistent inverse among the 8 ops"
+            )
             all_ok = False
 
     if all_ok:
-        print(f"OK: all {len(ops)} ops are invertible and features/actions transform consistently.")
+        print(
+            f"OK: all {len(ops)} ops are invertible and features/actions transform consistently."
+        )
     return all_ok
 
 
