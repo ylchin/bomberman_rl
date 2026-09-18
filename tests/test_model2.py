@@ -71,7 +71,19 @@ class Model2Tests(unittest.TestCase):
             torch.testing.assert_close(value, model.online.state_dict()[key])
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "model.pt"
-            model.save(path)
+            original_replace = Path.replace
+            attempts = []
+
+            def temporarily_locked(source, target):
+                attempts.append(1)
+                if len(attempts) == 1:
+                    raise PermissionError("Checkpoint temporarily locked")
+                return original_replace(source, target)
+
+            with patch.object(Path, "replace", temporarily_locked), \
+                    patch("agent_code.our_agent.model_net.time.sleep"):
+                model.save(path)
+            self.assertEqual(len(attempts), 2)
             loaded = NetQ.load(path, training=True)
             self.assertEqual(loaded.updates, 2)
             np.testing.assert_array_equal(model.q_values(phi), loaded.q_values(phi))

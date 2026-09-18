@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from pathlib import Path
+import time
 
 import numpy as np
 import torch
@@ -143,7 +144,16 @@ class NetQ:
                         optimizer=self.optimizer.state_dict(), updates=self.updates,
                         target_update_every=self.target_update_every,
                         grad_clip=self.grad_clip), temporary)
-        temporary.replace(path)
+        # Windows scanners/readers can briefly deny replacement of an existing
+        # checkpoint. Keep the valid old file and retry the atomic replacement.
+        for attempt in range(20):
+            try:
+                temporary.replace(path)
+                break
+            except PermissionError:
+                if attempt == 19:
+                    raise
+                time.sleep(0.25)
 
     @classmethod
     def load(cls, path, *, device="cpu", seed=None, training=False,
