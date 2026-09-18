@@ -12,8 +12,8 @@ scalar training reward.
 import events as e
 from .features import (
     DIRECTIONS, DIRECTION_VECTORS,
-    danger_map, get_blast_coords, bfs_direction,
-    MAX_DIST_NORM,
+    danger_map, get_blast_coords, bfs_direction, crate_approach_targets,
+    opponent_trapped, MAX_DIST_NORM,
 )
 
 # ---------------------------------------------------------------------------
@@ -61,7 +61,29 @@ GAME_REWARDS = {
     ESCAPED_DANGER: 0.30,
     BOMB_NEXT_TO_CRATE: 0.05,
     USELESS_BOMB: -0.10,
-    BOMB_WITH_NO_ESCAPE: -0.40,
+    BOMB_WITH_NO_ESCAPE: -0.55,
+    # Tried doubling these (0.60/0.45/0.80) + n_step=5 + symmetry together on
+    # 2026-09-17: official eval coins dropped 28.1 -> 9.7, training curve
+    # plateaued at ep~3000/8000. Reverted. If retrying, change ONE of these
+    # three things at a time so a regression is attributable.
+    #
+    # 2026-09-17, second finding: with -0.40 unchanged, more training time
+    # alone (3000 -> 6000 rounds, nothing else changed) raised coins
+    # 35.55->37.90 but self-kill 6%->11% -- self-kill is a structural issue,
+    # not an undertraining issue.
+    #
+    # 2026-09-17, third: -0.40 -> -0.55 alone (n_step=3, no symmetry, 3000
+    # rounds, otherwise = baseline): coins 35.55->37.42, self-kill 6%->4%.
+    # Both moved the right way together -- confirmed single-variable win.
+    #
+    # 2026-09-17, fourth: pushed -0.55 -> -0.70. Self-kill kept improving
+    # (4%->1%) but coins collapsed 37.42->21.98 (variance 11.9->18.6) --
+    # model got too bomb-shy to clear crates. Overshoot. REVERTED to -0.55,
+    # the best coins/safety point found on this single lever. Neither -0.55
+    # nor -0.70 clears both exit-criteria thresholds simultaneously (<2%
+    # self-kill AND >=40/50 coins) -- this axis alone won't get there; the
+    # remaining self-kill gap likely needs a feature/execution fix (better
+    # escape routing), not just a bigger penalty. -0.55 is current best.
 }
 
 
@@ -163,29 +185,50 @@ def detect_custom_events(old_state, self_action, new_state):
 
 
 # ---------------------------------------------------------------------------
-# Potential-based shaping  (Lecture 36 sec.9)  --  F = gamma*Phi(s') - Phi(s)
+# Potential-based shaping  (Lecture 36)  --  F = gamma*Phi(s') - Phi(s)
 # ---------------------------------------------------------------------------
 def potential(game_state):
     """
-    Phi(s): higher is better. Purely a function of state (never of the action),
-    which is what makes the shaping term provably policy-invariant.
+    Phi(s): higher is better. Afunction of state (never of the action).
 
-    Current design (good for Tasks 1-2):
-      + closeness to the nearest reachable coin
+    Design:
+      + closeness to the nearest reachable coin        (weight 1.0)
+      + closeness to a tile from which a crate can be bombed, only when no
+        coin is currently visible                       (weight 0.5)
+      + closeness to the nearest opponent               (weight 1.0, Tasks 3-4)
+      + a flat bonus while that opponent is currently trapped -- reuses
+        features.opponent_trapped so "worth attacking now" can never
+        silently disagree between the feature and the reward
       - being in a blast path, scaled by how soon it detonates
-    Extend with an opponent term for Tasks 3-4.
     """
     if game_state is None:
         return 0.0
 
     phi = 0.0
     pos = _agent_pos(game_state)
+    field = game_state["field"]
 
     coins = game_state["coins"]
     if coins:
         _, dist = bfs_direction(game_state, coins)
         if dist is not None:
             phi += 1.0 - min(dist, MAX_DIST_NORM) / MAX_DIST_NORM  # in [0, 1]
+    else:
+        crate_tiles = crate_approach_targets(field)
+        if crate_tiles:
+            _, dist = bfs_direction(game_state, crate_tiles)
+            if dist is not None:
+                phi += 0.5 * (1.0 - min(dist, MAX_DIST_NORM) / MAX_DIST_NORM)
+
+    others = game_state["others"]
+    if others:
+        opp_coords = [p for (_, _, _, p) in others]
+        _, opp_dist = bfs_direction(game_state, opp_coords)
+        if opp_dist is not None:
+            phi += 1.0 - min(opp_dist, MAX_DIST_NORM) / MAX_DIST_NORM
+        nearest_opp = min(opp_coords, key=lambda p: abs(pos[0] - p[0]) + abs(pos[1] - p[1]))
+        if opponent_trapped(field, nearest_opp):
+            phi += 1.5  # kill opportunity right now -- worth a strong nudge
 
     dmap = danger_map(game_state)
     d = dmap[pos]

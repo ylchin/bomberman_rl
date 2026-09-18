@@ -15,7 +15,8 @@ end_of_round. See config.TRAIN for every knob.
 
 import csv
 import os
-from collections import Counter
+import shutil
+from collections import Counter, deque
 
 import numpy as np
 
@@ -23,7 +24,7 @@ import events as e
 from .features import ACTIONS, FEATURE_DIM, state_to_features
 from .replay_buffer import ReplayBuffer
 from .rewards import reward_from_events, detect_custom_events, potential_shaping
-from .config import TRAIN, WEIGHTS_FILE, MODEL
+from .config import TRAIN, MODEL
 
 _ACTION_ID = {name: i for i, name in enumerate(ACTIONS)}
 
@@ -33,9 +34,20 @@ def setup_training(self):
     cfg = TRAIN
     self.t = cfg  # shorthand
 
+    if MODEL == "net":
+        from .model_net import INPUT_DIM, encode_state, transform_input
+        self.feature_dim = INPUT_DIM
+        self.encode_state = encode_state
+        self.transform_input = transform_input
+    else:
+        from .symmetry import apply_to_features
+        self.feature_dim = FEATURE_DIM
+        self.encode_state = state_to_features
+        self.transform_input = apply_to_features
+
     self.buffer = ReplayBuffer(
         capacity=cfg["buffer_capacity"],
-        feature_dim=FEATURE_DIM,
+        feature_dim=self.feature_dim,
         rng=self.rng,
         alpha=cfg["priority_alpha"],
     )
@@ -50,7 +62,10 @@ def setup_training(self):
     self.alpha = _alpha(self, 0)
 
     os.makedirs("weights", exist_ok=True)
-    self._weights_path = WEIGHTS_FILE[MODEL]
+    self._weights_path = cfg["weights_out"]
+    self._best_weights_path = cfg["best_weights_out"]
+    self._best_coins_avg = -1.0
+    self._recent_coins = deque(maxlen=100)  # rolling window used to detect "best so far"
     self._csv_path = cfg["log_csv"]
     _csv_header(self._csv_path)
 
@@ -62,8 +77,9 @@ def setup_training(self):
         self._sym = None
 
     self.logger.info(
-        f"training: model={MODEL} rule={cfg['rule']} k={cfg['n_step']} "
-        f"gamma={cfg['gamma']} alpha={cfg['alpha']}"
+        f"training: preset={cfg.get('preset')} model={MODEL} rule={cfg['rule']} "
+        f"k={cfg['n_step']} gamma={cfg['gamma']} alpha={cfg['alpha']}->{cfg.get('alpha_end')} "
+        f"eps_end={cfg['eps_end']} buffer={cfg['buffer_capacity']}"
     )
 
 
@@ -76,7 +92,7 @@ def game_events_occurred(self, old_game_state, self_action, new_game_state, even
     reward = reward_from_events(events, self.logger)
     reward += potential_shaping(old_game_state, new_game_state, self.t["gamma"])
 
-    phi = state_to_features(old_game_state)
+    phi = self.encode_state(old_game_state)
     self.traj.append((phi, _ACTION_ID[self_action], reward))
     self.ep_reward += reward
     self.ep_counts.update(events)
@@ -89,22 +105,32 @@ def game_events_occurred(self, old_game_state, self_action, new_game_state, even
 # ---------------------------------------------------------------------------
 def end_of_round(self, last_game_state, last_action, events):
     events = list(events)
-    reward = reward_from_events(events, self.logger)
-    # terminal: potential(terminal) := 0, so no shaping term on the last step
+    died = e.KILLED_SELF in events or e.GOT_KILLED in events
+    survived = e.SURVIVED_ROUND in events
 
-    if last_action is not None:
-        phi = state_to_features(last_game_state)
-        self.traj.append((phi, _ACTION_ID[last_action], reward))
-    self.ep_reward += reward
-    self.ep_counts.update(events)
+    # The framework delivers a survivor's final step to game_events_occurred AND
+    # again here (plus SURVIVED_ROUND). A dead agent's final step comes ONLY here.
+    if died or not survived or not self.traj:
+        reward = reward_from_events(events, self.logger)   # terminal: no shaping term
+        if last_action is not None:
+            phi = self.encode_state(last_game_state)
+            self.traj.append((phi, _ACTION_ID[last_action], reward))
+        self.ep_reward += reward
+        self.ep_counts.update(events)
+    else:
+        # survivor: fold only the genuinely-new SURVIVED_ROUND into the last step
+        bonus = reward_from_events([e.SURVIVED_ROUND])
+        phi, a, r = self.traj[-1]
+        self.traj[-1] = (phi, a, r + bonus)
+        self.ep_reward += bonus
+        self.ep_counts[e.SURVIVED_ROUND] += 1
 
     _flush_episode_to_buffer(self)
     _learn(self, n_iters=self.t["learn_iters_end"])
 
     self.episode += 1
-    if self.episode % self.t["save_every"] == 0:
-        self.model.save(self._weights_path)
     self.model.save(self._weights_path)  # always keep the latest
+    _update_best_checkpoint(self)
 
     _write_csv_row(self, last_game_state)
 
@@ -119,6 +145,27 @@ def end_of_round(self, last_game_state, last_action, events):
 # ---------------------------------------------------------------------------
 # internals
 # ---------------------------------------------------------------------------
+def _update_best_checkpoint(self):
+    """
+    Keep a `*_best.pkl` copy of the checkpoint whose trailing-100-episode
+    average coins is the best seen so far, alongside the always-overwritten
+    `*_latest.pkl`. A run CAN get worse after it was already good (bad
+    hyperparameter change, late-training instability) -- without this, the
+    only checkpoint on disk is whatever the run happened to end on.
+    Uses training-time coins (epsilon > 0, so noisier than a real eval) as a
+    cheap proxy -- it's for "don't lose a good run", not a substitute for
+    evaluate.py before actually shipping a model.
+    """
+    self._recent_coins.append(self.ep_counts[e.COIN_COLLECTED])
+    if len(self._recent_coins) < self._recent_coins.maxlen:
+        return  # not enough history yet to trust the average
+    avg = sum(self._recent_coins) / len(self._recent_coins)
+    if avg > self._best_coins_avg:
+        self._best_coins_avg = avg
+        shutil.copyfile(self._weights_path, self._best_weights_path)
+        self.logger.info(f"new best checkpoint: {avg:.1f} avg coins/ep (last 100) -> {self._best_weights_path}")
+
+
 def _epsilon(self, episode):
     c = TRAIN
     frac = min(1.0, episode / max(1, c["eps_decay_episodes"]))
@@ -140,7 +187,7 @@ def _flush_episode_to_buffer(self):
     if T == 0:
         return
     gamma, k = self.t["gamma"], self.t["n_step"]
-    zeros = np.zeros(FEATURE_DIM, dtype=np.float32)
+    zeros = np.zeros(self.feature_dim, dtype=np.float32)
 
     for t in range(T):
         R, discount = 0.0, 1.0
@@ -167,10 +214,10 @@ def _push(self, phi, a, R, boot_phi, boot_a, done):
             if op == (False, 0):
                 continue
             self.buffer.push(
-                self._sym.apply_to_features(phi, op),
+                self.transform_input(phi, op),
                 self._sym.apply_to_action(a, op),
                 R,
-                self._sym.apply_to_features(boot_phi, op),
+                self.transform_input(boot_phi, op),
                 self._sym.apply_to_action(boot_a, op),
                 done,
                 ep,

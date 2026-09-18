@@ -1,40 +1,20 @@
 """
-symmetry.py 
-
-The Bomberman board has 8 symmetries (4 rotations x optional mirror = the
-dihedral group D4). Any transition (state, action, reward, next_state) can be
-turned into 8 equally-valid training examples by applying the same transform
-to the state/features AND to the action label consistently.
-
-Two ways to use this, both supported:
-
-  1. RECOMMENDED — transform the raw game_state coordinates *before* running
-     features.state_to_features / state_to_channels on it. This is the most
-     robust option since it can never get out of sync with feature layout
-     changes: apply_to_state() + re-extract features.
-
-  2. FASTER — transform an already-computed feature vector directly via
-     apply_to_features(), using the DIRECTIONAL_GROUPS metadata exported by
-     features.py. Only permutes the directional one-hot blocks; use this once
-     features.py is stable and you want to avoid recomputing BFS 8x per
-     transition.
-
-Either way, apply_to_action() must be used to transform the label action to
-match, or your model will learn "go right" for boards that were flipped to
-actually require "go left".
+the bomberman board has 8 symmetries (4 rotations x optional mirror = the dihedral group D4)
+any transition (state, action, reward, next_state) can be turned into 8 equally-valid training examples 
+by applying the same transform to the state/features AND to the action label consistently
 """
 
 import numpy as np
 from .features import ACTIONS, DIRECTIONS, DIRECTION_VECTORS, DIRECTIONAL_GROUPS
 
-# The 8 ops, as (flip_first: bool, n_rotations_cw: int).
-# flip = mirror across the vertical axis (x -> W-1-x) applied BEFORE rotating.
+#the 8 ops, as (flip_first: bool, n_rotations_cw: int) 
+#flip = mirror across the vertical axis (x -> W-1-x) applied BEFORE rotating
 def sym_transforms():
-    """Returns the list of 8 op identifiers. Pass these to the apply_* functions."""
+    #Returns the list of 8 op identifiers. Pass these to the apply_* functions
     return [(flip, k) for flip in (False, True) for k in range(4)]
 
 
-# --- linear part, shared by coordinate and direction-vector transforms -----
+#linear part, shared by coordinate and direction-vector transforms
 def _flip_vec(dx, dy):
     return (-dx, dy)
 
@@ -51,10 +31,9 @@ def _transform_vec(dx, dy, op):
 
 
 def apply_to_coord(x, y, op, width, height):
-    """
-    Transform a single board coordinate under op. width/height are the
-    field's dimensions (board is square in this game, but kept general).
-    """
+    #Transform a single board coordinate under op. 
+    #width/height are the field's dimensions (board is square in this game, but kept general)
+  
     flip, k = op
     w, h = width, height
     if flip:
@@ -65,11 +44,9 @@ def apply_to_coord(x, y, op, width, height):
 
 
 def apply_to_action(action_id_or_name, op):
-    """
-    Transform an action under op. Non-directional actions (WAIT, BOMB) are
-    unchanged. Accepts either an int id (index into ACTIONS) or the action
-    name string; returns the same type it was given.
-    """
+    #transform an action under op. non-directional actions (WAIT, BOMB) are unchanged. 
+    #accepts either an int id (index into ACTIONS) or the action name string, returns the same type it was given
+    
     is_name = isinstance(action_id_or_name, str)
     name = action_id_or_name if is_name else ACTIONS[action_id_or_name]
 
@@ -84,15 +61,13 @@ def apply_to_action(action_id_or_name, op):
 
 
 def apply_to_features(vec, op):
-    """
-    Permute a state_to_features() vector under op. Only touches the
-    directional one-hot blocks listed in features.DIRECTIONAL_GROUPS;
-    everything else (scalars, distances) is copied unchanged, since those
-    are rotation/flip-invariant magnitudes.
-    """
+    #permute a state_to_features() vector under op
+    #only touches the directional one-hot blocks listed in features.DIRECTIONAL_GROUPS
+    # everything else (scalars, distances) is copied unchanged, since those are rotation/flip-invariant magnitudes
+    
     out = np.array(vec, dtype=vec.dtype if hasattr(vec, 'dtype') else np.float32)
 
-    # Build the direction permutation implied by op once, reuse for every group.
+    # Build the direction permutation implied by op once, reuse for every group
     perm = [DIRECTIONS.index(apply_to_action(d, op)) for d in DIRECTIONS]
 
     for start, has_none in DIRECTIONAL_GROUPS:
@@ -109,15 +84,11 @@ def apply_to_features(vec, op):
 
 
 def apply_to_state(game_state, op):
-    """
-    Transform an entire raw game_state dict under op — the robust path.
-    Returns a NEW dict; does not mutate the input. Recompute features from
-    this via features.state_to_features(transformed_state) /
-    state_to_channels(transformed_state).
-
-    Note: 'round', 'step', 'user_input' pass through unchanged; only spatial
-    fields are transformed.
-    """
+    #Transform an entire raw game_state dict under op — the robust path
+    #returns a new dict, does not mutate the input
+    #recompute features from this via features.state_to_features(transformed_state) / state_to_channels(transformed_state)
+    #'round', 'step', 'user_input' pass through unchanged, only spatial fields are transformed
+    
     field = game_state['field']
     w, h = field.shape
 
@@ -151,21 +122,11 @@ def apply_to_state(game_state, op):
     return new_state
 
 
-def augment_transition(state, action, reward, next_state, use_state_transform=True,
-                        feature_fn=None):
-    """
-    Convenience wrapper: given one (state, action, reward, next_state)
-    transition, returns a list of 8 augmented transitions.
-
-    If use_state_transform=True (recommended), `state`/`next_state` are raw
-    game_state dicts and `feature_fn` (e.g. features.state_to_features) is
-    called on each transformed state to produce the final training input.
-
-    If use_state_transform=False, `state`/`next_state` are already feature
-    vectors and apply_to_features() is used directly instead (faster, but
-    only valid for the flat-vector case, not channel stacks — channel stacks
-    should always go through apply_to_state + state_to_channels).
-    """
+def augment_transition(state, action, reward, next_state, use_state_transform=True, feature_fn=None):
+    #given one (state, action, reward, next_state) transition, returns a list of 8 augmented transitions
+    #if use_state_transform=True (recommended), state/next_state are raw game_state dicts and feature_fn
+    #if use_state_transform=False, state/next_state are already feature vectors and apply_to_features() is used directly instead 
+    
     out = []
     for op in sym_transforms():
         new_action = apply_to_action(action, op)
