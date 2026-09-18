@@ -45,25 +45,40 @@ class LinearQ:
         return Phi @ self.W.T
 
     # ------------------------------------------------------------------ act
-    def act(self, phi, epsilon=0.0, beta=None, rng=None):
+    @staticmethod
+    def legal_actions(phi):
+        """Use observed move occupancy and bomb availability, not tactical rules."""
+        phi = np.asarray(phi)
+        legal = np.ones((*phi.shape[:-1], N_ACTIONS), dtype=bool)
+        legal[..., :4] = phi[..., :4] < 0.5
+        legal[..., 5] = phi[..., 4] > 0.5
+        return legal
+
+    def act(self, phi, epsilon=0.0, beta=None, rng=None, action_mask=None):
         """
         Returns an action id in [0, n_actions).
           epsilon > 0  -> epsilon-greedy
           beta not None -> softmax(beta * Q) (overrides epsilon-greedy)
         """
         rng = rng or self._rng
+        legal = self.legal_actions(phi)
+        if action_mask is not None:
+            legal &= np.asarray(action_mask, dtype=bool)
+        candidates = np.flatnonzero(legal)
+        if len(candidates) == 0:
+            return ACTIONS.index("WAIT")
         if beta is not None:
-            q = self.q_values(phi)
+            q = self.q_values(phi)[candidates]
             q = q - q.max()
             p = np.exp(beta * q)
             p /= p.sum()
-            return int(rng.choice(self.n_actions, p=p))
+            return int(rng.choice(candidates, p=p))
         if epsilon > 0.0 and rng.random() < epsilon:
-            return int(rng.integers(self.n_actions))
-        q = self.q_values(phi)
+            return int(rng.choice(candidates))
+        q = self.q_values(phi)[candidates]
         # random tie-break among the argmax set
         best = np.flatnonzero(q == q.max())
-        return int(rng.choice(best))
+        return int(rng.choice(candidates[best]))
 
     # ------------------------------------------------------------------ targets
     def bootstrap_value(self, next_Phi, done, next_actions=None, rule="q"):
@@ -77,7 +92,7 @@ class LinearQ:
                 raise ValueError("SARSA target needs next_actions")
             v = q_next[np.arange(len(q_next)), next_actions]
         else:
-            v = q_next.max(axis=1)
+            v = np.where(self.legal_actions(next_Phi), q_next, -np.inf).max(axis=1)
         return v * (1.0 - np.asarray(done, dtype=np.float64))
 
     # ------------------------------------------------------------------ learn
@@ -116,11 +131,23 @@ class LinearQ:
                          "n_actions": self.n_actions, "actions": ACTIONS}, f)
 
     @classmethod
-    def load(cls, path):
+    def load(cls, path, *, allow_legacy_padding=False):
         with open(path, "rb") as f:
             data = pickle.load(f)
-        m = cls(feature_dim=data["feature_dim"], n_actions=data["n_actions"])
-        m.W = data["W"]
         if data.get("actions") != ACTIONS:
             raise ValueError("Checkpoint action order differs from features.ACTIONS")
+        old_dim = data["feature_dim"]
+        weights = np.asarray(data["W"], dtype=np.float64)
+        if data["n_actions"] != N_ACTIONS or weights.shape != (N_ACTIONS, old_dim):
+            raise ValueError("Checkpoint weight shape or action count is invalid")
+        if not np.isfinite(weights).all():
+            raise ValueError("Checkpoint contains non-finite weights")
+        legacy_ok = allow_legacy_padding and old_dim in (32, 34) and old_dim < FEATURE_DIM
+        if old_dim != FEATURE_DIM and not legacy_ok:
+            raise ValueError(
+                f"Checkpoint has {old_dim} features; expected {FEATURE_DIM}. "
+                "Set AGENT_INIT_CHECKPOINT to explicitly pad a legacy 32/34-dim model."
+            )
+        m = cls()
+        m.W[:, :old_dim] = weights
         return m

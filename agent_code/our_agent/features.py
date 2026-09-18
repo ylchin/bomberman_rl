@@ -14,10 +14,8 @@ ACTIONS ORDER IS LAW. Every index below (in ACTIONS, in one-hot blocks, in
 symmetry.py) assumes this exact order. Do not reorder without updating
 symmetry.py and every trained checkpoint.
 
-*** FEATURE_DIM CHANGED 32 -> 34 (added OPP_TRAPPED, OPP_NEAR_DEADEND at the
-end, indices 32-33). Existing indices 0-31 are UNCHANGED. Any q_linear.pkl
-trained against the old 32-dim vector is now incompatible and must be
-retrained -- ping Person B before pulling this in. ***
+Legacy 32/34-dim linear checkpoints can be used only as explicit initialization
+checkpoints; q_linear.load pads the appended columns with zeros. ***
 """
 
 from collections import deque
@@ -49,10 +47,9 @@ MAX_DANGER_NORM = float(BOMB_TIMER + EXPLOSION_LINGER)  # cap for danger-step no
 
 
 # ---------------------------------------------------------------------------
-# Feature vector layout (D = 34). Keep this list and the code that fills it
-# in sync — symmetry.py's DIRECTIONAL_GROUPS depends on these exact offsets
-# for indices 0-31; indices 32-33 are new, non-directional, appended at the
-# end so nothing above them shifts.
+# Feature vector layout (D = 37). Keep this list and the code that fills it
+# in sync. Symmetry only permutes directional groups; the appended interaction
+# features are scalar/invariant, so adding them does not affect Model 2.
 # ---------------------------------------------------------------------------
 FEATURE_NAMES = (
     ['WALL_UP', 'WALL_RIGHT', 'WALL_DOWN', 'WALL_LEFT']       # 0-3   blocked neighbor?
@@ -68,17 +65,20 @@ FEATURE_NAMES = (
     + ['OPP_DIR_UP', 'OPP_DIR_RIGHT', 'OPP_DIR_DOWN', 'OPP_DIR_LEFT', 'OPP_DIR_NONE']  # 25-29
     + ['OPP_DIST']                                               # 30
     + ['WOULD_HIT_OPPONENT']                                     # 31    bombing now would hit an opponent
-    + ['OPP_TRAPPED']                                            # 32    NEW: nearest opp has no bomb-escape route
-    + ['OPP_NEAR_DEADEND']                                       # 33    NEW: nearest opp is standing in a dead end
+    + ['OPP_TRAPPED']                                            # 32    selected opponent cannot escape OUR proposed bomb
+    + ['OPP_NEAR_DEADEND']                                       # 33    selected opponent is standing in a dead end
+    + ['SAFE_BOMB_HITS_OPPONENT']                                 # 34    bomb now hits >=1 opponent and we can escape
+    + ['SAFE_BOMB_TRAPS_OPPONENT']                                # 35    bomb now traps the selected opponent and we can escape
+    + ['SAFE_BOMB_HITS_CRATE']                                    # 36    bomb now hits >=1 crate and we can escape
 )
-FEATURE_DIM = len(FEATURE_NAMES)  # 34
+FEATURE_DIM = len(FEATURE_NAMES)  # 37
 
 # Directional one-hot blocks, used by symmetry.py to know which slices to
 # permute under rotation/flip. Each tuple = (start_index, has_none_slot).
 # The first 4 entries starting at `start_index` are [UP, RIGHT, DOWN, LEFT];
 # if has_none_slot, a 5th "NONE" entry follows and is left untouched.
-# UNCHANGED by this update -- OPP_TRAPPED/OPP_NEAR_DEADEND are scalars, not
-# directional, so they need no entry here.
+# Appended opponent/bomb interaction features are scalars, so they need no
+# directional-group entry.
 DIRECTIONAL_GROUPS = [
     (0, False),   # WALL_*
     (7, True),    # COIN_DIR_*
@@ -158,49 +158,55 @@ def _walkable(field, x, y):
     return 0 <= x < w and 0 <= y < h and field[x, y] == 0
 
 
-def bfs_direction(game_state, targets, avoid_danger=False, danger=None):
+def bfs_direction_and_target(game_state, targets, avoid_danger=False, danger=None, blocked=None):
     """
-    BFS from the agent's position to the nearest tile in `targets`
-    (a set/list of (x, y) coords). Returns (first_step_direction, distance).
-    If no target is reachable, returns (None, None).
-
-    If avoid_danger=True, tiles with danger[x,y] == 1 (lethal next step) are
-    treated as walls — used for SAFE_DIR routing so we don't path through
-    something about to explode. Pass a precomputed `danger` map to avoid
-    recomputing it multiple times per act() call.
+    Time-aware BFS from the agent to the nearest reachable target. Returns
+    (first_step_direction, distance, target_coord). The returned target is the
+    exact target that the direction/distance describe, preventing opponent
+    features from accidentally referring to different opponents.
     """
     _, _, _, (sx, sy) = game_state['self']
     field = game_state['field']
     target_set = set(targets)
+    blocked = set(blocked or ())
+
+    def _unsafe_at(x, y, depth):
+        return not _walkable(field, x, y) or (x, y) in blocked or (
+            avoid_danger and danger is not None and danger[x, y] != 0 and danger[x, y] <= depth
+        )
+
     if (sx, sy) in target_set:
-        return None, 0  # already there
+        return None, 0, (sx, sy)
 
     visited = {(sx, sy)}
-    # queue entries: (x, y, first_step_direction)
     queue = deque()
     for d in DIRECTIONS:
         dx, dy = DIRECTION_VECTORS[d]
         nx, ny = sx + dx, sy + dy
-        if _walkable(field, nx, ny) and not (avoid_danger and danger is not None and danger[nx, ny] == 1):
+        if not _unsafe_at(nx, ny, 1):
             visited.add((nx, ny))
             queue.append((nx, ny, d, 1))
 
     while queue:
         x, y, first_dir, dist = queue.popleft()
         if (x, y) in target_set:
-            return first_dir, dist
+            return first_dir, dist, (x, y)
         for dx, dy in DIRECTION_VECTORS.values():
             nx, ny = x + dx, y + dy
-            if (nx, ny) in visited:
-                continue
-            if not _walkable(field, nx, ny):
-                continue
-            if avoid_danger and danger is not None and danger[nx, ny] == 1:
+            if (nx, ny) in visited or _unsafe_at(nx, ny, dist + 1):
                 continue
             visited.add((nx, ny))
             queue.append((nx, ny, first_dir, dist + 1))
 
-    return None, None
+    return None, None, None
+
+
+def bfs_direction(game_state, targets, avoid_danger=False, danger=None, blocked=None):
+    """Backward-compatible two-value wrapper around bfs_direction_and_target()."""
+    direction, distance, _ = bfs_direction_and_target(
+        game_state, targets, avoid_danger=avoid_danger, danger=danger, blocked=blocked
+    )
+    return direction, distance
 
 
 def _one_hot_direction(direction):
@@ -252,42 +258,85 @@ def is_dead_end(field, x, y):
     return _walkable(field, x, y) and local_degree(field, x, y) <= 1
 
 
-def opponent_trapped(field, opp_pos, bomb_timer=BOMB_TIMER):
+def _escape_route_from(game_state, start_pos, danger=None, blocked=None, placement_turn=False):
+    """Search positions and arrival times through all known explosion intervals.
+
+    `danger` is retained for call compatibility; the full bomb schedule is used
+    because a minimum-countdown map loses later blasts and fire expiration.
     """
-    True if, assuming a bomb detonates at the opponent's current tile
-    (worst-case: they've just been cornered and bombed there), the opponent
-    cannot reach any tile outside that blast within `bomb_timer` steps.
+    from .escape_planner import escape_route
+    return escape_route(game_state, start_pos, blocked or (), placement_turn)
 
-    Reuses get_blast_coords (same blast geometry as danger_map, so this
-    can't silently disagree with how danger is computed elsewhere). Ignores
-    other agents' bodies blocking the opponent's path (a mild
-    underestimate of how trapped they really are -- fine for a feature,
-    would need tightening for exact tournament-accurate danger).
 
-    Does not account for bombs already on the board independently of this
-    hypothetical one; a genuinely thorough version would merge with
-    danger_map, but that couples this function to the *current* danger
-    state rather than the "if I bomb them right now" hypothetical we
-    actually want here.
+def select_opponent_target(game_state):
+    """Return one consistent opponent target plus BFS direction/distance to it."""
+    opp_coords = [pos for (_, _, _, pos) in game_state['others']]
+    if not opp_coords:
+        return None, None, None
+    direction, distance, target = bfs_direction_and_target(game_state, opp_coords)
+    if target is None:
+        sx, sy = game_state['self'][3]
+        target = min(opp_coords, key=lambda p: abs(sx - p[0]) + abs(sy - p[1]))
+    return target, direction, distance
+
+
+def proposed_bomb_analysis(game_state, target_opp=None):
     """
-    blast = set(get_blast_coords(opp_pos, field))
-    visited = {opp_pos: 0}
-    queue = deque([opp_pos])
+    Analyse the bomb the agent would ACTUALLY place now (at its own tile).
+    Existing bombs are included in the danger schedule. The result is shared by
+    Model-1 features and reward shaping so they cannot silently disagree.
+    """
+    field = game_state['field']
+    _, _, bomb_possible, self_pos = game_state['self']
+    opp_coords = [pos for (_, _, _, pos) in game_state['others']]
+    if target_opp is None and opp_coords:
+        target_opp, _, _ = select_opponent_target(game_state)
 
-    while queue:
-        (x, y) = queue.popleft()
-        dist = visited[(x, y)]
-        if (x, y) not in blast:
-            return False  # found a safe tile reachable in time -> not trapped
-        if dist >= bomb_timer:
-            continue  # out of time to search further from here
-        for dx, dy in DIRECTION_VECTORS.values():
-            nx, ny = x + dx, y + dy
-            if _walkable(field, nx, ny) and (nx, ny) not in visited:
-                visited[(nx, ny)] = dist + 1
-                queue.append((nx, ny))
+    blast = set(get_blast_coords(self_pos, field))
+    hits_crate = any(field[x, y] == 1 for x, y in blast)
+    hit_opponents = set(opp_coords) & blast
 
-    return True  # exhausted every reachable tile within the time window, all lethal
+    result = {
+        'can_drop': bool(bomb_possible),
+        'blast': blast,
+        'hits_crate': hits_crate,
+        'hit_opponents': hit_opponents,
+        'hits_opponent': bool(hit_opponents),
+        'target': target_opp,
+        'target_hit': target_opp in blast if target_opp is not None else False,
+        'can_escape': False,
+        'escape_dir': None,
+        'escape_dist': None,
+        'target_trapped': False,
+    }
+    if not bomb_possible:
+        return result
+
+    hypothetical = dict(game_state)
+    hypothetical['bombs'] = list(game_state['bombs']) + [(self_pos, BOMB_TIMER)]
+    bomb_positions = {pos for pos, _ in hypothetical['bombs']}
+    opp_positions = set(opp_coords)
+
+    can_escape, escape_dir, escape_dist = _escape_route_from(
+        hypothetical, self_pos, blocked=bomb_positions | opp_positions,
+        placement_turn=True
+    )
+    result['can_escape'] = can_escape
+    result['escape_dir'] = escape_dir
+    result['escape_dist'] = escape_dist
+
+    if result['target_hit']:
+        target_can_escape, _, _ = _escape_route_from(
+            hypothetical, target_opp, blocked=bomb_positions
+        )
+        result['target_trapped'] = not target_can_escape
+
+    return result
+
+
+def opponent_trapped(game_state, opp_pos):
+    """True only if OUR proposed bomb hits this opponent and they cannot escape it."""
+    return bool(proposed_bomb_analysis(game_state, target_opp=opp_pos)['target_trapped'])
 
 
 # ---------------------------------------------------------------------------
@@ -308,12 +357,13 @@ def state_to_features(game_state):
 
     feats = np.zeros(FEATURE_DIM, dtype=np.float32)
 
-    # --- WALL_* (0-3): is the neighbor tile blocked (wall or crate)? ---
+    # --- WALL_* (0-3): blocked by terrain, a bomb, or another agent. ---
+    occupied = {pos for pos, _ in game_state['bombs']} | {a[3] for a in game_state['others']}
     for i, d in enumerate(DIRECTIONS):
         dx, dy = DIRECTION_VECTORS[d]
         nx, ny = sx + dx, sy + dy
         w, h = field.shape
-        blocked = not (0 <= nx < w and 0 <= ny < h) or field[nx, ny] != 0
+        blocked = not (0 <= nx < w and 0 <= ny < h) or field[nx, ny] != 0 or (nx, ny) in occupied
         feats[i] = float(blocked)
 
     # --- BOMB_POSSIBLE (4) ---
@@ -338,36 +388,38 @@ def state_to_features(game_state):
 
     # --- SAFE_DIR (19-23): nearest tile with danger==0, avoiding walk-through-fire ---
     if my_danger > 0:
-        w, h = field.shape
-        safe_tiles = [(x, y) for x in range(w) for y in range(h)
-                      if field[x, y] == 0 and dmap[x, y] == 0]
-        safe_dir, _ = bfs_direction(game_state, safe_tiles, avoid_danger=True, danger=dmap)
+        opp_positions = {pos for (_, _, _, pos) in game_state['others']}
+        bomb_positions = {pos for pos, _ in game_state['bombs']}
+        blocked = opp_positions | bomb_positions
+        _, safe_dir, _ = _escape_route_from(game_state, (sx, sy), blocked=blocked)
     else:
         safe_dir = None
     feats[19:24] = _one_hot_direction(safe_dir)
 
-    # --- OPP_NEARBY / OPP_DIR / OPP_DIST / WOULD_HIT_OPPONENT (24-31) ---
-    # --- OPP_TRAPPED / OPP_NEAR_DEADEND (32-33), NEW ---
+    # --- Opponent target features (24-33): all describe ONE selected target. ---
     others = game_state['others']
     opp_coords = [pos for (_, _, _, pos) in others]
+    bomb_info = proposed_bomb_analysis(game_state)
     if opp_coords:
-        opp_dir, opp_dist = bfs_direction(game_state, opp_coords)
-        # nearest opponent by Manhattan distance -- also used as the target
-        # for the two new trapped/dead-end features below, so they describe
-        # the SAME opponent that OPP_DIR/OPP_DIST point at.
-        nearest_opp = min(opp_coords, key=lambda p: abs(sx - p[0]) + abs(sy - p[1]))
-        manhattan_min = abs(sx - nearest_opp[0]) + abs(sy - nearest_opp[1])
-        feats[24] = float(manhattan_min <= (2 * BOMB_POWER + 1))
+        target_opp, opp_dir, opp_dist = select_opponent_target(game_state)
+        if opp_dist is not None:
+            nearby_dist = opp_dist
+        else:
+            nearby_dist = abs(sx - target_opp[0]) + abs(sy - target_opp[1])
+        feats[24] = float(nearby_dist <= (2 * BOMB_POWER + 1))
         feats[25:30] = _one_hot_direction(opp_dir)
         feats[30] = 0.0 if opp_dist is None else min(opp_dist, MAX_DIST_NORM) / MAX_DIST_NORM
-        blast_if_bombed_here = set(get_blast_coords((sx, sy), field))
-        feats[31] = float(bool(blast_if_bombed_here & set(opp_coords)))
+        feats[31] = float(bomb_info['hits_opponent'])
+        feats[32] = float(bomb_info['target_trapped'])
+        feats[33] = float(is_dead_end(field, *target_opp))
+    else:
+        feats[29] = 1.0  # OPP_DIR_NONE
 
-        feats[32] = float(opponent_trapped(field, nearest_opp))
-        feats[33] = float(is_dead_end(field, *nearest_opp))
-    # else: leave OPP_* and OPP_TRAPPED/OPP_NEAR_DEADEND as zeros / NONE-implicit
-    # (index 29 stays 0 too — acceptable since OPP_NEARBY=0 already signals
-    # "no opponents visible", and trapped/dead-end are meaningless without one)
+    # --- Explicit Model-1 interaction features (34-36). ---
+    # A linear Q function cannot create these AND conditions on its own.
+    feats[34] = float(bomb_info['can_drop'] and bomb_info['can_escape'] and bomb_info['hits_opponent'])
+    feats[35] = float(bomb_info['can_drop'] and bomb_info['can_escape'] and bomb_info['target_trapped'])
+    feats[36] = float(bomb_info['can_drop'] and bomb_info['can_escape'] and bomb_info['hits_crate'])
 
     return feats
 

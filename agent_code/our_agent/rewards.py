@@ -12,8 +12,8 @@ scalar training reward.
 import events as e
 from .features import (
     DIRECTIONS, DIRECTION_VECTORS,
-    danger_map, get_blast_coords, bfs_direction, crate_approach_targets,
-    opponent_trapped, MAX_DIST_NORM,
+    danger_map, bfs_direction, crate_approach_targets,
+    select_opponent_target, proposed_bomb_analysis, MAX_DIST_NORM, _escape_route_from,
 )
 
 # ---------------------------------------------------------------------------
@@ -28,6 +28,8 @@ ESCAPED_DANGER = "ESCAPED_DANGER"
 BOMB_NEXT_TO_CRATE = "BOMB_NEXT_TO_CRATE"
 USELESS_BOMB = "USELESS_BOMB"
 BOMB_WITH_NO_ESCAPE = "BOMB_WITH_NO_ESCAPE"
+SAFE_BOMB_THREATENS_OPPONENT = "SAFE_BOMB_THREATENS_OPPONENT"
+SAFE_BOMB_TRAPS_OPPONENT = "SAFE_BOMB_TRAPS_OPPONENT"
 
 # ---------------------------------------------------------------------------
 # Reward table. Every value is a hyperparameter -- tune via experiments/.
@@ -62,6 +64,10 @@ GAME_REWARDS = {
     BOMB_NEXT_TO_CRATE: 0.05,
     USELESS_BOMB: -0.10,
     BOMB_WITH_NO_ESCAPE: -0.55,
+    # Small, separate aggression shaping. Keep these modest relative to the true
+    # +5 kill reward; tune one lever at a time if Task 3 needs more aggression.
+    SAFE_BOMB_THREATENS_OPPONENT: 0.10,
+    SAFE_BOMB_TRAPS_OPPONENT: 0.20,
     # Tried doubling these (0.60/0.45/0.80) + n_step=5 + symmetry together on
     # 2026-09-17: official eval coins dropped 28.1 -> 9.7, training curve
     # plateaued at ep~3000/8000. Reverted. If retrying, change ONE of these
@@ -113,10 +119,11 @@ def _moved_action(self_action, old_state, new_state):
     return None
 
 
-def detect_custom_events(old_state, self_action, new_state):
+def detect_custom_events(old_state, self_action, new_state, framework_events=()):
     """
-    Return a list of extra event strings for the transition old -> new.
-    Cheap-ish: at most a couple of BFS calls. Only runs during training.
+    Return extra event strings for old -> new. Bomb-quality rewards are emitted
+    only when the framework confirms BOMB_DROPPED, so an unavailable/invalid
+    BOMB request can never receive bomb-placement shaping.
     """
     if old_state is None or new_state is None or self_action is None:
         return []
@@ -132,18 +139,17 @@ def detect_custom_events(old_state, self_action, new_state):
 
     # --- danger handling dominates: if we were in a blast path, only judge escape ---
     if in_danger_before:
-        safe_tiles = [
-            (x, y)
-            for x in range(field.shape[0])
-            for y in range(field.shape[1])
-            if field[x, y] == 0 and old_danger[x, y] == 0
-        ]
-        safe_dir, _ = bfs_direction(old_state, safe_tiles, avoid_danger=True, danger=old_danger)
+        opp_positions = {pos for (_, _, _, pos) in old_state["others"]}
+        bomb_positions = {pos for pos, _ in old_state["bombs"]}
+        blocked = opp_positions | bomb_positions
+        can_escape, safe_dir, _ = _escape_route_from(old_state, old_pos, blocked=blocked)
         moved = _moved_action(self_action, old_state, new_state)
 
         if not in_danger_after:
             ev.append(ESCAPED_DANGER)
         elif moved is not None and moved == safe_dir:
+            ev.append(MOVED_TOWARD_SAFETY)
+        elif can_escape and safe_dir is None and self_action == "WAIT":
             ev.append(MOVED_TOWARD_SAFETY)
         else:
             ev.append(STAYED_IN_DANGER)
@@ -160,26 +166,21 @@ def detect_custom_events(old_state, self_action, new_state):
             if moved is not None and coin_dir is not None:
                 ev.append(MOVED_TOWARD_COIN if moved == coin_dir else MOVED_AWAY_FROM_COIN)
 
-    # --- bomb quality, judged at drop time ---
-    if self_action == "BOMB":
-        blast = set(get_blast_coords(old_pos, field))
-        hits_crate = any(field[x, y] == 1 for (x, y) in blast)
-        opp_positions = {pos for (_, _, _, pos) in old_state["others"]}
-        hits_opp = bool(blast & opp_positions)
-        ev.append(BOMB_NEXT_TO_CRATE if (hits_crate or hits_opp) else USELESS_BOMB)
+    # --- bomb quality, judged only after a SUCCESSFUL placement ---
+    if self_action == "BOMB" and e.BOMB_DROPPED in framework_events:
+        info = proposed_bomb_analysis(old_state)
 
-        # can we still reach safety after dropping here?
-        hypothetical = {**old_state, "bombs": list(old_state["bombs"]) + [(old_pos, 3)]}
-        post_danger = danger_map(hypothetical)
-        safe_tiles = [
-            (x, y)
-            for x in range(field.shape[0])
-            for y in range(field.shape[1])
-            if field[x, y] == 0 and post_danger[x, y] == 0
-        ]
-        sdir, sdist = bfs_direction(old_state, safe_tiles, avoid_danger=True, danger=post_danger)
-        if sdir is None or (sdist is not None and sdist > 3):
+        if info['hits_crate']:
+            ev.append(BOMB_NEXT_TO_CRATE)
+        if not info['hits_crate'] and not info['hits_opponent']:
+            ev.append(USELESS_BOMB)
+
+        if not info['can_escape']:
             ev.append(BOMB_WITH_NO_ESCAPE)
+        elif info['hits_opponent']:
+            ev.append(SAFE_BOMB_THREATENS_OPPONENT)
+            if info['target_trapped']:
+                ev.append(SAFE_BOMB_TRAPS_OPPONENT)
 
     return ev
 
@@ -195,11 +196,13 @@ def potential(game_state):
       + closeness to the nearest reachable coin        (weight 1.0)
       + closeness to a tile from which a crate can be bombed, only when no
         coin is currently visible                       (weight 0.5)
-      + closeness to the nearest opponent               (weight 1.0, Tasks 3-4)
-      + a flat bonus while that opponent is currently trapped -- reuses
-        features.opponent_trapped so "worth attacking now" can never
-        silently disagree between the feature and the reward
+      + closeness to the same BFS-selected opponent used by Model 1
       - being in a blast path, scaled by how soon it detonates
+
+    Bomb/trap opportunity is intentionally NOT placed in the potential: after
+    dropping a bomb, BOMB_POSSIBLE becomes false, so an action-opportunity
+    potential could accidentally punish the very bomb action it is meant to
+    encourage. Successful safe threats are shaped as events instead.
     """
     if game_state is None:
         return 0.0
@@ -222,13 +225,9 @@ def potential(game_state):
 
     others = game_state["others"]
     if others:
-        opp_coords = [p for (_, _, _, p) in others]
-        _, opp_dist = bfs_direction(game_state, opp_coords)
+        _, _, opp_dist = select_opponent_target(game_state)
         if opp_dist is not None:
             phi += 1.0 - min(opp_dist, MAX_DIST_NORM) / MAX_DIST_NORM
-        nearest_opp = min(opp_coords, key=lambda p: abs(pos[0] - p[0]) + abs(pos[1] - p[1]))
-        if opponent_trapped(field, nearest_opp):
-            phi += 1.5  # kill opportunity right now -- worth a strong nudge
 
     dmap = danger_map(game_state)
     d = dmap[pos]

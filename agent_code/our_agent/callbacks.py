@@ -112,10 +112,15 @@ def act(self, game_state: dict) -> str:
     self._repeat_count = self._repeat_count + 1 if ineffective_repeat else 0
     if self._repeat_count >= STUCK_AFTER:
         stuck_on = ACTIONS[action_id]
-        action_id = int(self.rng.integers(len(ACTIONS)))
+        if self.model_kind == "linear":
+            alternatives = np.ones(len(ACTIONS), dtype=bool)
+            alternatives[action_id] = False
+            action_id = self.model.act(phi, rng=self.rng, action_mask=alternatives)
+        else:
+            action_id = int(self.rng.integers(len(ACTIONS)))
         self.logger.warning(
             f"step {game_state['step']}: stuck at {pos} repeating {stuck_on!r} "
-            f"with no effect; forcing random action {ACTIONS[action_id]!r} instead"
+            f"with no effect; selecting alternative {ACTIONS[action_id]!r} instead"
         )
         self._repeat_count = 0
 
