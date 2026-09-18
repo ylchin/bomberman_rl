@@ -5,9 +5,16 @@ import numpy as np
 from agent_code.our_agent.escape_planner import escape_route
 from agent_code.our_agent.features import FEATURE_DIM, state_to_features, proposed_bomb_analysis
 from agent_code.our_agent.q_linear import LinearQ
+import events as e
+from agent_code.our_agent.rewards import (
+    detect_custom_events,
+    MOVED_INTO_DANGER,
+    BOMB_WITH_NO_ESCAPE,
+)
 
 
 def state(pos=(3, 3)):
+    
     field = np.full((9, 9), -1, dtype=int)
     field[1:-1, 1:-1] = 0
     return dict(field=field, self=('me', 0, True, pos), others=[], bombs=[],
@@ -77,3 +84,21 @@ class Model1SafetyTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+def test_safe_successful_bomb_not_penalised_as_entering_danger(self):
+    old = state((3, 3))
+
+    new = dict(old)
+    new["bombs"] = [((3, 3), 3)]
+    new["explosion_map"] = old["explosion_map"].copy()
+
+    events = detect_custom_events(
+        old,
+        "BOMB",
+        new,
+        [e.BOMB_DROPPED],
+    )
+
+    self.assertNotIn(MOVED_INTO_DANGER, events)
+    self.assertNotIn(BOMB_WITH_NO_ESCAPE, events)
+    

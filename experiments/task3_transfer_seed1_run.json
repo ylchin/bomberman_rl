@@ -1,0 +1,35 @@
+{
+  "run": "task3_transfer_seed1",
+  "model": "linear",
+  "preset": "task3",
+  "training_rounds": 4000,
+  "world_seed": 1,
+  "agent_seed": 1,
+  "source_checkpoint": "q_linear_task2_best.pkl",
+  "source_sha256_at_start": "3989fa9b8ea22c1dadec3602d4f70486e880fd6c0f220f07ac8b69e028e0490a",
+  "checkpoints": {
+    "q_linear_task3_transfer_seed1.pkl": "01fd273e80d558fb923fdf6c9c4a54344eccd13b89590c1ff6b884fefbbad647",
+    "q_linear_task3_transfer_seed1_best.pkl": "3086188a62004a78b56f59e54b5dd7ae2907f8bcf7bd142d1e8229c9ad0b2666"
+  },
+  "evaluation_seeds": [
+    22000,
+    22099
+  ],
+  "selection": "best rolling 100-round training coins",
+  "notes": [
+    "Supplied opponents remain independently stochastic.",
+    "Model 2 code edits occurred during training; training retained startup imports.",
+    "Evaluation uses edited code with AGENT_MODEL=linear explicitly selected.",
+    "Source Task 2 file changed on disk during training after it had been loaded."
+  ],
+  "evaluation_summary": {
+    "score": 0.88,
+    "coins": 0.48,
+    "kills": 0.08,
+    "self_kill": 0.07,
+    "win": 0.03,
+    "tie": 0.01,
+    "loss": 0.96
+  },
+  "evaluated_checkpoint": "q_linear_task3_transfer_seed1_best.pkl"
+}

@@ -92,6 +92,30 @@ PRESETS = {
         # coins 1.09/9, 6% kill rate, but self-kill worsened to 6% -- and
         # the training curve plateaued by ep~4000-5000.
     ),
+        "task3": dict(
+        # classic vs peaceful_agent + coin_collector_agent
+        gamma=0.97,
+        n_step=4,
+        alpha=0.02,
+        alpha_end=0.004,
+        eps_end=0.05,
+        eps_decay_episodes=2000,
+        buffer_capacity=200_000,
+        save_every=50,
+    ),
+
+    "task4": dict(
+        # classic vs full-strength rule_based_agent
+        # Start identical to Task 3 for a controlled baseline.
+        gamma=0.97,
+        n_step=4,
+        alpha=0.02,
+        alpha_end=0.004,
+        eps_end=0.05,
+        eps_decay_episodes=2000,
+        buffer_capacity=200_000,
+        save_every=50,
+    ),
 }
 
 _preset = os.environ.get("AGENT_PRESET", "").strip()
