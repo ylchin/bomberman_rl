@@ -1,31 +1,8 @@
 """
-evaluate.py
+Runs a fixed, documented set of seeded rounds against a chosen opponent lineup and writes one CSV row per round, 
+so every claimed improvement in the report is measured identically
 
-Headless evaluation harness (Person A). Runs a fixed, documented set of
-seeded rounds against a chosen opponent lineup and writes one CSV row per
-round, so every claimed improvement in the report is measured identically
-(assignment Sec. 04: held-out seeds, >=100 rounds, exploration off,
-original settings.py, no auxiliary reward -- true game score only).
-
-Confirmed against a real --save-stats output (2026-09-12):
-    {
-      "by_agent": {
-        "<agent_name>": {
-          "score": int, "steps": int, "invalid": int,
-          "coins": int (absent if 0), "suicides": int (absent if 0),
-          "bombs": int, "crates": int, "moves": int, "rounds": int, "time": float
-        }, ...
-      },
-      "by_round": {"Round 01 (...)": {"coins": int, "kills": int, "steps": int, "suicides": int}}
-    }
-NOTE: by_round is a TOTAL across all agents in that round, not per-agent --
-it cannot tell you how YOUR agent specifically did. by_agent is the primary
-source for per-agent metrics (score/coins/self-kill for `our_agent`); the
-by_round totals are pulled in as extra context columns (round_total_*).
-There is no per-agent "kills" field -- score = coins*1 + kills*5 (assignment
-Sec. 3), so per-agent kills is derived as (score - coins) / 5.
-
-CSV columns (fixed -- do not rename without updating downstream plotting):
+CSV columns:
     seed, round, task, agent_name, score, coins, kills, self_kill,
     steps_survived, invalid_actions, round_total_coins, round_total_kills,
     round_total_suicides
@@ -36,8 +13,8 @@ Usage:
         --opponents rule_based_agent rule_based_agent rule_based_agent \
         --scenario classic --n-rounds 100 --out experiments/task4_eval.csv
 
-    # curriculum task preset (recommended -- locks in scenario + opponents +
-    # a fixed held-out seed range per task, matching Section 04's protocol)
+    # curriculum task preset 
+    #locks in scenario + opponents + a fixed held-out seed range per task
     python evaluate.py --agent our_agent --task 1 --n-rounds 100 \
         --out experiments/task1_eval.csv
 """
@@ -58,12 +35,8 @@ CSV_COLUMNS = [
     "round_total_coins", "round_total_kills", "round_total_suicides",
 ]
 
-# ---------------------------------------------------------------------------
-# Curriculum task presets, matching the four tasks in the assignment PDF /
-# project plan (Section 03). Each has its own fixed, documented held-out
-# seed range so results are reproducible and never overlap with seeds used
-# during training. NEVER use these seeds for training runs.
-# ---------------------------------------------------------------------------
+
+# task presets, matching the four tasks 
 TASK_PRESETS = {
     1: {  # Navigation: collect coins, no crates, no opponents
         "scenario": "coin-heaven",
@@ -89,11 +62,9 @@ TASK_PRESETS = {
 
 
 def run_single_seed(agent: str, opponents: list, scenario: str, seed: int) -> Path:
-    """
-    Runs one seeded, single-round game with --agents (agent first, then
-    opponents -- empty opponents list is valid, for solo Task 1/2 runs) and
-    --save-stats pointed at a seed-specific file.
-    """
+    #Runs one seeded, single-round game with --agents (agent first, then opponents -- empty opponents list is valid, for solo Task 1/2 runs) 
+    #and --save-stats pointed at a seed-specific file.
+    
     STATS_DIR.mkdir(parents=True, exist_ok=True)
     stats_path = STATS_DIR / f"eval_{agent}_seed{seed}.json"
 
@@ -121,7 +92,7 @@ def run_single_seed(agent: str, opponents: list, scenario: str, seed: int) -> Pa
 
 
 def parse_result_file(path: Path, agent_name: str, seed: int, round_num: int, task) -> dict:
-    """Parses one --save-stats JSON file into our fixed CSV schema."""
+    #Parses one --save-stats JSON file into our fixed CSV schema
     with open(path) as f:
         data = json.load(f)
 
@@ -159,13 +130,10 @@ def parse_result_file(path: Path, agent_name: str, seed: int, round_num: int, ta
 
 def run_evaluation(agent, opponents, scenario, n_rounds, seed_start, out_csv: Path,
                     task=None, keep_stats_files: bool = False) -> Path:
-    """
-    Runs n_rounds separate seeded games (seed_start, seed_start+1, ...) and
-    writes every round's result as one CSV row. Re-running with the same
-    seed_start reproduces the identical evaluation -- this IS the
-    held-out-seed protocol: always evaluate this way, never compare runs
-    on different seeds or eyeball a single game.
-    """
+    #Runs n_rounds separate seeded games (seed_start, seed_start+1, ...)
+    #writes every round's result as one CSV row
+    #Re-running with the same seed_start reproduces the identical evaluation 
+    
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     rows = []
 
@@ -189,7 +157,7 @@ def run_evaluation(agent, opponents, scenario, n_rounds, seed_start, out_csv: Pa
 
 
 def summarize(csv_path: Path):
-    """Console summary: mean score, coins, kills, self-kill rate."""
+    #Console summary: mean score, coins, kills, self-kill rate
     import statistics as st
     with open(csv_path) as f:
         rows = list(csv.DictReader(f))
