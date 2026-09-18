@@ -142,11 +142,11 @@ class LinearQ:
             raise ValueError("Checkpoint weight shape or action count is invalid")
         if not np.isfinite(weights).all():
             raise ValueError("Checkpoint contains non-finite weights")
-        legacy_ok = allow_legacy_padding and old_dim in (32, 34) and old_dim < FEATURE_DIM
+        legacy_ok = allow_legacy_padding and old_dim in (32, 34, 37) and old_dim < FEATURE_DIM
         if old_dim != FEATURE_DIM and not legacy_ok:
             raise ValueError(
                 f"Checkpoint has {old_dim} features; expected {FEATURE_DIM}. "
-                "Set AGENT_INIT_CHECKPOINT to explicitly pad a legacy 32/34-dim model."
+                "Set AGENT_INIT_CHECKPOINT to explicitly pad a legacy 32/34/37-dim model."
             )
         m = cls()
         m.W[:, :old_dim] = weights

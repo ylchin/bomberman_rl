@@ -47,7 +47,7 @@ MAX_DANGER_NORM = float(BOMB_TIMER + EXPLOSION_LINGER)  # cap for danger-step no
 
 
 # ---------------------------------------------------------------------------
-# Feature vector layout (D = 37). Keep this list and the code that fills it
+# Feature vector layout (D = 44). Keep this list and the code that fills it
 # in sync. Symmetry only permutes directional groups; the appended interaction
 # features are scalar/invariant, so adding them does not affect Model 2.
 # ---------------------------------------------------------------------------
@@ -69,9 +69,18 @@ FEATURE_NAMES = (
     + ['OPP_NEAR_DEADEND']                                       # 33    selected opponent is standing in a dead end
     + ['SAFE_BOMB_HITS_OPPONENT']                                 # 34    bomb now hits >=1 opponent and we can escape
     + ['SAFE_BOMB_TRAPS_OPPONENT']                                # 35    bomb now traps the selected opponent and we can escape
-    + ['SAFE_BOMB_HITS_CRATE']                                    # 36    bomb now hits >=1 crate and we can escape
+    + ['SAFE_BOMB_HITS_CRATE']                                       # 36    bomb now hits >=1 crate and we can escape
+    + [
+    'ATTACK_DIR_UP',
+    'ATTACK_DIR_RIGHT',
+    'ATTACK_DIR_DOWN',
+    'ATTACK_DIR_LEFT',
+    'ATTACK_DIR_NONE',
+    ]
+    + ['ATTACK_DIST']
+    + ['AT_SAFE_ATTACK_POS']                               
 )
-FEATURE_DIM = len(FEATURE_NAMES)  # 37
+FEATURE_DIM = len(FEATURE_NAMES)  # 44
 
 # Directional one-hot blocks, used by symmetry.py to know which slices to
 # permute under rotation/flip. Each tuple = (start_index, has_none_slot).
@@ -85,6 +94,7 @@ DIRECTIONAL_GROUPS = [
     (13, True),   # CRATE_DIR_*
     (19, True),   # SAFE_DIR_*
     (25, True),   # OPP_DIR_*
+    (37, True),   # ATTACK_DIR_*
 ]
 
 # Channel stack layout for state_to_channels — order is fixed, document it here.
@@ -333,6 +343,87 @@ def proposed_bomb_analysis(game_state, target_opp=None):
 
     return result
 
+def safe_attack_positions(game_state, target_opp):
+    """
+    Return currently free tiles from which:
+
+      1. a bomb would hit target_opp, and
+      2. the agent would have an escape route after dropping it.
+
+    This is deliberately small/cheap: only tiles within bomb range of the
+    selected opponent are considered.
+    """
+    if target_opp is None:
+        return set()
+
+    field = game_state["field"]
+
+    occupied = (
+        {pos for pos, _ in game_state["bombs"]}
+        | {pos for (_, _, _, pos) in game_state["others"]}
+    )
+
+    tx, ty = target_opp
+
+    candidates = set()
+
+    # Candidate bombing positions can only lie in the same row/column
+    # within BOMB_POWER tiles.
+    for dx, dy in DIRECTION_VECTORS.values():
+
+        for distance in range(1, BOMB_POWER + 1):
+            x = tx + dx * distance
+            y = ty + dy * distance
+
+            if not (
+                0 <= x < field.shape[0]
+                and 0 <= y < field.shape[1]
+            ):
+                break
+
+            # Stone wall terminates blast visibility.
+            if field[x, y] == -1:
+                break
+
+            # Must be somewhere the agent could stand.
+            if field[x, y] != 0:
+                continue
+
+            pos = (x, y)
+
+            if pos in occupied:
+                continue
+
+            # Defensive check using the actual framework blast geometry.
+            if target_opp not in set(
+                get_blast_coords(pos, field)
+            ):
+                continue
+
+            # Pretend we were standing at this candidate and could bomb.
+            name, score, _, _ = game_state["self"]
+
+            hypothetical = dict(game_state)
+            hypothetical["self"] = (
+                name,
+                score,
+                True,
+                pos,
+            )
+
+            info = proposed_bomb_analysis(
+                hypothetical,
+                target_opp=target_opp,
+            )
+
+            if (
+                info["target_hit"]
+                and info["can_escape"]
+            ):
+                candidates.add(pos)
+
+    return candidates
+
 
 def opponent_trapped(game_state, opp_pos):
     """True only if OUR proposed bomb hits this opponent and they cannot escape it."""
@@ -420,6 +511,69 @@ def state_to_features(game_state):
     feats[34] = float(bomb_info['can_drop'] and bomb_info['can_escape'] and bomb_info['hits_opponent'])
     feats[35] = float(bomb_info['can_drop'] and bomb_info['can_escape'] and bomb_info['target_trapped'])
     feats[36] = float(bomb_info['can_drop'] and bomb_info['can_escape'] and bomb_info['hits_crate'])
+
+    # -------------------------------------------------------------
+
+    # Only pursue attack positions when:
+    #   1. an opponent exists,
+    #   2. we can currently place a bomb, and
+    #   3. we are currently safe.
+    #
+    # Otherwise the attack features are disabled so that navigation,
+    # coin collection and escape behaviour can dominate.
+    
+    attack_enabled = (
+        bool(opp_coords)
+        and bool(bomb_possible)
+        and my_danger == 0
+    )
+
+    if attack_enabled:
+        attack_tiles = safe_attack_positions(
+            game_state,
+            target_opp,
+        )
+
+        if attack_tiles:
+            bomb_positions = {
+                pos for pos, _ in game_state["bombs"]
+            }
+
+            opp_positions = {
+                pos for (_, _, _, pos)
+                in game_state["others"]
+            }
+
+            blocked = bomb_positions | opp_positions
+
+            attack_dir, attack_dist, _ = (
+                bfs_direction_and_target(
+                    game_state,
+                    attack_tiles,
+                    avoid_danger=True,
+                    danger=dmap,
+                    blocked=blocked,
+                )
+            )
+
+            feats[37:42] = _one_hot_direction(
+                attack_dir
+            )
+
+            feats[42] = (
+                0.0
+                if attack_dist is None
+                else min(
+                    attack_dist,
+                    MAX_DIST_NORM,
+                ) / MAX_DIST_NORM
+            )
+
+            feats[43] = float(
+                attack_dist == 0
+                and bomb_possible
+            )
+
 
     return feats
 

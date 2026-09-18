@@ -31,7 +31,7 @@ def _open_state(bomb_possible=True, bombs=()):
 def check_feature_dimension():
     state = _open_state()
     feats = state_to_features(state)
-    ok = len(feats) == FEATURE_DIM == 37 and len(FEATURE_NAMES) == 37
+    ok = len(feats) == FEATURE_DIM == 44 and len(FEATURE_NAMES) == 44
     print('OK' if ok else 'FAIL', f': FEATURE_DIM={FEATURE_DIM}, len(features)={len(feats)}')
     return ok
 
