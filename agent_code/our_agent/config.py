@@ -39,6 +39,8 @@ TRAIN = dict(
     eps_end=0.01,  # low floor: coin-heaven needs little exploration once solved
     eps_decay_episodes=500,
     softmax_beta=None,  # set a float to use softmax instead of eps-greedy
+    # Model 1 only: screen known bomb traps in actions and bootstrap targets.
+    survival_filter=os.environ.get("AGENT_SURVIVAL_FILTER", "1") == "1",
     # --- replay ---
     buffer_capacity=100_000,
     batch_size=256,

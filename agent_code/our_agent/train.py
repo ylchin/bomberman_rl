@@ -25,6 +25,7 @@ from .features import ACTIONS, FEATURE_DIM, state_to_features
 from .replay_buffer import ReplayBuffer
 from .rewards import reward_from_events, detect_custom_events, potential_shaping
 from .config import TRAIN, MODEL
+from .callbacks import action_options
 
 _ACTION_ID = {name: i for i, name in enumerate(ACTIONS)}
 
@@ -57,6 +58,7 @@ def setup_training(self):
     self.episode = 0
     self.step_count = 0  # global env steps, for learn_every
     self.traj = []  # [(phi, action_id, reward), ...] for the current episode
+    self.traj_masks = []
     self.ep_counts = Counter()  # event tally for the CSV row
     self.ep_reward = 0.0
 
@@ -102,6 +104,7 @@ def game_events_occurred(self, old_game_state, self_action, new_game_state, even
 
     phi = self.encode_state(old_game_state)
     self.traj.append((phi, _ACTION_ID[self_action], reward))
+    self.traj_masks.append(action_options(old_game_state).get("action_mask"))
     self.ep_reward += reward
     self.ep_counts.update(events)
 
@@ -123,6 +126,7 @@ def end_of_round(self, last_game_state, last_action, events):
         if last_action is not None:
             phi = self.encode_state(last_game_state)
             self.traj.append((phi, _ACTION_ID[last_action], reward))
+            self.traj_masks.append(action_options(last_game_state).get("action_mask"))
         self.ep_reward += reward
         self.ep_counts.update(events)
     else:
@@ -147,6 +151,7 @@ def end_of_round(self, last_game_state, last_action, events):
     self.epsilon = _epsilon(self, self.episode)
     self.alpha = _alpha(self, self.episode)
     self.traj = []
+    self.traj_masks = []
     self.ep_counts = Counter()
     self.ep_reward = 0.0
 
@@ -250,16 +255,23 @@ def _flush_episode_to_buffer(self):
             boot_phi, boot_a, done = zeros, 0, 1.0
 
         phi_t, a_t, _ = traj[t]
-        _push(self, phi_t, a_t, R, boot_phi, boot_a, done)
+        masks = getattr(self, "traj_masks", [])
+        boot_mask = masks[j] if j < len(masks) else None
+        _push(self, phi_t, a_t, R, boot_phi, boot_a, done, boot_mask)
 
 
-def _push(self, phi, a, R, boot_phi, boot_a, done):
+def _push(self, phi, a, R, boot_phi, boot_a, done, boot_mask=None):
     ep = self.episode
-    self.buffer.push(phi, a, R, boot_phi, boot_a, done, ep)
+    self.buffer.push(phi, a, R, boot_phi, boot_a, done, ep, next_action_mask=boot_mask)
     if self._sym is not None and self.t["use_symmetry"]:
         for op in self._sym.sym_transforms():
             if op == (False, 0):
                 continue
+            rotated_mask = None
+            if boot_mask is not None:
+                rotated_mask = np.empty(len(ACTIONS), dtype=bool)
+                for old_action in range(len(ACTIONS)):
+                    rotated_mask[self._sym.apply_to_action(old_action, op)] = boot_mask[old_action]
             self.buffer.push(
                 self.transform_input(phi, op),
                 self._sym.apply_to_action(a, op),
@@ -268,6 +280,7 @@ def _push(self, phi, a, R, boot_phi, boot_a, done):
                 self._sym.apply_to_action(boot_a, op),
                 done,
                 ep,
+                next_action_mask=rotated_mask,
             )
 
 
@@ -277,11 +290,13 @@ def _learn(self, n_iters=1):
         return
     for _ in range(n_iters):
         batch, idx, w = self.buffer.sample(cfg["batch_size"])
+        options = {"next_action_mask": batch["next_action_mask"]} if MODEL == "linear" else {}
         v_next = self.model.bootstrap_value(
             batch["next_phi"],
             batch["done"],
             next_actions=batch["next_action"] if cfg["rule"] == "sarsa" else None,
             rule=cfg["rule"],
+            **options,
         )
         targets = batch["reward"] + (cfg["gamma"] ** cfg["n_step"]) * v_next
         td_err = self.model.update(

@@ -54,6 +54,15 @@ class LinearQ:
         legal[..., 5] = phi[..., 4] > 0.5
         return legal
 
+    @classmethod
+    def available_actions(cls, phi, action_mask=None):
+        legal = cls.legal_actions(phi)
+        if action_mask is None:
+            return legal
+        screened = legal & np.asarray(action_mask, dtype=bool)
+        # No predicted escape is not proof of certain death: opponents can move.
+        return np.where(screened.any(axis=-1, keepdims=True), screened, legal)
+
     def act(self, phi, epsilon=0.0, beta=None, rng=None, action_mask=None):
         """
         Returns an action id in [0, n_actions).
@@ -61,9 +70,7 @@ class LinearQ:
           beta not None -> softmax(beta * Q) (overrides epsilon-greedy)
         """
         rng = rng or self._rng
-        legal = self.legal_actions(phi)
-        if action_mask is not None:
-            legal &= np.asarray(action_mask, dtype=bool)
+        legal = self.available_actions(phi, action_mask)
         candidates = np.flatnonzero(legal)
         if len(candidates) == 0:
             return ACTIONS.index("WAIT")
@@ -81,7 +88,7 @@ class LinearQ:
         return int(rng.choice(candidates[best]))
 
     # ------------------------------------------------------------------ targets
-    def bootstrap_value(self, next_Phi, done, next_actions=None, rule="q"):
+    def bootstrap_value(self, next_Phi, done, next_actions=None, rule="q", next_action_mask=None):
         """
         V(s') for a batch, masked to 0 where done.
         next_Phi: (N, D), done: (N,), next_actions: (N,) needed for SARSA.
@@ -92,7 +99,7 @@ class LinearQ:
                 raise ValueError("SARSA target needs next_actions")
             v = q_next[np.arange(len(q_next)), next_actions]
         else:
-            v = np.where(self.legal_actions(next_Phi), q_next, -np.inf).max(axis=1)
+            v = np.where(self.available_actions(next_Phi, next_action_mask), q_next, -np.inf).max(axis=1)
         return v * (1.0 - np.asarray(done, dtype=np.float64))
 
     # ------------------------------------------------------------------ learn

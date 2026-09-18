@@ -20,6 +20,14 @@ STUCK_AFTER = (
 )
 
 
+def action_options(game_state):
+    """Keep Model 2 unchanged; Model 1 can screen known bomb traps."""
+    if config.MODEL == "linear" and config.TRAIN.get("survival_filter", False):
+        from .escape_planner import survival_actions
+        return {"action_mask": survival_actions(game_state)}
+    return {}
+
+
 def setup(self):
     """
     self.train is set by the framework. When training, train.setup_training()
@@ -110,6 +118,7 @@ def act(self, game_state: dict) -> str:
     phi = self.encode_state(game_state)
     if phi is None:
         return "WAIT"
+    options = action_options(game_state)
 
     if game_state["step"] == 1:
         # new round -- don't compare across the round boundary
@@ -118,9 +127,9 @@ def act(self, game_state: dict) -> str:
 
     if self.train:
         beta = config.TRAIN["softmax_beta"]
-        action_id = self.model.act(phi, epsilon=self.epsilon, beta=beta, rng=self.rng)
+        action_id = self.model.act(phi, epsilon=self.epsilon, beta=beta, rng=self.rng, **options)
     else:
-        action_id = self.model.act(phi, epsilon=0.0, rng=self.rng)
+        action_id = self.model.act(phi, epsilon=0.0, rng=self.rng, **options)
 
     # Safety net: a greedy (eps=0) policy that picks an action the game rejects
     # (wall/crate/out of bounds) sees an unchanged game_state next step, so it
@@ -137,9 +146,10 @@ def act(self, game_state: dict) -> str:
     if self._repeat_count >= STUCK_AFTER:
         stuck_on = ACTIONS[action_id]
         if self.model_kind == "linear":
-            alternatives = np.ones(len(ACTIONS), dtype=bool)
+            alternatives = self.model.available_actions(phi, options.get("action_mask"))
             alternatives[action_id] = False
-            action_id = self.model.act(phi, rng=self.rng, action_mask=alternatives)
+            if alternatives.any():
+                action_id = self.model.act(phi, rng=self.rng, action_mask=alternatives)
         else:
             action_id = int(self.rng.integers(len(ACTIONS)))
         self.logger.warning(

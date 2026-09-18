@@ -37,6 +37,7 @@ class ReplayBuffer:
         self.next_action = np.zeros(
             self.capacity, dtype=np.int64
         )  # for SARSA bootstrap
+        self.next_action_mask = np.ones((self.capacity, 6), dtype=bool)
         self.reward = np.zeros(self.capacity, dtype=np.float32)
         self.done = np.zeros(self.capacity, dtype=np.float32)
         self.episode = np.zeros(self.capacity, dtype=np.int64)
@@ -49,13 +50,14 @@ class ReplayBuffer:
     def __len__(self):
         return self._size
 
-    def push(self, phi, action, reward, next_phi, next_action, done, episode):
+    def push(self, phi, action, reward, next_phi, next_action, done, episode, next_action_mask=None):
         i = self._next
         self.phi[i] = phi
         # terminal transition: next_phi is None -> store zeros, done flag masks it
         self.next_phi[i] = 0.0 if next_phi is None else next_phi
         self.action[i] = action
         self.next_action[i] = 0 if next_action is None else next_action
+        self.next_action_mask[i] = True if next_action_mask is None else next_action_mask
         self.reward[i] = reward
         self.done[i] = float(done)
         self.episode[i] = episode
@@ -91,6 +93,7 @@ class ReplayBuffer:
             "reward": self.reward[idx],
             "next_phi": self.next_phi[idx],
             "next_action": self.next_action[idx],
+            "next_action_mask": self.next_action_mask[idx],
             "done": self.done[idx],
         }
         return batch, idx, w

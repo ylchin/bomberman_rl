@@ -8,14 +8,17 @@ from collections import deque
 
 import numpy as np
 
-from .features import DIRECTION_VECTORS, EXPLOSION_LINGER, get_blast_coords
+from .features import ACTIONS, BOMB_TIMER, DIRECTION_VECTORS, EXPLOSION_LINGER, get_blast_coords
 
 
-def escape_route(state, start, blocked=(), placement_turn=False):
+def escape_route(state, start, blocked=(), placement_turn=False, first_action=None, deadline_margin=0):
     """Return (survives, first move or None for WAIT, moves to refuge).
 
     `placement_turn` forces the agent to stay put for the first update: placing a
     new bomb consumes an action. Callers include that bomb with its initial timer.
+    `first_action` forces the first move (including WAIT), for action screening.
+    `deadline_margin` expands blast intervals earlier without clearing obstacles
+    or fire earlier. It reserves time for an opponent obstructing the route.
     """
     field = state["field"]
     bombs = [(tuple(pos), int(timer) + 1) for pos, timer in state["bombs"]]
@@ -32,7 +35,7 @@ def escape_route(state, start, blocked=(), placement_turn=False):
     for pos, detonation in bombs:
         occupied_until[pos] = max(occupied_until.get(pos, 0), detonation)
         for x, y in get_blast_coords(pos, field):
-            lethal[detonation : detonation + EXPLOSION_LINGER + 1, x, y] = True
+            lethal[max(1, detonation - deadline_margin) : detonation + EXPLOSION_LINGER + 1, x, y] = True
             if field[x, y] == 1:
                 # Moves occur before crates are destroyed in this step.
                 opens_at[x, y] = min(opens_at[x, y], detonation + 1)
@@ -49,12 +52,14 @@ def escape_route(state, start, blocked=(), placement_turn=False):
     ]
     while queue:
         pos, t, first = queue.popleft()
-        if not lethal[t + 1 :, pos[0], pos[1]].any():
+        if (first_action is None or t > start_time) and not lethal[t + 1 :, pos[0], pos[1]].any():
             return True, first, t - start_time
         if t == horizon:
             continue
         nt = t + 1
         for name, (dx, dy) in moves:
+            if t == start_time and first_action is not None and (name or "WAIT") != first_action:
+                continue
             nxt = (pos[0] + dx, pos[1] + dy)
             x, y = nxt
             if not (0 <= x < field.shape[0] and 0 <= y < field.shape[1]):
@@ -69,3 +74,28 @@ def escape_route(state, start, blocked=(), placement_turn=False):
             visited.add((nxt, nt))
             queue.append((nxt, nt, name if t == start_time else first))
     return False, None, None
+
+
+def survival_actions(state, deadline_margin=1):
+    """Actions leaving a route through all currently known explosions.
+
+    Does not predict future enemy actions. All-false means no route was found;
+    the learned policy then falls back to its legal actions rather than freezing.
+    This screen restricts choices, but Q values still rank the retained actions.
+    """
+    start = state['self'][3]
+    opponents = {a[3] for a in state['others']}
+    allowed = np.zeros(len(ACTIONS), dtype=bool)
+    for i, action in enumerate(ACTIONS[:-1]):
+        allowed[i] = escape_route(state, start, blocked=opponents, first_action=action,
+                                  deadline_margin=deadline_margin)[0]
+    if state['self'][2]:
+        proposed = dict(state)
+        proposed['bombs'] = list(state['bombs']) + [(start, BOMB_TIMER)]
+        allowed[-1] = escape_route(proposed, start, blocked=opponents, placement_turn=True,
+                                   deadline_margin=deadline_margin)[0]
+    # If no conservative route exists, still use an exact-timing escape before
+    # falling back to legal actions. Do not throw away the only surviving move.
+    if deadline_margin and not allowed.any():
+        return survival_actions(state, deadline_margin=0)
+    return allowed
