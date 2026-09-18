@@ -1,18 +1,9 @@
 """
-check_symmetry_sync.py
+Verifies that features.DIRECTIONAL_GROUPS still matches the actual layout of features.FEATURE_NAMES, 
+and that symmetry.apply_to_features / apply_to_action form a consistent, invertible group action 
+(augmenting a transition doesn't silently mislabel it)
 
-Verifies that features.DIRECTIONAL_GROUPS still matches the actual layout
-of features.FEATURE_NAMES, and that symmetry.apply_to_features / 
-apply_to_action form a consistent, invertible group action (i.e. augmenting
-a transition doesn't silently mislabel it).
-
-Run from the repo root:
-    python -m agent_code.our_agent.check_symmetry_sync
-
-(uses -m because symmetry.py does `from .features import ...`, a relative
-import -- it must be run as part of the agent_code.our_agent package, not
-as a standalone script, or you'll get "attempted relative import with no
-known parent package".)
+Run from repo root: python -m agent_code.our_agent.check_symmetry_sync
 """
 
 import numpy as np
@@ -21,12 +12,9 @@ from .symmetry import sym_transforms, apply_to_features, apply_to_action
 
 
 def check_groups_match_names():
-    """
-    For each (start, has_none) in DIRECTIONAL_GROUPS, confirm FEATURE_NAMES
-    at that offset actually reads like [X_UP, X_RIGHT, X_DOWN, X_LEFT, (X_NONE)]
-    for some common prefix X -- i.e. the offsets haven't drifted out of sync
-    with the feature list above them.
-    """
+    #for each (start, has_none) in DIRECTIONAL_GROUPS, confirm FEATURE_NAMES at that offset actually reads 
+    #like [X_UP, X_RIGHT, X_DOWN, X_LEFT, (X_NONE)] for some common prefix X -- the offsets haven't drifted out of sync with the feature list above them
+    
     problems = []
     for start, has_none in DIRECTIONAL_GROUPS:
         span = 5 if has_none else 4
@@ -60,14 +48,12 @@ def check_groups_match_names():
 
 
 def check_symmetry_group_consistency():
-    """
-    Confirms the 8 ops form a real group action on feature vectors:
-      - identity op is truly a no-op
-      - every op has an inverse among the 8 that undoes it exactly
-      - action transforms and feature-vector transforms agree with each
-        other (transforming a one-hot-encoded action via apply_to_action
-        matches transforming the same info via apply_to_features)
-    """
+    #Confirms the 8 ops form a real group action on feature vectors:
+    #identity op is truly a no-op
+    #every op has an inverse among the 8 that undoes it exactly
+    #action transforms and feature-vector transforms agree with each other 
+    #(transforming a one-hot-encoded action via apply_to_action matches transforming the same info via apply_to_features)
+
     ops = sym_transforms()
     if len(ops) != 8:
         print(f"FAIL: expected 8 symmetry ops, got {len(ops)}")
@@ -76,7 +62,7 @@ def check_symmetry_group_consistency():
     rng = np.random.default_rng(0)
     test_vec = rng.random(FEATURE_DIM).astype(np.float32)
 
-    # identity check
+    #identity check
     identity = ops[0]
     if not np.allclose(apply_to_features(test_vec, identity), test_vec):
         print("FAIL: identity op is not a no-op on apply_to_features")
@@ -86,14 +72,14 @@ def check_symmetry_group_consistency():
             print(f"FAIL: identity op changed action {ACTIONS[a]}")
             return False
 
-    # every op must have a matching inverse among the 8 ops
+    #every op must have a matching inverse among the 8 ops
     all_ok = True
     for op in ops:
         found_inverse = False
         for inv in ops:
             round_trip = apply_to_features(apply_to_features(test_vec, op), inv)
             if np.allclose(round_trip, test_vec):
-                # also check action round-trips consistently under the same pair
+                #also check action round-trips consistently under the same pair
                 action_ok = all(
                     apply_to_action(apply_to_action(a, op), inv) == a
                     for a in range(len(ACTIONS))
