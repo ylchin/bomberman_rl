@@ -110,12 +110,14 @@ def escape_route(state, start, blocked=(), placement_turn=False, first_action=No
     return False, None, None
 
 
-def survival_actions(state, deadline_margin=1, bomb_collision_guard=True):
+def survival_actions(state, deadline_margin=1, bomb_collision_guard=True,
+                     escape_collision_guard=False):
     """Actions leaving a route through all currently known explosions.
 
     New bombs optionally require an escape avoiding tiles opponents can reach
-    first. Existing-bomb escapes retain the usual search, so the guard never
-    removes a last-chance movement route. All-false means no route was found;
+    first. The optional escape guard prefers collision-safe movement routes
+    while already in a blast path, but retains the original choices if none
+    are found. All-false means no route was found;
     the learned policy then falls back to its legal actions rather than freezing.
     This screen restricts choices, but Q values still rank the retained actions.
     """
@@ -134,5 +136,24 @@ def survival_actions(state, deadline_margin=1, bomb_collision_guard=True):
     # If no conservative route exists, still use an exact-timing escape before
     # falling back to legal actions. Do not throw away the only surviving move.
     if deadline_margin and not allowed.any():
-        return survival_actions(state, deadline_margin=0, bomb_collision_guard=bomb_collision_guard)
+        return survival_actions(state, deadline_margin=0,
+                                bomb_collision_guard=bomb_collision_guard,
+                                escape_collision_guard=escape_collision_guard)
+    in_blast_path = escape_collision_guard and bool(opponents) and any(
+        start in get_blast_coords(pos, state['field']) for pos, _ in state['bombs']
+    )
+    if in_blast_path:
+        robust_moves = np.zeros(len(ACTIONS) - 1, dtype=bool)
+        for i, action in enumerate(ACTIONS[:-1]):
+            if allowed[i]:
+                robust_moves[i] = escape_route(
+                    state, start, blocked=opponents, first_action=action,
+                    deadline_margin=deadline_margin,
+                    avoid_opponent_collisions=True,
+                )[0]
+        # Do not turn a difficult escape into an empty mask (which would make
+        # LinearQ fall back to arbitrary legal actions). Keep the old search
+        # when every route is contested. Bomb screening remains independent.
+        if robust_moves.any():
+            allowed[:-1] = robust_moves
     return allowed

@@ -35,6 +35,43 @@ def state(pos=(3, 3)):
 
 
 class Model1SafetyTests(unittest.TestCase):
+    def test_escape_guard_prefers_uncontested_route_after_placement(self):
+        s = state((3, 1))
+        s["field"][:] = -1
+        for p in [(3, 1), (3, 2), (3, 3), (4, 3), (5, 3), (2, 1), (1, 1), (1, 2)]:
+            s["field"][p] = 0
+        s["self"] = ("me", 0, False, (3, 1))
+        s["bombs"] = [((3, 1), 3)]
+        s["others"] = [("opp", 0, True, (5, 3))]
+        before = survival_actions(s, escape_collision_guard=False)
+        after = survival_actions(s, escape_collision_guard=True)
+        self.assertTrue(before[2])  # DOWN leads to a contested refuge.
+        self.assertFalse(after[2])
+        self.assertTrue(after[3])  # LEFT reaches the alternative refuge.
+        self.assertTrue(np.all(~after | before))
+
+    def test_escape_guard_keeps_only_route_when_all_exits_contested(self):
+        s = state((3, 1))
+        s["field"][:] = -1
+        for p in [(3, 1), (3, 2), (3, 3), (4, 3), (5, 3)]:
+            s["field"][p] = 0
+        s["self"] = ("me", 0, False, (3, 1))
+        s["bombs"] = [((3, 1), 3)]
+        s["others"] = [("opp", 0, True, (5, 3))]
+        before = survival_actions(s, escape_collision_guard=False)
+        after = survival_actions(s, escape_collision_guard=True)
+        self.assertTrue(before[2])
+        np.testing.assert_array_equal(before, after)
+
+    def test_escape_guard_does_not_change_choices_outside_blast_path(self):
+        s = state()
+        s["bombs"] = [((1, 1), 3)]
+        s["others"] = [("opp", 0, True, (5, 3))]
+        np.testing.assert_array_equal(
+            survival_actions(s, escape_collision_guard=False),
+            survival_actions(s, escape_collision_guard=True),
+        )
+
     def test_bomb_rejected_when_opponent_can_intercept_only_exit(self):
         s = state((3, 1))
         s["field"][:] = -1

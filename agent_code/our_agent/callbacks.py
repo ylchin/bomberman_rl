@@ -25,7 +25,8 @@ def action_options(game_state):
     if config.MODEL == "linear" and config.TRAIN.get("survival_filter", False):
         from .escape_planner import survival_actions
         return {"action_mask": survival_actions(
-            game_state, bomb_collision_guard=config.TRAIN.get("bomb_collision_guard", True)
+            game_state, bomb_collision_guard=config.TRAIN.get("bomb_collision_guard", True),
+            escape_collision_guard=config.TRAIN.get("escape_collision_guard", False)
         )}
     return {}
 

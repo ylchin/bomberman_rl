@@ -42,6 +42,8 @@ TRAIN = dict(
     # Model 1 only: screen known bomb traps in actions and bootstrap targets.
     survival_filter=os.environ.get("AGENT_SURVIVAL_FILTER", "1") == "1",
     bomb_collision_guard=os.environ.get("AGENT_BOMB_COLLISION_GUARD", "1") == "1",
+    # Experimental: preserve the validated placement-only baseline by default.
+    escape_collision_guard=os.environ.get("AGENT_ESCAPE_COLLISION_GUARD", "0") == "1",
     # --- replay ---
     buffer_capacity=100_000,
     batch_size=256,
