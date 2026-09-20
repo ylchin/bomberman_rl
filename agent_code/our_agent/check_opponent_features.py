@@ -1,5 +1,3 @@
-"""Checks the corrected Task-3 opponent and bomb-interaction features."""
-
 import numpy as np
 from .features import (
     is_dead_end,
@@ -43,6 +41,17 @@ def _trapped_board():
     field[2, 1] = -1
     field[2, 2] = -1
     field[1, 3] = -1
+    
+def _make_board():
+    #9x9 board
+    #border walls, open interior, one genuine 2-tile dead-end pocket at (1,1)-(1,2) with no room to outrun a blast
+    #open space elsewhere for a free/untrapped opponent
+    
+    field = np.full((9, 9), -1, dtype=np.int8)
+    field[1:8, 1:8] = 0
+    field[2, 1] = -1   #seal the pocket's only other side
+    field[2, 2] = -1
+    field[1, 3] = -1   #seal off further corridor, pocket is only (1,1),(1,2)
     return field
 
 

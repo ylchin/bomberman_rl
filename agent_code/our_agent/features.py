@@ -30,8 +30,6 @@ import numpy as np
 ACTIONS = ["UP", "RIGHT", "DOWN", "LEFT", "WAIT", "BOMB"]
 
 
-# (dx, dy) in game_state['field'] coordinates (x, y), matching the framework's
-# image-coordinate convention noted in the assignment PDF.
 DIRECTION_VECTORS = {
     "UP": (0, -1),
     "RIGHT": (1, 0),
@@ -538,6 +536,7 @@ def select_opponent_target(game_state):
         distance,
     )
 
+#flat feature vector for Model 1 
 
 # ---------------------------------------------------------------------------
 # Hypothetical bomb analysis.

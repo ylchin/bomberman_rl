@@ -37,8 +37,8 @@ Usage:
         --opponents rule_based_agent rule_based_agent rule_based_agent \
         --scenario classic --n-rounds 100 --out experiments/task4_eval.csv
 
-    # curriculum task preset (recommended -- locks in scenario + opponents +
-    # a fixed held-out seed range per task, matching Section 04's protocol)
+    # curriculum task preset 
+    #locks in scenario + opponents + a fixed held-out seed range per task
     python evaluate.py --agent our_agent --task 1 --n-rounds 100 \
         --out experiments/task1_eval.csv
 """
@@ -76,12 +76,8 @@ CSV_COLUMNS = [
     "loss",
 ]
 
-# ---------------------------------------------------------------------------
-# Curriculum task presets, matching the four tasks in the assignment PDF /
-# project plan (Section 03). Each has its own fixed, documented held-out
-# seed range so results are reproducible and never overlap with seeds used
-# during training. NEVER use these seeds for training runs.
-# ---------------------------------------------------------------------------
+
+# task presets, matching the four tasks 
 TASK_PRESETS = {
     1: {  # Navigation: collect coins, no crates, no opponents
         "scenario": "coin-heaven",
@@ -251,7 +247,7 @@ def run_evaluation(
 
 
 def summarize(csv_path: Path):
-    """Console summary: mean score, coins, kills, self-kill rate."""
+    #Console summary: mean score, coins, kills, self-kill rate
     import statistics as st
 
     with open(csv_path) as f:

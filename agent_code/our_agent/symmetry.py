@@ -31,11 +31,11 @@ from .features import ACTIONS, DIRECTIONS, DIRECTION_VECTORS, DIRECTIONAL_GROUPS
 # The 8 ops, as (flip_first: bool, n_rotations_cw: int).
 # flip = mirror across the vertical axis (x -> W-1-x) applied BEFORE rotating.
 def sym_transforms():
-    """Returns the list of 8 op identifiers. Pass these to the apply_* functions."""
+    #Returns the list of 8 op identifiers. Pass these to the apply_* functions
     return [(flip, k) for flip in (False, True) for k in range(4)]
 
 
-# --- linear part, shared by coordinate and direction-vector transforms -----
+#linear part, shared by coordinate and direction-vector transforms
 def _flip_vec(dx, dy):
     return (-dx, dy)
 
@@ -54,10 +54,9 @@ def _transform_vec(dx, dy, op):
 
 
 def apply_to_coord(x, y, op, width, height):
-    """
-    Transform a single board coordinate under op. width/height are the
-    field's dimensions (board is square in this game, but kept general).
-    """
+    #Transform a single board coordinate under op. 
+    #width/height are the field's dimensions (board is square in this game, but kept general)
+  
     flip, k = op
     w, h = width, height
     if flip:
@@ -68,11 +67,9 @@ def apply_to_coord(x, y, op, width, height):
 
 
 def apply_to_action(action_id_or_name, op):
-    """
-    Transform an action under op. Non-directional actions (WAIT, BOMB) are
-    unchanged. Accepts either an int id (index into ACTIONS) or the action
-    name string; returns the same type it was given.
-    """
+    #transform an action under op. non-directional actions (WAIT, BOMB) are unchanged. 
+    #accepts either an int id (index into ACTIONS) or the action name string, returns the same type it was given
+    
     is_name = isinstance(action_id_or_name, str)
     name = action_id_or_name if is_name else ACTIONS[action_id_or_name]
 
@@ -95,7 +92,7 @@ def apply_to_features(vec, op):
     """
     out = np.array(vec, dtype=vec.dtype if hasattr(vec, "dtype") else np.float32)
 
-    # Build the direction permutation implied by op once, reuse for every group.
+    # Build the direction permutation implied by op once, reuse for every group
     perm = [DIRECTIONS.index(apply_to_action(d, op)) for d in DIRECTIONS]
 
     for start, has_none in DIRECTIONAL_GROUPS:
