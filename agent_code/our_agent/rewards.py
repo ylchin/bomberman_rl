@@ -137,7 +137,11 @@ def detect_custom_events(old_state, self_action, new_state, framework_events=())
     new_danger = danger_map(new_state)
     in_danger_before = old_danger[old_pos] > 0
     in_danger_after = new_danger[new_pos] > 0
-    field = old_state["field"]
+    bomb_info = (
+        proposed_bomb_analysis(old_state)
+        if self_action == "BOMB" and e.BOMB_DROPPED in framework_events
+        else None
+    )
 
     # --- danger handling dominates: if we were in a blast path, only judge escape ---
     if in_danger_before:
@@ -159,7 +163,11 @@ def detect_custom_events(old_state, self_action, new_state, framework_events=())
             ev.append(STAYED_IN_DANGER)
     else:
         # --- moved into a fresh blast path (e.g. walked next to a ticking bomb) ---
-        if in_danger_after:
+        # A successful bomb necessarily puts us in its blast path. When the
+        # placement leaves an escape route, judge it using bomb quality below.
+        # Keep the danger penalty for unsafe placements and failed requests.
+        safe_placement = bomb_info is not None and bomb_info["can_escape"]
+        if in_danger_after and not safe_placement:
             ev.append(MOVED_INTO_DANGER)
 
         # --- coin seeking (only when safe and coins are visible) ---
@@ -173,8 +181,8 @@ def detect_custom_events(old_state, self_action, new_state, framework_events=())
                 )
 
     # --- bomb quality, judged only after a SUCCESSFUL placement ---
-    if self_action == "BOMB" and e.BOMB_DROPPED in framework_events:
-        info = proposed_bomb_analysis(old_state)
+    if bomb_info is not None:
+        info = bomb_info
 
         if info["hits_crate"]:
             ev.append(BOMB_NEXT_TO_CRATE)

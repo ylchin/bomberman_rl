@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from agent_code.our_agent.escape_planner import escape_route
+from agent_code.our_agent.escape_planner import escape_route, survival_actions
 from agent_code.our_agent.features import (
     FEATURE_DIM,
     state_to_features,
@@ -14,6 +14,7 @@ from agent_code.our_agent.rewards import (
     detect_custom_events,
     MOVED_INTO_DANGER,
     BOMB_WITH_NO_ESCAPE,
+    SAFE_BOMB_THREATENS_OPPONENT,
 )
 
 
@@ -34,6 +35,42 @@ def state(pos=(3, 3)):
 
 
 class Model1SafetyTests(unittest.TestCase):
+    def test_bomb_rejected_when_opponent_can_intercept_only_exit(self):
+        s = state((3, 1))
+        s["field"][:] = -1
+        for p in [(3, 1), (3, 2), (3, 3), (4, 3), (5, 3)]:
+            s["field"][p] = 0
+        s["others"] = [("opp", 0, True, (5, 3))]
+        before = survival_actions(s, bomb_collision_guard=False)
+        after = survival_actions(s, bomb_collision_guard=True)
+        self.assertTrue(before[-1])
+        self.assertFalse(after[-1])
+        np.testing.assert_array_equal(before[:-1], after[:-1])
+
+    def test_bomb_allowed_with_uncontested_alternative_exit(self):
+        s = state((3, 1))
+        s["field"][:] = -1
+        for p in [(3, 1), (3, 2), (3, 3), (4, 3), (5, 3), (2, 1), (1, 1), (1, 2)]:
+            s["field"][p] = 0
+        s["others"] = [("opp", 0, True, (5, 3))]
+        self.assertTrue(survival_actions(s)[-1])
+
+    def test_collision_guard_preserves_solo_bombing(self):
+        s = state()
+        np.testing.assert_array_equal(
+            survival_actions(s, bomb_collision_guard=False), survival_actions(s)
+        )
+
+    def test_collision_guard_preserves_emergency_escape(self):
+        s = state((3, 1))
+        s["self"] = ("me", 0, False, (3, 1))
+        s["bombs"] = [((3, 1), 1)]
+        s["others"] = [("opp", 0, True, (5, 3))]
+        before = survival_actions(s, bomb_collision_guard=False)
+        after = survival_actions(s)
+        self.assertTrue(after.any())
+        np.testing.assert_array_equal(before, after)
+
     def test_wait_for_fire_then_escape(self):
         s = state((3, 3))
         s["field"][:] = -1
@@ -95,24 +132,39 @@ class Model1SafetyTests(unittest.TestCase):
         self.assertEqual(s["bombs"], [])
         self.assertEqual(state_to_features(s).shape, (FEATURE_DIM,))
 
+    def test_safe_successful_bomb_not_penalised_as_entering_danger(self):
+        old = state()
+        old["others"] = [("opp", 0, True, (5, 3))]
+        new = dict(old, bombs=[((3, 3), 3)])
+        events = detect_custom_events(old, "BOMB", new, [e.BOMB_DROPPED])
+        self.assertIn(SAFE_BOMB_THREATENS_OPPONENT, events)
+        self.assertNotIn(MOVED_INTO_DANGER, events)
+        self.assertNotIn(BOMB_WITH_NO_ESCAPE, events)
+
+    def test_unsafe_successful_bomb_keeps_danger_penalties(self):
+        old = state()
+        old["field"][:] = -1
+        old["field"][3, 3] = 0
+        new = dict(old, bombs=[((3, 3), 3)])
+        events = detect_custom_events(old, "BOMB", new, [e.BOMB_DROPPED])
+        self.assertIn(MOVED_INTO_DANGER, events)
+        self.assertIn(BOMB_WITH_NO_ESCAPE, events)
+        self.assertNotIn(SAFE_BOMB_THREATENS_OPPONENT, events)
+
+    def test_walking_into_blast_path_keeps_penalty(self):
+        old = state((3, 4))
+        old["bombs"] = [((5, 3), 3)]
+        new = dict(old, self=("me", 0, True, (3, 3)))
+        events = detect_custom_events(old, "UP", new)
+        self.assertIn(MOVED_INTO_DANGER, events)
+
+    def test_failed_bomb_does_not_exempt_new_danger(self):
+        old = state()
+        new = dict(old, bombs=[((5, 3), 3)])
+        events = detect_custom_events(old, "BOMB", new, [e.INVALID_ACTION])
+        self.assertIn(MOVED_INTO_DANGER, events)
+        self.assertNotIn(SAFE_BOMB_THREATENS_OPPONENT, events)
+
 
 if __name__ == "__main__":
     unittest.main()
-
-
-def test_safe_successful_bomb_not_penalised_as_entering_danger(self):
-    old = state((3, 3))
-
-    new = dict(old)
-    new["bombs"] = [((3, 3), 3)]
-    new["explosion_map"] = old["explosion_map"].copy()
-
-    events = detect_custom_events(
-        old,
-        "BOMB",
-        new,
-        [e.BOMB_DROPPED],
-    )
-
-    self.assertNotIn(MOVED_INTO_DANGER, events)
-    self.assertNotIn(BOMB_WITH_NO_ESCAPE, events)

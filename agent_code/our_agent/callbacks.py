@@ -24,7 +24,9 @@ def action_options(game_state):
     """Keep Model 2 unchanged; Model 1 can screen known bomb traps."""
     if config.MODEL == "linear" and config.TRAIN.get("survival_filter", False):
         from .escape_planner import survival_actions
-        return {"action_mask": survival_actions(game_state)}
+        return {"action_mask": survival_actions(
+            game_state, bomb_collision_guard=config.TRAIN.get("bomb_collision_guard", True)
+        )}
     return {}
 
 

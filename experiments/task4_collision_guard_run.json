@@ -1,0 +1,57 @@
+{
+  "experiment": "Task 4 bomb escape collision guard",
+  "date": "2026-09-20",
+  "git_base": "4ae7017ac3ea9906b9b9733fd7fdf7423f8c09da",
+  "checkpoint": "agent_code/our_agent/weights/candidates/linear_model1_safety_v2_seed1/ep_04000.pkl",
+  "checkpoint_sha256": "7be4fa91084f831f276520f79e56bf5b8323c3c22762a6c7197e555587336286",
+  "source_sha256": {
+    "agent_code/our_agent/escape_planner.py": "fda9dbd9c8fda01b03c92215875eaf5f6a7159dad5e83b73847b91716c037a8a",
+    "agent_code/our_agent/callbacks.py": "a5589ddf77a8beb930a3ad1649114dfcf51377c083a731ecef0dfd22dd856407",
+    "agent_code/our_agent/config.py": "7905e0432e3760321d0e7ae0949157b2b8ffce1f82e442112240cd17e60f387e",
+    "agent_code/our_agent/features.py": "0c8f9d22ef489a4d17a9aaaaf678a5605469821d7dcb06909fd028e2a708b45b",
+    "agent_code/our_agent/q_linear.py": "b20c6676440277188008958f22158fe9e4488442c7b39c61e83657ca52a9f0ac"
+  },
+  "environment": {
+    "AGENT_MODEL": "linear",
+    "AGENT_SURVIVAL_FILTER": "1",
+    "AGENT_BOMB_COLLISION_GUARD": "1"
+  },
+  "world_seeds": [
+    24000,
+    24099
+  ],
+  "baseline": {
+    "path": "experiments/task4_safety_v2_validation.csv",
+    "rounds": 100,
+    "score": 3.06,
+    "coins": 2.31,
+    "kills": 0.15,
+    "self_kill": 0.15,
+    "win": 0.2,
+    "tie": 0.14,
+    "loss": 0.66
+  },
+  "candidate": {
+    "path": "experiments/task4_collision_guard_validation.csv",
+    "rounds": 100,
+    "score": 3.1,
+    "coins": 2.4,
+    "kills": 0.14,
+    "self_kill": 0.07,
+    "win": 0.25,
+    "tie": 0.08,
+    "loss": 0.67
+  },
+  "validation": "24 unit tests passed; 100 evaluation rounds completed; no retraining.",
+  "diagnosis": "Three distinct self-kills in a 20-round diagnostic involved opponents intercepting escape moves. The new placement guard rejects two of those three recorded bomb decisions.",
+  "history_review": [
+    "c0a382c introduced escape planning and movement legality checks",
+    "4ae7017 added survival action screening and replay action masks",
+    "Compared current code against experiments/model1_safety_v2_seed1_source.zip"
+  ],
+  "limitations": [
+    "Opponents use unseeded randomness; this is not a deterministic paired comparison.",
+    "One 100-round comparison is preliminary evidence, not a confirmed win-rate improvement.",
+    "The guard cannot anticipate new enemy bombs or paths opened by future crate destruction."
+  ]
+}
