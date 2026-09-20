@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from pathlib import Path
+import time
 
 import numpy as np
 import torch
@@ -37,12 +38,16 @@ class QNetwork(nn.Module):
     def __init__(self):
         super().__init__()
         self.layers = nn.Sequential(
-            nn.Conv2d(N_CHANNELS, 32, 3, padding=1), nn.ReLU(),
-            nn.Conv2d(32, 64, 3, stride=2, padding=1), nn.ReLU(),
-            nn.Conv2d(64, 64, 3, stride=2, padding=1), nn.ReLU(),
+            nn.Conv2d(N_CHANNELS, 32, 3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, 3, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, 3, stride=2, padding=1),
+            nn.ReLU(),
             nn.Flatten(),
             nn.Linear(64 * ((COLS + 3) // 4) * ((ROWS + 3) // 4), 128),
-            nn.ReLU(), nn.Linear(128, len(ACTIONS)),
+            nn.ReLU(),
+            nn.Linear(128, len(ACTIONS)),
         )
 
     def forward(self, inputs):
@@ -50,10 +55,18 @@ class QNetwork(nn.Module):
 
 
 class NetQ:
-    def __init__(self, seed=None, device="cpu", target_update_every=500,
-                 grad_clip=10.0, torch_threads=1):
+    def __init__(
+        self,
+        seed=None,
+        device="cpu",
+        target_update_every=500,
+        grad_clip=10.0,
+        torch_threads=1,
+    ):
         if target_update_every < 1 or grad_clip <= 0 or torch_threads < 1:
-            raise ValueError("Target interval, gradient clip and thread count must be positive")
+            raise ValueError(
+                "Target interval, gradient clip and thread count must be positive"
+            )
         torch.set_num_threads(torch_threads)
         self.device = torch.device(device)
         # Keep initialization reproducible without changing the caller's torch RNG.
@@ -78,7 +91,9 @@ class NetQ:
         if array.ndim == 2 and array.shape[1] == INPUT_DIM:
             array = array.reshape(-1, *INPUT_SHAPE)
         if array.ndim != 4 or tuple(array.shape[1:]) != INPUT_SHAPE:
-            raise ValueError(f"Expected flattened or spatial inputs with shape {INPUT_SHAPE}")
+            raise ValueError(
+                f"Expected flattened or spatial inputs with shape {INPUT_SHAPE}"
+            )
         return torch.as_tensor(np.ascontiguousarray(array), device=self.device)
 
     @torch.no_grad()
@@ -107,7 +122,9 @@ class NetQ:
             # Online network chooses; frozen target network evaluates.
             actions = self.online(inputs).argmax(dim=1)
         elif rule == "sarsa" and next_actions is not None:
-            actions = torch.as_tensor(next_actions, dtype=torch.long, device=self.device)
+            actions = torch.as_tensor(
+                next_actions, dtype=torch.long, device=self.device
+            )
         else:
             raise ValueError("Expected rule='q', or rule='sarsa' with next_actions")
         values = self.target(inputs).gather(1, actions[:, None]).squeeze(1)
@@ -120,11 +137,15 @@ class NetQ:
             group["lr"] = alpha
         actions = torch.as_tensor(actions, dtype=torch.long, device=self.device)
         targets = torch.as_tensor(targets, dtype=torch.float32, device=self.device)
-        predictions = self.online(self._tensor(Phi)).gather(1, actions[:, None]).squeeze(1)
+        predictions = (
+            self.online(self._tensor(Phi)).gather(1, actions[:, None]).squeeze(1)
+        )
         errors = (targets - predictions).detach().cpu().numpy()
         loss = F.smooth_l1_loss(predictions, targets, reduction="none")
         if weights is not None:
-            loss = loss * torch.as_tensor(weights, dtype=torch.float32, device=self.device)
+            loss = loss * torch.as_tensor(
+                weights, dtype=torch.float32, device=self.device
+            )
         self.optimizer.zero_grad(set_to_none=True)
         loss.mean().backward()
         nn.utils.clip_grad_norm_(self.online.parameters(), self.grad_clip)
@@ -138,22 +159,59 @@ class NetQ:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         temporary = path.with_suffix(path.suffix + ".tmp")
-        torch.save(dict(version=1, actions=ACTIONS, input_shape=INPUT_SHAPE,
-                        online=self.online.state_dict(), target=self.target.state_dict(),
-                        optimizer=self.optimizer.state_dict(), updates=self.updates,
-                        target_update_every=self.target_update_every,
-                        grad_clip=self.grad_clip), temporary)
-        temporary.replace(path)
+        torch.save(
+            dict(
+                version=1,
+                actions=ACTIONS,
+                input_shape=INPUT_SHAPE,
+                online=self.online.state_dict(),
+                target=self.target.state_dict(),
+                optimizer=self.optimizer.state_dict(),
+                updates=self.updates,
+                target_update_every=self.target_update_every,
+                grad_clip=self.grad_clip,
+            ),
+            temporary,
+        )
+        # Windows scanners/readers can briefly deny replacement of an existing
+        # checkpoint. Keep the valid old file and retry the atomic replacement.
+        for attempt in range(20):
+            try:
+                temporary.replace(path)
+                break
+            except PermissionError:
+                if attempt == 19:
+                    raise
+                time.sleep(0.25)
 
     @classmethod
-    def load(cls, path, *, device="cpu", seed=None, training=False,
-             target_update_every=500, grad_clip=10.0, torch_threads=1):
+    def load(
+        cls,
+        path,
+        *,
+        device="cpu",
+        seed=None,
+        training=False,
+        target_update_every=500,
+        grad_clip=10.0,
+        torch_threads=1,
+    ):
         data = torch.load(path, map_location=device, weights_only=True)
-        if (data.get("version") != 1 or data.get("actions") != ACTIONS
-                or tuple(data.get("input_shape", ())) != INPUT_SHAPE):
-            raise ValueError("Incompatible CNN checkpoint version, actions or input shape")
-        model = cls(seed=seed, device=device, target_update_every=target_update_every,
-                    grad_clip=grad_clip, torch_threads=torch_threads)
+        if (
+            data.get("version") != 1
+            or data.get("actions") != ACTIONS
+            or tuple(data.get("input_shape", ())) != INPUT_SHAPE
+        ):
+            raise ValueError(
+                "Incompatible CNN checkpoint version, actions or input shape"
+            )
+        model = cls(
+            seed=seed,
+            device=device,
+            target_update_every=target_update_every,
+            grad_clip=grad_clip,
+            torch_threads=torch_threads,
+        )
         model.online.load_state_dict(data["online"])
         if not all(torch.isfinite(p).all() for p in model.online.parameters()):
             raise ValueError("Checkpoint contains non-finite weights")

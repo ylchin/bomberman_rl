@@ -1,5 +1,5 @@
 """
-callbacks.py  --  our_agent 
+callbacks.py  --  our_agent
 
 Tournament entry point. Must stay importable with NO training-only deps
 (train.py is only imported by the framework when --train is set).
@@ -15,7 +15,19 @@ import numpy as np
 from .features import ACTIONS, state_to_features
 from . import config
 
-STUCK_AFTER = 2  # consecutive ineffective repeats of the same move before we force a change
+STUCK_AFTER = (
+    2  # consecutive ineffective repeats of the same move before we force a change
+)
+
+
+def action_options(game_state):
+    """Keep Model 2 unchanged; Model 1 can screen known bomb traps."""
+    if config.MODEL == "linear" and config.TRAIN.get("survival_filter", False):
+        from .escape_planner import survival_actions
+        return {"action_mask": survival_actions(
+            game_state, bomb_collision_guard=config.TRAIN.get("bomb_collision_guard", True)
+        )}
+    return {}
 
 
 def setup(self):
@@ -29,17 +41,29 @@ def setup(self):
 
     if self.model_kind == "net":
         from .model_net import NetQ, encode_state
-        options = {key: config.TRAIN[key] for key in (
-            "seed", "device", "target_update_every", "grad_clip", "torch_threads")}
+
+        options = {
+            key: config.TRAIN[key]
+            for key in (
+                "seed",
+                "device",
+                "target_update_every",
+                "grad_clip",
+                "torch_threads",
+            )
+        }
         create_model = lambda: NetQ(**options)
         load_model = lambda path, initialize=False: NetQ.load(
-            path, training=self.train and not initialize, **options)
+            path, training=self.train and not initialize, **options
+        )
         self.encode_state = encode_state
     else:
         from .q_linear import LinearQ
+
         create_model = LinearQ
         load_model = lambda path, initialize=False: LinearQ.load(
-            path, allow_legacy_padding=initialize)
+            path, allow_legacy_padding=initialize
+        )
         self.encode_state = state_to_features
 
     if self.train:
@@ -50,15 +74,25 @@ def setup(self):
         if init_checkpoint:
             for output in (resume_path, config.TRAIN["best_weights_out"]):
                 if os.path.abspath(init_checkpoint) == os.path.abspath(output):
-                    raise ValueError("Initialization checkpoint must differ from output checkpoints")
+                    raise ValueError(
+                        "Initialization checkpoint must differ from output checkpoints"
+                    )
                 if os.path.exists(output):
-                    raise FileExistsError(f"Training output already exists: {output}. Set a new AGENT_RUN.")
+                    raise FileExistsError(
+                        f"Training output already exists: {output}. Set a new AGENT_RUN."
+                    )
             if os.path.exists(config.TRAIN["log_csv"]):
-                raise FileExistsError("Training log already exists. Set a new AGENT_RUN.")
-            self.logger.info(f"Initializing {self.model_kind} from checkpoint {init_checkpoint}.")
+                raise FileExistsError(
+                    "Training log already exists. Set a new AGENT_RUN."
+                )
+            self.logger.info(
+                f"Initializing {self.model_kind} from checkpoint {init_checkpoint}."
+            )
             self.model = load_model(init_checkpoint, initialize=True)
         elif config.TRAIN["resume"]:
-            self.logger.info(f"Loading {self.model_kind} for further training from {resume_path}.")
+            self.logger.info(
+                f"Loading {self.model_kind} for further training from {resume_path}."
+            )
             self.model = load_model(resume_path)
         else:
             self.logger.info(f"Fresh {self.model_kind} model.")
@@ -86,6 +120,7 @@ def act(self, game_state: dict) -> str:
     phi = self.encode_state(game_state)
     if phi is None:
         return "WAIT"
+    options = action_options(game_state)
 
     if game_state["step"] == 1:
         # new round -- don't compare across the round boundary
@@ -94,9 +129,9 @@ def act(self, game_state: dict) -> str:
 
     if self.train:
         beta = config.TRAIN["softmax_beta"]
-        action_id = self.model.act(phi, epsilon=self.epsilon, beta=beta, rng=self.rng)
+        action_id = self.model.act(phi, epsilon=self.epsilon, beta=beta, rng=self.rng, **options)
     else:
-        action_id = self.model.act(phi, epsilon=0.0, rng=self.rng)
+        action_id = self.model.act(phi, epsilon=0.0, rng=self.rng, **options)
 
     # Safety net: a greedy (eps=0) policy that picks an action the game rejects
     # (wall/crate/out of bounds) sees an unchanged game_state next step, so it
@@ -112,10 +147,16 @@ def act(self, game_state: dict) -> str:
     self._repeat_count = self._repeat_count + 1 if ineffective_repeat else 0
     if self._repeat_count >= STUCK_AFTER:
         stuck_on = ACTIONS[action_id]
-        action_id = int(self.rng.integers(len(ACTIONS)))
+        if self.model_kind == "linear":
+            alternatives = self.model.available_actions(phi, options.get("action_mask"))
+            alternatives[action_id] = False
+            if alternatives.any():
+                action_id = self.model.act(phi, rng=self.rng, action_mask=alternatives)
+        else:
+            action_id = int(self.rng.integers(len(ACTIONS)))
         self.logger.warning(
             f"step {game_state['step']}: stuck at {pos} repeating {stuck_on!r} "
-            f"with no effect; forcing random action {ACTIONS[action_id]!r} instead"
+            f"with no effect; selecting alternative {ACTIONS[action_id]!r} instead"
         )
         self._repeat_count = 0
 
@@ -123,5 +164,7 @@ def act(self, game_state: dict) -> str:
     self._last_action_id = action_id
 
     action = ACTIONS[action_id]
-    self.logger.debug(f"step {game_state['step']}: {action} (eps={getattr(self, 'epsilon', 0):.2f})")
+    self.logger.debug(
+        f"step {game_state['step']}: {action} (eps={getattr(self, 'epsilon', 0):.2f})"
+    )
     return action

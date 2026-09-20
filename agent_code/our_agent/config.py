@@ -22,42 +22,41 @@ if MODEL not in ("linear", "net"):
 # act() loads weights from when self.train is False.
 WEIGHTS_FILE = {
     "linear": "weights/q_linear.pkl",
-    "net":    "weights/q_net.pt",
+    "net": "weights/q_net.pt",
     "forest": "weights/q_forest.pkl",
 }
 
 TRAIN = dict(
     # --- RL ---
     gamma=0.95,
-    n_step=3,                # k in the k-step TD target; 1 = plain 1-step
-    rule="q",                # "q" (Q-learning) or "sarsa"
-    alpha=0.02,              # linear-model learning rate (start)
-    alpha_end=0.005,         # linear-annealed to this over eps_decay_episodes; None = constant
-    td_clip=8.0,             # clip |TD error| in the gradient step; None = off
-
+    n_step=3,  # k in the k-step TD target; 1 = plain 1-step
+    rule="q",  # "q" (Q-learning) or "sarsa"
+    alpha=0.02,  # linear-model learning rate (start)
+    alpha_end=0.005,  # linear-annealed to this over eps_decay_episodes; None = constant
+    td_clip=8.0,  # clip |TD error| in the gradient step; None = off
     # --- exploration: linear anneal of epsilon, then hold ---
     eps_start=1.0,
-    eps_end=0.01,            # low floor: coin-heaven needs little exploration once solved
+    eps_end=0.01,  # low floor: coin-heaven needs little exploration once solved
     eps_decay_episodes=500,
-    softmax_beta=None,       # set a float to use softmax instead of eps-greedy
-
+    softmax_beta=None,  # set a float to use softmax instead of eps-greedy
+    # Model 1 only: screen known bomb traps in actions and bootstrap targets.
+    survival_filter=os.environ.get("AGENT_SURVIVAL_FILTER", "1") == "1",
+    bomb_collision_guard=os.environ.get("AGENT_BOMB_COLLISION_GUARD", "1") == "1",
     # --- replay ---
     buffer_capacity=100_000,
     batch_size=256,
-    learn_every=4,           # learn once per this many env steps
-    learn_iters_end=8,       # extra learn steps at end_of_round
-    priority_alpha=0.0,      # 0 = uniform; try 0.5-0.7 once it trains
-
+    learn_every=4,  # learn once per this many env steps
+    learn_iters_end=8,  # extra learn steps at end_of_round
+    priority_alpha=0.0,  # 0 = uniform; try 0.5-0.7 once it trains
     # --- data augmentation ---
-    use_symmetry=False,      # 8x transitions per step via symmetry.py (turn on later)
-
+    use_symmetry=False,  # 8x transitions per step via symmetry.py (turn on later)
     # --- bookkeeping ---
-    resume=False,            # True = keep training the existing checkpoint
+    resume=False,  # True = keep training the existing checkpoint
     init_checkpoint=os.environ.get("AGENT_INIT_CHECKPOINT", "").strip(),
     seed=int(os.environ["AGENT_SEED"]) if "AGENT_SEED" in os.environ else None,
-    save_every=25,           # checkpoint every N episodes (also always at the end)
+    save_every=25,  # preserve a candidate checkpoint every N episodes for validation
     log_csv="training_log.csv",
-    preset="task1",          # overwritten below when AGENT_PRESET is set
+    preset="task1",  # overwritten below when AGENT_PRESET is set
 )
 
 # ---------------------------------------------------------------------------
@@ -65,22 +64,24 @@ TRAIN = dict(
 # ---------------------------------------------------------------------------
 PRESETS = {
     "task1": {},
-    "task2": dict(               # loot-crate: bomb crates, find coins, never suicide
-        gamma=0.97,             # longer horizon: bomb -> crate -> coin -> collect chains
+    "task2": dict(  # loot-crate: bomb crates, find coins, never suicide
+        gamma=0.97,  # longer horizon: bomb -> crate -> coin -> collect chains
         n_step=3,
-        alpha=0.02, alpha_end=0.004,
-        eps_end=0.03,           # more residual exploration: bombing must keep being tried
+        alpha=0.02,
+        alpha_end=0.004,
+        eps_end=0.03,  # more residual exploration: bombing must keep being tried
         eps_decay_episodes=1500,
         buffer_capacity=200_000,
         save_every=50,
         # 2026-09-17: tried n_step=5 + use_symmetry=True + doubled escape
         # penalties together -- official eval coins 28.1 -> 9.7, reverted.
     ),
-    "task3": dict(               # classic vs peaceful_agent + coin_collector_agent
+    "task3": dict(  # classic vs peaceful_agent + coin_collector_agent
         gamma=0.97,
-        n_step=4,               # approach -> corner -> bomb -> escape -> kill is a longer chain
-        alpha=0.02, alpha_end=0.004,
-        eps_end=0.05,           # opponents move -- keep more exploration than task2
+        n_step=4,  # approach -> corner -> bomb -> escape -> kill is a longer chain
+        alpha=0.02,
+        alpha_end=0.004,
+        eps_end=0.05,  # opponents move -- keep more exploration than task2
         eps_decay_episodes=2000,
         buffer_capacity=200_000,
         save_every=50,
@@ -91,6 +92,29 @@ PRESETS = {
         # self-kill. Doubled to 8000 rounds (everything else identical):
         # coins 1.09/9, 6% kill rate, but self-kill worsened to 6% -- and
         # the training curve plateaued by ep~4000-5000.
+    ),
+    "task3": dict(
+        # classic vs peaceful_agent + coin_collector_agent
+        gamma=0.97,
+        n_step=4,
+        alpha=0.02,
+        alpha_end=0.004,
+        eps_end=0.05,
+        eps_decay_episodes=2000,
+        buffer_capacity=200_000,
+        save_every=50,
+    ),
+    "task4": dict(
+        # Fine-tune the successful Task-3 policy against strong opponents.
+        gamma=0.97,
+        n_step=4,
+        alpha=0.005,
+        alpha_end=0.001,
+        eps_start=0.20,
+        eps_end=0.03,
+        eps_decay_episodes=1500,
+        buffer_capacity=200_000,
+        save_every=50,
     ),
 }
 
@@ -103,23 +127,47 @@ if _preset:
 
 # keep each task's training log + checkpoint separate so parallel runs don't clash
 _run_name = os.environ.get("AGENT_RUN", TRAIN["preset"]).strip()
-if not _run_name or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-" for c in _run_name):
-    raise ValueError("AGENT_RUN must contain only letters, digits, underscores or hyphens")
+if not _run_name or any(
+    c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"
+    for c in _run_name
+):
+    raise ValueError(
+        "AGENT_RUN must contain only letters, digits, underscores or hyphens"
+    )
 if MODEL == "net":
     # Spatial replay needs substantially more memory than flat features.
-    TRAIN.update(alpha=1e-4, alpha_end=1e-4, batch_size=64,
-                 buffer_capacity=10_000, target_update_every=500,
-                 grad_clip=10.0, torch_threads=1,
-                 device=os.environ.get("AGENT_DEVICE", "cpu"))
+    TRAIN.update(
+        alpha=1e-4,
+        alpha_end=1e-4,
+        batch_size=64,
+        buffer_capacity=10_000,
+        target_update_every=500,
+        grad_clip=10.0,
+        torch_threads=1,
+        device=os.environ.get("AGENT_DEVICE", "cpu"),
+    )
 _extension = "pt" if MODEL == "net" else "pkl"
 _log_prefix = "training_net" if MODEL == "net" else "training"
 TRAIN["log_csv"] = f"{_log_prefix}_{_run_name}.csv"
 TRAIN["weights_out"] = f"weights/q_{MODEL}_{_run_name}.{_extension}"
 TRAIN["best_weights_out"] = f"weights/q_{MODEL}_{_run_name}_best.{_extension}"
+TRAIN["candidate_dir"] = f"weights/candidates/{MODEL}_{_run_name}"
 
-# What callbacks.act() loads in eval / tournament mode: prefer the best
-# checkpoint (a training run can get WORSE after a bad hyperparameter change
-# -- this bit us once already, don't silently ship the latest instead of the
-# best), then the latest, then the stable path (copy your final model there
-# before submitting:  cp weights/q_linear_task4_best.pkl weights/q_linear.pkl).
-EVAL_WEIGHTS = [TRAIN["best_weights_out"], TRAIN["weights_out"], WEIGHTS_FILE[MODEL]]
+# Evaluation checkpoint selection.
+# During experiments with an explicit run/preset, prefer that run's best model.
+# In tournament/submission mode, where no environment variables are supplied,
+# always load the stable submission checkpoint only.
+_eval_override = os.environ.get("AGENT_EVAL_CHECKPOINT", "").strip()
+_explicit_run = os.environ.get("AGENT_RUN", "").strip()
+_explicit_preset = os.environ.get("AGENT_PRESET", "").strip()
+
+if _eval_override:
+    EVAL_WEIGHTS = [_eval_override]
+elif _explicit_run or _explicit_preset:
+    EVAL_WEIGHTS = [
+        TRAIN["best_weights_out"],
+        TRAIN["weights_out"],
+        WEIGHTS_FILE[MODEL],
+    ]
+else:
+    EVAL_WEIGHTS = [WEIGHTS_FILE[MODEL]]
