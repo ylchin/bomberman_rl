@@ -82,20 +82,19 @@ GAME_REWARDS = {
     SAFE_BOMB_THREATENS_OPPONENT: 0.10,
     SAFE_BOMB_TRAPS_OPPONENT: 0.20,
     # Tried doubling these (0.60/0.45/0.80) + n_step=5 + symmetry together on
-    # 2026-09-17: official eval coins dropped 28.1 -> 9.7, training curve
+    # official eval coins dropped 28.1 -> 9.7, training curve
     # plateaued at ep~3000/8000. Reverted. If retrying, change ONE of these
     # three things at a time so a regression is attributable.
     #
-    # 2026-09-17, second finding: with -0.40 unchanged, more training time
+    # second finding: with -0.40 unchanged, more training time
     # alone (3000 -> 6000 rounds, nothing else changed) raised coins
-    # 35.55->37.90 but self-kill 6%->11% -- self-kill is a structural issue,
-    # not an undertraining issue.
+    # 35.55->37.90 but self-kill 6%->11% -- self-kill is a structural issue.
     #
-    # 2026-09-17, third: -0.40 -> -0.55 alone (n_step=3, no symmetry, 3000
+    # third: -0.40 -> -0.55 alone (n_step=3, no symmetry, 3000
     # rounds, otherwise = baseline): coins 35.55->37.42, self-kill 6%->4%.
-    # Both moved the right way together -- confirmed single-variable win.
+    # Both moved the right way together.
     #
-    # 2026-09-17, fourth: pushed -0.55 -> -0.70. Self-kill kept improving
+    # fourth: pushed -0.55 -> -0.70. Self-kill kept improving
     # (4%->1%) but coins collapsed 37.42->21.98 (variance 11.9->18.6) --
     # model got too bomb-shy to clear crates. Overshoot. REVERTED to -0.55,
     # the best coins/safety point found on this single lever. Neither -0.55

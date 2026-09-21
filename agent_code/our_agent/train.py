@@ -1,5 +1,5 @@
 """
-train.py  --  our_agent  (Yi Ling Chin)
+train.py  --  our_agent
 
 Imported by the framework only when --train is set. Owns:
 

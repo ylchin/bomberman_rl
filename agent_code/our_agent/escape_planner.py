@@ -195,9 +195,7 @@ def survival_actions(state, deadline_margin=1, bomb_collision_guard=True,
                     deadline_margin=deadline_margin,
                     avoid_opponent_collisions=True,
                 )[0]
-        # Do not turn a difficult escape into an empty mask (which would make
-        # LinearQ fall back to arbitrary legal actions). Keep the old search
-        # when every route is contested. Bomb screening remains independent.
+
         if robust_moves.any():
             allowed[:-1] = robust_moves
     return allowed
