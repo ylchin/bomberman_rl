@@ -104,13 +104,24 @@ class NetQ:
     def q_values(self, inputs):
         return self.q_values_batch(inputs)[0]
 
-    def act(self, phi, epsilon=0.0, beta=None, rng=None):
+    def act(self, phi, epsilon=0.0, beta=None, rng=None, action_mask=None):
         rng = rng or self._rng
+        # FIX (2026-09-20): action_mask, matching LinearQ's existing interface.
+        if action_mask is not None:
+            action_mask = np.asarray(action_mask, dtype=bool)
+            if action_mask.shape != (len(ACTIONS),) or not action_mask.any():
+                action_mask = None
         if beta is None and rng.random() < epsilon:
+            if action_mask is not None:
+                return int(rng.choice(np.flatnonzero(action_mask)))
             return int(rng.integers(len(ACTIONS)))
         q = self.q_values(phi)
+        if action_mask is not None:
+            q = np.where(action_mask, q, -np.inf)
         if beta is not None:
             probabilities = np.exp(beta * q - np.max(beta * q))
+            if action_mask is not None:
+                probabilities = np.where(action_mask, probabilities, 0.0)
             return int(rng.choice(len(ACTIONS), p=probabilities / probabilities.sum()))
         return int(rng.choice(np.flatnonzero(q == q.max())))
 

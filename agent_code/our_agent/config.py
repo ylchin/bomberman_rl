@@ -146,6 +146,11 @@ if MODEL == "net":
         torch_threads=1,
         device=os.environ.get("AGENT_DEVICE", "cpu"),
     )
+
+    if "eps_decay_episodes" not in PRESETS.get(_preset, {}):
+        TRAIN["eps_decay_episodes"] = 2000
+    if "eps_end" not in PRESETS.get(_preset, {}):
+        TRAIN["eps_end"] = 0.05
 _extension = "pt" if MODEL == "net" else "pkl"
 _log_prefix = "training_net" if MODEL == "net" else "training"
 TRAIN["log_csv"] = f"{_log_prefix}_{_run_name}.csv"

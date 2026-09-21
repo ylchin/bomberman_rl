@@ -20,9 +20,12 @@ STUCK_AFTER = (
 )
 
 
+_NET_FALLBACK_ACTIONS = [i for i, a in enumerate(ACTIONS) if a != "BOMB"]
+
+
 def action_options(game_state):
-    """Keep Model 2 unchanged; Model 1 can screen known bomb traps."""
-    if config.MODEL == "linear" and config.TRAIN.get("survival_filter", False):
+    """Screen known bomb traps in actions for both models."""
+    if config.TRAIN.get("survival_filter", False):
         from .escape_planner import survival_actions
         return {"action_mask": survival_actions(
             game_state, bomb_collision_guard=config.TRAIN.get("bomb_collision_guard", True)
@@ -153,7 +156,10 @@ def act(self, game_state: dict) -> str:
             if alternatives.any():
                 action_id = self.model.act(phi, rng=self.rng, action_mask=alternatives)
         else:
-            action_id = int(self.rng.integers(len(ACTIONS)))
+            # dont let fallback pick bomb
+            action_id = _NET_FALLBACK_ACTIONS[
+                int(self.rng.integers(len(_NET_FALLBACK_ACTIONS)))
+            ]
         self.logger.warning(
             f"step {game_state['step']}: stuck at {pos} repeating {stuck_on!r} "
             f"with no effect; selecting alternative {ACTIONS[action_id]!r} instead"

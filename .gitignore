@@ -116,3 +116,6 @@ agent_code/*/logs/
 agent_code/*/training_*.csv
 agent_code/*/weights/*.pkl
 agent_code/*/weights/*.pt
+.DS_Store
+*.bak
+weights/candidates/
