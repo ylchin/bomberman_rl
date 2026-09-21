@@ -1,37 +1,52 @@
 """Short-horizon survival search matching this framework's bomb update order.
 
-Other agents are held at their observed positions. Future bomb placements and
-opponent moves are unknown, so a route is a prediction, not a guarantee.
+Observed opponent positions block routes; optional collision guards also
+consider tiles opponents could reach as known bombs and crates disappear.
+Future bomb placements and moves are unknown, so routes are not guarantees.
 """
 
 from collections import deque
+from heapq import heappop, heappush
 
 import numpy as np
 
 from .features import ACTIONS, BOMB_TIMER, DIRECTION_VECTORS, EXPLOSION_LINGER, get_blast_coords
 
 
-def _opponent_arrival_times(state):
-    """Earliest arrival through currently open tiles, including simultaneous moves."""
+def _opponent_arrival_times(state, opens_at, occupied_until, horizon):
+    """Optimistic arrival bounds using the escape search's obstacle schedule.
+
+    Opponents may wait for a bomb or crate to disappear. Fire and other agents
+    are deliberately ignored: this can predict an arrival earlier than a real
+    safe route permits, making collision screening conservative. Only arrivals
+    within the escape horizon matter. Stone walls never open.
+    """
     field = state["field"]
     arrival = np.full(field.shape, np.inf)
-    bombs = {pos for pos, _ in state["bombs"]}
-    queue = deque()
+    queue = []
     for opponent in state["others"]:
-        pos = opponent[3]
+        pos = tuple(opponent[3])
         arrival[pos] = 0
-        queue.append(pos)
+        heappush(queue, (0, pos))
     while queue:
-        x, y = queue.popleft()
+        t, (x, y) = heappop(queue)
+        if t != arrival[x, y]:
+            continue
         for dx, dy in DIRECTION_VECTORS.values():
             nxt = (x + dx, y + dy)
             nx, ny = nxt
             if not (0 <= nx < field.shape[0] and 0 <= ny < field.shape[1]):
                 continue
-            if field[nxt] != 0 or nxt in bombs or np.isfinite(arrival[nxt]):
+            if field[nxt] == -1:
                 continue
-            arrival[nxt] = arrival[x, y] + 1
-            queue.append(nxt)
+            # Moves precede bomb updates, so a detonating bomb blocks entry
+            # through its detonation turn. Crate release times already include
+            # the same one-turn offset in opens_at.
+            nt = max(t + 1, int(opens_at[nxt]), occupied_until.get(nxt, 0) + 1)
+            if nt > horizon or nt >= arrival[nxt]:
+                continue
+            arrival[nxt] = nt
+            heappush(queue, (nt, nxt))
     return arrival
 
 
@@ -45,11 +60,10 @@ def escape_route(state, start, blocked=(), placement_turn=False, first_action=No
     `deadline_margin` expands blast intervals earlier without clearing obstacles
     or fire earlier. It reserves time for an opponent obstructing the route.
     `avoid_opponent_collisions` rejects moves to tiles an opponent can reach by
-    that turn. Used before committing to a new bomb; it assumes opponents can
-    wait, but cannot predict new bombs or paths opened by future crate removal.
+    that turn. It includes paths opened by known explosions and assumes
+    opponents can wait, even through fire, but cannot predict new bombs.
     """
     field = state["field"]
-    opponent_arrival = _opponent_arrival_times(state) if avoid_opponent_collisions else None
     bombs = [(tuple(pos), int(timer) + 1) for pos, timer in state["bombs"]]
     existing_fire = np.asarray(state.get("explosion_map", np.zeros_like(field)))
     horizon = max(
@@ -68,6 +82,11 @@ def escape_route(state, start, blocked=(), placement_turn=False, first_action=No
             if field[x, y] == 1:
                 # Moves occur before crates are destroyed in this step.
                 opens_at[x, y] = min(opens_at[x, y], detonation + 1)
+
+    opponent_arrival = (
+        _opponent_arrival_times(state, opens_at, occupied_until, horizon)
+        if avoid_opponent_collisions else None
+    )
 
     # Bomb occupancy is time-dependent; callers may include it in blocked.
     blocked = set(blocked) - set(occupied_until) - {start}
@@ -108,6 +127,31 @@ def escape_route(state, start, blocked=(), placement_turn=False, first_action=No
             visited.add((nxt, nt))
             queue.append((nxt, nt, name if t == start_time else first))
     return False, None, None
+
+
+def optimistic_fallback_actions(state, action_mask, legal):
+    """Prefer possible escapes only when the normal legal safety screen is empty.
+
+    The first action must be legal under observed occupancy. Later moves may
+    use opponent-occupied tiles, assuming opponents clear them. Known bombs,
+    crates and fire retain exact timing, including a proposed bomb's placement
+    turn. This is an emergency preference, not a certified safe route.
+    """
+    if np.any(np.asarray(action_mask, dtype=bool) & legal):
+        return action_mask
+    possible = np.zeros(len(ACTIONS), dtype=bool)
+    start = state["self"][3]
+    for i, action in enumerate(ACTIONS):
+        if not legal[i]:
+            continue
+        if action == "BOMB":
+            proposed = dict(state, bombs=[*state["bombs"], (start, BOMB_TIMER)])
+            possible[i] = escape_route(proposed, start, placement_turn=True)[0]
+        else:
+            possible[i] = escape_route(state, start, first_action=action)[0]
+    # Preserve the existing legal-action fallback when even optimism finds no
+    # route. Do not replace a hopeless screen with an arbitrary new preference.
+    return possible if possible.any() else action_mask
 
 
 def survival_actions(state, deadline_margin=1, bomb_collision_guard=True,

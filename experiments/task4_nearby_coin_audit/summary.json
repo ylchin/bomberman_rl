@@ -1,0 +1,413 @@
+{
+  "source_rounds": 20,
+  "source_decisions": 7247,
+  "filter": {
+    "max_clear_walking_distance": 6,
+    "no_bombs_anywhere": true,
+    "no_active_fire_anywhere": true,
+    "minimum_consecutive_waits": 3
+  },
+  "filter_counts": {
+    "no_clear_visible_coin_route": 2345,
+    "bomb_present": 3978,
+    "active_fire_present": 651,
+    "included": 166,
+    "coin_beyond_distance_limit": 107
+  },
+  "overall": {
+    "decisions": 166,
+    "categories": {
+      "safe_coin_opportunity": 166
+    },
+    "coin_opportunities": 166,
+    "actual_nonprogress_coin_choices": 40,
+    "actual_coin_progress_fraction": 0.7590361445783133,
+    "mean_greedy_coin_probability": 0.7590361445783133,
+    "nonprogress_actions": {
+      "WAIT": 32,
+      "BOMB": 8
+    },
+    "safe_wait_decisions": 32,
+    "safe_wait_categories": {
+      "safe_coin_opportunity": 32
+    },
+    "safe_wait_streaks": 0,
+    "safe_wait_streaks_with_coin_opportunities": 0,
+    "longest_safe_wait_streak": 0,
+    "longest_streak_examples": [],
+    "longest_streaks_with_coin_opportunities": [],
+    "distance_counts": {
+      "5": 25,
+      "2": 26,
+      "1": 27,
+      "4": 40,
+      "3": 29,
+      "6": 19
+    },
+    "wait_strictly_above_all_coin_moves": 32,
+    "by_coin_feature_alignment": {
+      "matches_clear_route": {
+        "decisions": 163,
+        "categories": {
+          "safe_coin_opportunity": 163
+        },
+        "coin_opportunities": 163,
+        "actual_nonprogress_coin_choices": 37,
+        "actual_coin_progress_fraction": 0.7730061349693251,
+        "mean_greedy_coin_probability": 0.7730061349693251,
+        "nonprogress_actions": {
+          "WAIT": 32,
+          "BOMB": 5
+        },
+        "safe_wait_decisions": 32,
+        "safe_wait_categories": {
+          "safe_coin_opportunity": 32
+        },
+        "safe_wait_streaks": 0,
+        "safe_wait_streaks_with_coin_opportunities": 0,
+        "longest_safe_wait_streak": 0,
+        "longest_streak_examples": [],
+        "longest_streaks_with_coin_opportunities": []
+      },
+      "differs_from_clear_route": {
+        "decisions": 3,
+        "categories": {
+          "safe_coin_opportunity": 3
+        },
+        "coin_opportunities": 3,
+        "actual_nonprogress_coin_choices": 3,
+        "actual_coin_progress_fraction": 0.0,
+        "mean_greedy_coin_probability": 0.0,
+        "nonprogress_actions": {
+          "BOMB": 3
+        },
+        "safe_wait_decisions": 0,
+        "safe_wait_categories": {},
+        "safe_wait_streaks": 0,
+        "safe_wait_streaks_with_coin_opportunities": 0,
+        "longest_safe_wait_streak": 0,
+        "longest_streak_examples": [],
+        "longest_streaks_with_coin_opportunities": []
+      }
+    }
+  },
+  "games_with_eligible_decisions": 20,
+  "wait_examples": [
+    {
+      "seed": 32015,
+      "step": 103,
+      "position": [
+        6,
+        3
+      ],
+      "coin_distance": 5,
+      "coin_actions": [
+        "LEFT"
+      ],
+      "greedy_actions": [
+        "WAIT"
+      ],
+      "coin_feature_directions": [
+        "LEFT"
+      ],
+      "feature_matches_clear_route": true,
+      "nearest_opponent_manhattan": 5,
+      "chosen_minus_best_coin_q": 3.0039102121297607,
+      "largest_ranking_contributions": [
+        {
+          "feature": "CRATE_DIR_RIGHT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.9920069621245557
+        },
+        {
+          "feature": "OPP_DIR_LEFT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.9646890129341655
+        },
+        {
+          "feature": "COIN_DIR_LEFT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.6716784515628161
+        },
+        {
+          "feature": "SAFE_DIR_NONE",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": -0.21505164320209502
+        },
+        {
+          "feature": "WALL_UP",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.17966890502860616
+        },
+        {
+          "feature": "WALL_DOWN",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.17966890502860616
+        },
+        {
+          "feature": "OPP_NEARBY",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.14402496369677256
+        },
+        {
+          "feature": "OPP_DIST",
+          "value": 0.3499999940395355,
+          "chosen_minus_coin_contribution": 0.04857871497646604
+        }
+      ]
+    },
+    {
+      "seed": 32016,
+      "step": 61,
+      "position": [
+        1,
+        4
+      ],
+      "coin_distance": 4,
+      "coin_actions": [
+        "DOWN"
+      ],
+      "greedy_actions": [
+        "WAIT"
+      ],
+      "coin_feature_directions": [
+        "DOWN"
+      ],
+      "feature_matches_clear_route": true,
+      "nearest_opponent_manhattan": 5,
+      "chosen_minus_best_coin_q": 2.9828763125417876,
+      "largest_ranking_contributions": [
+        {
+          "feature": "CRATE_DIR_UP",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.9920069621245557
+        },
+        {
+          "feature": "OPP_DIR_DOWN",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.9646890129341655
+        },
+        {
+          "feature": "COIN_DIR_DOWN",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.6716784515628161
+        },
+        {
+          "feature": "SAFE_DIR_NONE",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": -0.21505164320209502
+        },
+        {
+          "feature": "WALL_RIGHT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.17966890502860616
+        },
+        {
+          "feature": "WALL_LEFT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.17966890502860616
+        },
+        {
+          "feature": "OPP_NEARBY",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.14402496369677256
+        },
+        {
+          "feature": "OPP_DIST",
+          "value": 0.25,
+          "chosen_minus_coin_contribution": 0.03469908271696903
+        }
+      ]
+    },
+    {
+      "seed": 32015,
+      "step": 75,
+      "position": [
+        5,
+        4
+      ],
+      "coin_distance": 3,
+      "coin_actions": [
+        "DOWN"
+      ],
+      "greedy_actions": [
+        "WAIT"
+      ],
+      "coin_feature_directions": [
+        "DOWN"
+      ],
+      "feature_matches_clear_route": true,
+      "nearest_opponent_manhattan": 5,
+      "chosen_minus_best_coin_q": 2.9751993904752534,
+      "largest_ranking_contributions": [
+        {
+          "feature": "CRATE_DIR_UP",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.9920069621245557
+        },
+        {
+          "feature": "OPP_DIR_DOWN",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.9646890129341655
+        },
+        {
+          "feature": "COIN_DIR_DOWN",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.6716784515628161
+        },
+        {
+          "feature": "SAFE_DIR_NONE",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": -0.21505164320209502
+        },
+        {
+          "feature": "WALL_RIGHT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.17966890502860616
+        },
+        {
+          "feature": "WALL_LEFT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.17966890502860616
+        },
+        {
+          "feature": "OPP_NEARBY",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.14402496369677256
+        },
+        {
+          "feature": "OPP_DIST",
+          "value": 0.25,
+          "chosen_minus_coin_contribution": 0.03469908271696903
+        }
+      ]
+    },
+    {
+      "seed": 32008,
+      "step": 101,
+      "position": [
+        12,
+        5
+      ],
+      "coin_distance": 6,
+      "coin_actions": [
+        "LEFT"
+      ],
+      "greedy_actions": [
+        "WAIT"
+      ],
+      "coin_feature_directions": [
+        "LEFT"
+      ],
+      "feature_matches_clear_route": true,
+      "nearest_opponent_manhattan": 5,
+      "chosen_minus_best_coin_q": 2.921496623615834,
+      "largest_ranking_contributions": [
+        {
+          "feature": "CRATE_DIR_RIGHT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.9920069621245557
+        },
+        {
+          "feature": "OPP_DIR_RIGHT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.8884781323252999
+        },
+        {
+          "feature": "COIN_DIR_LEFT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.6716784515628161
+        },
+        {
+          "feature": "SAFE_DIR_NONE",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": -0.21505164320209502
+        },
+        {
+          "feature": "WALL_UP",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.17966890502860616
+        },
+        {
+          "feature": "WALL_DOWN",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.17966890502860616
+        },
+        {
+          "feature": "OPP_NEARBY",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.14402496369677256
+        },
+        {
+          "feature": "COIN_DIST",
+          "value": 0.30000001192092896,
+          "chosen_minus_coin_contribution": 0.046061536975008734
+        }
+      ]
+    },
+    {
+      "seed": 32016,
+      "step": 174,
+      "position": [
+        14,
+        7
+      ],
+      "coin_distance": 6,
+      "coin_actions": [
+        "LEFT"
+      ],
+      "greedy_actions": [
+        "WAIT"
+      ],
+      "coin_feature_directions": [
+        "LEFT"
+      ],
+      "feature_matches_clear_route": true,
+      "nearest_opponent_manhattan": 7,
+      "chosen_minus_best_coin_q": 2.9121629121140584,
+      "largest_ranking_contributions": [
+        {
+          "feature": "OPP_DIR_LEFT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.9646890129341655
+        },
+        {
+          "feature": "CRATE_DIR_LEFT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.8920600830163592
+        },
+        {
+          "feature": "COIN_DIR_LEFT",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.6716784515628161
+        },
+        {
+          "feature": "SAFE_DIR_NONE",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": -0.21505164320209502
+        },
+        {
+          "feature": "WALL_UP",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.17966890502860616
+        },
+        {
+          "feature": "WALL_DOWN",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.17966890502860616
+        },
+        {
+          "feature": "OPP_NEARBY",
+          "value": 1.0,
+          "chosen_minus_coin_contribution": 0.14402496369677256
+        },
+        {
+          "feature": "OPP_DIST",
+          "value": 0.3499999940395355,
+          "chosen_minus_coin_contribution": 0.04857871497646604
+        }
+      ]
+    }
+  ],
+  "limits": "Offline analysis of correlated saved decisions; no games or policy changes. Nearby means clear walking distance, not Manhattan distance. Opponent occupancy blocks coin paths, but future movement and bomb placements remain unknown. No bombs/fire does not guarantee safety. Feature agreement means the encoded coin direction matches any allowed shortest first move. Nonprogress is not necessarily a strategic mistake; six steps is an exploratory cutoff. Uses current feature/planner code with the original checkpoint, not a replay."
+}

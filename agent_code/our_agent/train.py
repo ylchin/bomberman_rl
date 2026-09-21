@@ -101,6 +101,9 @@ def game_events_occurred(self, old_game_state, self_action, new_game_state, even
     )
     reward = reward_from_events(events, self.logger)
     reward += potential_shaping(old_game_state, new_game_state, self.t["gamma"])
+    # A survivor's last transition arrives here before end_of_round. Keep its
+    # observed successor so the terminal callback can cancel gamma * Phi(s').
+    self._last_post_state = new_game_state
 
     phi = self.encode_state(old_game_state)
     self.traj.append((phi, _ACTION_ID[self_action], reward))
@@ -122,7 +125,8 @@ def end_of_round(self, last_game_state, last_action, events):
     # The framework delivers a survivor's final step to game_events_occurred AND
     # again here (plus SURVIVED_ROUND). A dead agent's final step comes ONLY here.
     if died or not survived or not self.traj:
-        reward = reward_from_events(events, self.logger)  # terminal: no shaping term
+        reward = reward_from_events(events, self.logger)
+        reward += _terminal_potential_correction(self, last_game_state, False)
         if last_action is not None:
             phi = self.encode_state(last_game_state)
             self.traj.append((phi, _ACTION_ID[last_action], reward))
@@ -132,6 +136,7 @@ def end_of_round(self, last_game_state, last_action, events):
     else:
         # survivor: fold only the genuinely-new SURVIVED_ROUND into the last step
         bonus = reward_from_events([e.SURVIVED_ROUND])
+        bonus += _terminal_potential_correction(self, last_game_state, True)
         phi, a, r = self.traj[-1]
         self.traj[-1] = (phi, a, r + bonus)
         self.ep_reward += bonus
@@ -154,6 +159,24 @@ def end_of_round(self, last_game_state, last_action, events):
     self.traj_masks = []
     self.ep_counts = Counter()
     self.ep_reward = 0.0
+
+    self._last_post_state = None
+
+
+def _terminal_potential_correction(self, last_game_state, already_recorded):
+    """Make the final transition end at an absorbing state with Phi=0.
+
+    Death: the last transition was not recorded, so add -Phi(last_state).
+    Survivor: the recorded transition already contains gamma*Phi(successor)
+    - Phi(last_state), so cancel only that successor term. Do not subtract
+    Phi(last_state) twice. No observed successor means no residual to cancel.
+    """
+    from .rewards import potential
+
+    if already_recorded:
+        successor = getattr(self, "_last_post_state", None)
+        return -self.t["gamma"] * potential(successor)
+    return -potential(last_game_state)
 
 
 # ---------------------------------------------------------------------------
@@ -179,7 +202,8 @@ def _update_best_checkpoint(self):
     score (coins + 5*kills), then kills, then lower self-kill rate, then coins.
 
     Because epsilon is non-zero during training, use the periodic candidates +
-    validate_checkpoints.py for the final choice on separate validation seeds.
+    frozen evaluations for the final choice on separate validation seeds.
+    See experiments/TASK4_CHECKPOINT_REVIEW.md for the current Task 4 protocol.
     """
     metrics = (
         self.ep_counts[e.COIN_COLLECTED],

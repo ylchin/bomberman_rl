@@ -2,7 +2,11 @@ import unittest
 
 import numpy as np
 
-from agent_code.our_agent.escape_planner import escape_route, survival_actions
+from agent_code.our_agent.escape_planner import (
+    _opponent_arrival_times,
+    escape_route,
+    survival_actions,
+)
 from agent_code.our_agent.features import (
     FEATURE_DIM,
     state_to_features,
@@ -35,6 +39,79 @@ def state(pos=(3, 3)):
 
 
 class Model1SafetyTests(unittest.TestCase):
+    def test_opponent_can_cross_bomb_only_after_detonation_turn(self):
+        s = state()
+        s["field"][:] = -1
+        s["field"][1:6, 3] = 0
+        s["others"] = [("opp", 0, False, (1, 3))]
+        horizon = 6
+        opens_at = np.where(s["field"] == 0, 0, horizon + 1)
+        arrivals = _opponent_arrival_times(s, opens_at, {(3, 3): 2}, horizon)
+        self.assertEqual(arrivals[2, 3], 1)
+        self.assertEqual(arrivals[3, 3], 3)
+        self.assertEqual(arrivals[4, 3], 4)
+        self.assertTrue(np.isinf(arrivals[3, 2]))  # Stone remains impassable.
+
+    def test_opponent_can_use_destroyed_but_not_intact_crates(self):
+        s = state()
+        s["field"][:] = -1
+        s["field"][1:7, 3] = 0
+        s["field"][3, 3] = s["field"][5, 3] = 1
+        s["others"] = [("opp", 0, True, (1, 3))]
+        horizon = 6
+        opens_at = np.where(s["field"] == 0, 0, horizon + 1)
+        opens_at[3, 3] = 3  # Only this crate is destroyed by a known blast.
+        arrivals = _opponent_arrival_times(s, opens_at, {}, horizon)
+        self.assertEqual(arrivals[3, 3], 3)
+        self.assertEqual(arrivals[4, 3], 4)
+        self.assertTrue(np.isinf(arrivals[5, 3]))
+        self.assertTrue(np.isinf(arrivals[6, 3]))
+
+    def test_opponent_can_leave_its_own_live_bomb(self):
+        s = state()
+        s["others"] = [("opp", 0, False, (3, 3))]
+        opens_at = np.where(s["field"] == 0, 0, 7)
+        arrivals = _opponent_arrival_times(s, opens_at, {(3, 3): 5}, 6)
+        self.assertEqual(arrivals[3, 3], 0)
+        self.assertEqual(arrivals[4, 3], 1)
+
+    def test_bomb_rejected_when_clearing_obstacle_opens_interception_route(self):
+        # Captured seeds 29029/29045/29061 share the bomb version of this trap:
+        # self drops at (14, 1), then an opponent intercepts its right escape.
+        # The apparently safe left escape relies on a disappearing obstacle
+        # at (13, 2), which also opens a shortcut for the opponent.
+        for obstacle in ("bomb", "crate"):
+            for margin in (0, 1):
+                with self.subTest(obstacle=obstacle, margin=margin):
+                    s = state((14, 1))
+                    field = np.full((17, 17), -1, dtype=int)
+                    field[1:-1, 1:-1] = 0
+                    field[2:-1:2, 2:-1:2] = -1
+                    s["field"] = field
+                    s["explosion_map"] = np.zeros_like(field)
+                    s["others"] = [("opp", 0, False, (13, 3))]
+                    if obstacle == "bomb":
+                        s["bombs"] = [((13, 2), 0)]
+                    else:
+                        field[13, 2] = 1
+                        s["bombs"] = [((13, 4), 0)]
+                    original_field = field.copy()
+                    original_bombs = list(s["bombs"])
+                    unguarded = survival_actions(
+                        s, deadline_margin=margin, bomb_collision_guard=False,
+                        escape_collision_guard=True,
+                    )
+                    guarded = survival_actions(
+                        s, deadline_margin=margin, bomb_collision_guard=True,
+                        escape_collision_guard=True,
+                    )
+                    self.assertTrue(unguarded[-1])
+                    self.assertFalse(guarded[-1])
+                    self.assertTrue(guarded[1])  # RIGHT remains available.
+                    np.testing.assert_array_equal(guarded[:-1], unguarded[:-1])
+                    np.testing.assert_array_equal(field, original_field)
+                    self.assertEqual(s["bombs"], original_bombs)
+
     def test_escape_guard_prefers_uncontested_route_after_placement(self):
         s = state((3, 1))
         s["field"][:] = -1

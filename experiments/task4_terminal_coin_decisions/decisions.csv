@@ -1,0 +1,127 @@
+step,coin_distance,coin_actions,baseline_greedy,candidate_greedy,baseline_coin_probability,candidate_coin_probability,strict_coin_preference_loss,strict_coin_preference_gain,allowed_actions,driver,seed,actual_driver_action
+16,4,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28000,DOWN
+31,2,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'RIGHT', 'LEFT', 'WAIT', 'BOMB']",baseline,28000,UP
+41,2,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'RIGHT', 'LEFT', 'WAIT', 'BOMB']",baseline,28000,UP
+21,5,['RIGHT'],['BOMB'],['RIGHT'],0.0,1.0,False,True,"['RIGHT', 'WAIT', 'BOMB']",candidate,28000,RIGHT
+41,16,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28000,UP
+116,12,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28000,DOWN
+121,17,['UP'],['DOWN'],['DOWN'],0.0,0.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28000,DOWN
+131,9,['LEFT'],['LEFT'],['LEFT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28000,LEFT
+141,5,['UP'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['UP', 'DOWN', 'WAIT']",candidate,28000,WAIT
+151,6,['LEFT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",candidate,28000,WAIT
+161,7,"['DOWN', 'LEFT']",['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28000,DOWN
+166,20,['RIGHT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'WAIT']",candidate,28000,WAIT
+171,7,"['DOWN', 'LEFT']",['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28000,DOWN
+356,16,['UP'],['BOMB'],['DOWN'],0.0,0.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28000,DOWN
+121,11,['UP'],['BOMB'],['UP'],0.0,1.0,False,True,"['UP', 'WAIT', 'BOMB']",candidate,28001,UP
+126,21,['UP'],['UP'],['DOWN'],1.0,0.0,True,False,"['UP', 'RIGHT', 'DOWN', 'WAIT', 'BOMB']",candidate,28001,DOWN
+131,18,['UP'],['BOMB'],['UP'],0.0,1.0,False,True,"['UP', 'WAIT', 'BOMB']",candidate,28001,UP
+136,21,['UP'],['BOMB'],['RIGHT'],0.0,0.0,False,False,"['UP', 'RIGHT', 'DOWN', 'WAIT', 'BOMB']",candidate,28001,RIGHT
+146,6,['RIGHT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",candidate,28001,WAIT
+51,3,['RIGHT'],['RIGHT'],['RIGHT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",baseline,28001,RIGHT
+136,20,['UP'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['UP', 'WAIT']",baseline,28001,WAIT
+46,5,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28002,DOWN
+61,3,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28002,DOWN
+96,6,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28002,DOWN
+101,1,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28002,DOWN
+111,5,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28002,DOWN
+396,6,['LEFT'],['LEFT'],['LEFT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",baseline,28002,LEFT
+41,10,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,DOWN
+46,5,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,DOWN
+51,2,['UP'],['UP'],['DOWN'],1.0,0.0,True,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,DOWN
+61,25,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,DOWN
+81,21,['RIGHT'],['RIGHT'],['RIGHT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",candidate,28002,RIGHT
+86,17,['UP'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['UP', 'WAIT']",candidate,28002,WAIT
+91,16,['RIGHT'],['BOMB'],['RIGHT'],0.0,1.0,False,True,"['RIGHT', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,RIGHT
+96,11,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,UP
+101,8,['UP'],['UP'],['DOWN'],1.0,0.0,True,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,DOWN
+106,9,['UP'],['UP'],['DOWN'],1.0,0.0,True,False,"['UP', 'DOWN', 'WAIT']",candidate,28002,DOWN
+111,10,['UP'],['UP'],['DOWN'],1.0,0.0,True,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,DOWN
+116,11,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,UP
+121,10,['UP'],['UP'],['DOWN'],1.0,0.0,True,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,DOWN
+126,11,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,UP
+131,10,['UP'],['UP'],['DOWN'],1.0,0.0,True,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,DOWN
+136,11,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,UP
+141,10,['UP'],['UP'],['DOWN'],1.0,0.0,True,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,DOWN
+146,14,['DOWN'],['UP'],['UP'],0.0,0.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,UP
+156,5,['LEFT'],['LEFT'],['LEFT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28002,LEFT
+161,5,"['RIGHT', 'DOWN']",['BOMB'],['BOMB'],0.0,0.0,False,False,"['RIGHT', 'DOWN', 'WAIT', 'BOMB']",candidate,28002,BOMB
+206,17,"['UP', 'LEFT']",['LEFT'],['LEFT'],1.0,1.0,False,False,"['UP', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28002,LEFT
+331,5,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28002,DOWN
+341,4,"['RIGHT', 'LEFT']",['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",candidate,28002,WAIT
+11,5,['RIGHT'],['BOMB'],['RIGHT'],0.0,1.0,False,True,"['RIGHT', 'WAIT', 'BOMB']",candidate,28003,RIGHT
+46,5,['RIGHT'],['LEFT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28003,WAIT
+51,1,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28003,UP
+61,4,['RIGHT'],['LEFT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28003,WAIT
+66,1,['LEFT'],['LEFT'],['LEFT'],1.0,1.0,False,False,"['UP', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28003,LEFT
+71,1,['LEFT'],['LEFT'],['LEFT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28003,LEFT
+76,6,['UP'],['LEFT'],['LEFT'],0.0,0.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28003,LEFT
+86,3,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28003,DOWN
+16,3,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28003,UP
+26,3,['RIGHT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'WAIT']",baseline,28003,WAIT
+31,1,['UP'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['UP', 'WAIT']",baseline,28003,WAIT
+41,4,['RIGHT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",baseline,28003,WAIT
+56,9,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28003,UP
+96,4,['LEFT'],['BOMB'],['BOMB'],0.0,0.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28003,BOMB
+101,21,['UP'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['UP', 'WAIT']",baseline,28003,WAIT
+16,4,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28004,DOWN
+26,4,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28004,DOWN
+56,5,['DOWN'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['UP', 'DOWN', 'WAIT']",baseline,28004,WAIT
+156,22,['LEFT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",baseline,28004,WAIT
+11,2,['RIGHT'],['RIGHT'],['RIGHT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28004,RIGHT
+21,2,['RIGHT'],['RIGHT'],['RIGHT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28004,RIGHT
+61,1,['LEFT'],['BOMB'],['BOMB'],0.0,0.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28004,BOMB
+71,2,['UP'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['UP', 'WAIT']",candidate,28004,WAIT
+86,3,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28004,UP
+96,4,['LEFT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",candidate,28004,WAIT
+106,10,['RIGHT'],['BOMB'],['BOMB'],0.0,0.0,False,False,"['RIGHT', 'DOWN', 'WAIT', 'BOMB']",candidate,28004,BOMB
+151,4,"['UP', 'DOWN']",['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28004,UP
+51,24,['UP'],['DOWN'],['DOWN'],0.0,0.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28005,DOWN
+76,30,"['RIGHT', 'DOWN']",['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'WAIT', 'BOMB']",baseline,28005,DOWN
+86,5,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'WAIT', 'BOMB']",baseline,28005,DOWN
+101,6,['LEFT'],['LEFT'],['LEFT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",baseline,28005,LEFT
+106,16,['RIGHT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'WAIT']",baseline,28005,WAIT
+111,5,"['DOWN', 'LEFT']",['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28005,DOWN
+116,16,['RIGHT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'WAIT']",baseline,28005,WAIT
+166,18,['RIGHT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'WAIT']",baseline,28005,WAIT
+31,1,['RIGHT'],['RIGHT'],['RIGHT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",baseline,28006,RIGHT
+46,23,['DOWN'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['DOWN', 'WAIT']",baseline,28006,WAIT
+51,2,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28006,DOWN
+81,9,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28006,DOWN
+96,10,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28006,DOWN
+131,12,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28006,DOWN
+301,4,['RIGHT'],['RIGHT'],['RIGHT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28006,RIGHT
+311,4,['LEFT'],['LEFT'],['LEFT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28006,LEFT
+11,1,['RIGHT'],['RIGHT'],['RIGHT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28007,RIGHT
+51,3,['RIGHT'],['BOMB'],['BOMB'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28007,BOMB
+61,3,['RIGHT'],['RIGHT'],['RIGHT'],1.0,1.0,False,False,"['UP', 'RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28007,RIGHT
+121,21,['UP'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['UP', 'WAIT']",candidate,28007,WAIT
+11,1,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28007,UP
+26,3,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28007,DOWN
+46,5,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28007,DOWN
+61,9,['RIGHT'],['RIGHT'],['RIGHT'],1.0,1.0,False,False,"['UP', 'RIGHT', 'LEFT', 'WAIT']",baseline,28007,RIGHT
+66,28,['LEFT'],['RIGHT'],['LEFT'],0.0,1.0,False,True,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",baseline,28007,RIGHT
+71,8,"['UP', 'LEFT']",['UP'],['UP'],1.0,1.0,False,False,"['UP', 'RIGHT', 'LEFT', 'WAIT']",baseline,28007,UP
+76,18,['LEFT'],['RIGHT'],['LEFT'],0.0,1.0,False,True,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",baseline,28007,RIGHT
+41,6,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28008,DOWN
+101,13,"['UP', 'LEFT']",['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28008,UP
+36,20,['RIGHT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",candidate,28008,WAIT
+56,5,['DOWN'],['WAIT'],['BOMB'],0.0,0.0,False,False,"['DOWN', 'WAIT', 'BOMB']",candidate,28008,BOMB
+71,14,"['UP', 'LEFT']",['LEFT'],['LEFT'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28008,LEFT
+76,9,['LEFT'],['LEFT'],['LEFT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",candidate,28008,LEFT
+81,4,['UP'],['BOMB'],['UP'],0.0,1.0,False,True,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",candidate,28008,UP
+91,5,['LEFT'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",candidate,28008,WAIT
+141,14,['UP'],['WAIT'],['WAIT'],0.0,0.0,False,False,"['UP', 'WAIT']",candidate,28008,WAIT
+16,3,['RIGHT'],['RIGHT'],['WAIT'],1.0,0.0,True,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28009,WAIT
+61,18,['RIGHT'],['RIGHT'],['RIGHT'],1.0,1.0,False,False,"['RIGHT', 'LEFT', 'WAIT']",candidate,28009,RIGHT
+96,8,"['UP', 'DOWN']",['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",candidate,28009,UP
+181,2,['RIGHT'],['RIGHT'],['WAIT'],1.0,0.0,True,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28009,WAIT
+186,2,['RIGHT'],['BOMB'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28009,WAIT
+191,2,['RIGHT'],['BOMB'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28009,WAIT
+196,2,['RIGHT'],['BOMB'],['WAIT'],0.0,0.0,False,False,"['RIGHT', 'LEFT', 'WAIT', 'BOMB']",candidate,28009,WAIT
+16,2,['DOWN'],['DOWN'],['WAIT'],1.0,0.0,True,False,"['RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28009,DOWN
+66,3,['RIGHT'],['RIGHT'],['WAIT'],1.0,0.0,True,False,"['RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28009,RIGHT
+81,16,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28009,DOWN
+171,3,['DOWN'],['DOWN'],['DOWN'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28009,DOWN
+216,1,['LEFT'],['LEFT'],['LEFT'],1.0,1.0,False,False,"['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']",baseline,28009,LEFT
+236,4,['UP'],['UP'],['UP'],1.0,1.0,False,False,"['UP', 'DOWN', 'WAIT', 'BOMB']",baseline,28009,UP

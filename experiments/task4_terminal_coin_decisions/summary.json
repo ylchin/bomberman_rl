@@ -1,0 +1,265 @@
+{
+  "sampled_states": {
+    "baseline": 692,
+    "candidate": 800
+  },
+  "overall": {
+    "comparable_states": 126,
+    "baseline_mean_coin_probability": 0.6190476190476191,
+    "candidate_mean_coin_probability": 0.5873015873015873,
+    "strict_coin_preference_losses": 12,
+    "strict_coin_preference_gains": 8,
+    "candidate_actions_in_losses": {
+      "DOWN": 8,
+      "WAIT": 4
+    }
+  },
+  "by_driver": {
+    "baseline": {
+      "comparable_states": 51,
+      "baseline_mean_coin_probability": 0.7058823529411765,
+      "candidate_mean_coin_probability": 0.7058823529411765,
+      "strict_coin_preference_losses": 2,
+      "strict_coin_preference_gains": 2,
+      "candidate_actions_in_losses": {
+        "WAIT": 2
+      }
+    },
+    "candidate": {
+      "comparable_states": 75,
+      "baseline_mean_coin_probability": 0.56,
+      "candidate_mean_coin_probability": 0.5066666666666667,
+      "strict_coin_preference_losses": 10,
+      "strict_coin_preference_gains": 6,
+      "candidate_actions_in_losses": {
+        "DOWN": 8,
+        "WAIT": 2
+      }
+    }
+  },
+  "limits": "Correlated, trajectory-selected states, not independent trials. Safe shortest-path coin seeking is a diagnostic reference, not always the best strategic action. Tie sets are compared without the history-dependent stuck-action override. Q values are uncalibrated across checkpoints; feature shifts describe ranking changes, not causes of the training regression.",
+  "example_preference_losses": [
+    {
+      "driver": "candidate",
+      "seed": 28002,
+      "step": 121,
+      "coin_actions": [
+        "UP"
+      ],
+      "baseline_greedy": [
+        "UP"
+      ],
+      "candidate_greedy": [
+        "DOWN"
+      ],
+      "baseline_alternative_minus_coin": -0.4127130879780864,
+      "candidate_alternative_minus_coin": 0.16147564508622567,
+      "largest_feature_shifts": [
+        {
+          "feature": "BOMB_POSSIBLE",
+          "value": 1.0,
+          "baseline_contribution": 0.6376028547778869,
+          "candidate_contribution": -0.02409311557509286,
+          "shift_toward_alternative": -0.6616959703529798
+        },
+        {
+          "feature": "COIN_DIR_UP",
+          "value": 1.0,
+          "baseline_contribution": -0.29638265375872114,
+          "candidate_contribution": 0.2113528439786436,
+          "shift_toward_alternative": 0.5077354977373647
+        },
+        {
+          "feature": "OPP_DIR_DOWN",
+          "value": 1.0,
+          "baseline_contribution": 0.06035041921789808,
+          "candidate_contribution": 0.31497905793700826,
+          "shift_toward_alternative": 0.2546286387191102
+        },
+        {
+          "feature": "CRATE_DIR_NONE",
+          "value": 1.0,
+          "baseline_contribution": 0.1586478891512268,
+          "candidate_contribution": 0.36324653036223,
+          "shift_toward_alternative": 0.20459864121100318
+        },
+        {
+          "feature": "OPP_DIST",
+          "value": 1.0,
+          "baseline_contribution": 0.05707938797740608,
+          "candidate_contribution": 0.2007155097796478,
+          "shift_toward_alternative": 0.14363612180224172
+        },
+        {
+          "feature": "WALL_RIGHT",
+          "value": 1.0,
+          "baseline_contribution": 0.014584274343943611,
+          "candidate_contribution": -0.11696253159001499,
+          "shift_toward_alternative": -0.1315468059339586
+        },
+        {
+          "feature": "SAFE_DIR_NONE",
+          "value": 1.0,
+          "baseline_contribution": -1.0853225894514735,
+          "candidate_contribution": -1.0030177470946775,
+          "shift_toward_alternative": 0.08230484235679603
+        },
+        {
+          "feature": "COIN_DIST",
+          "value": 0.5,
+          "baseline_contribution": -0.09431794002560873,
+          "candidate_contribution": -0.014040813660369078,
+          "shift_toward_alternative": 0.08027712636523965
+        }
+      ]
+    },
+    {
+      "driver": "candidate",
+      "seed": 28002,
+      "step": 141,
+      "coin_actions": [
+        "UP"
+      ],
+      "baseline_greedy": [
+        "UP"
+      ],
+      "candidate_greedy": [
+        "DOWN"
+      ],
+      "baseline_alternative_minus_coin": -0.43634818644312606,
+      "candidate_alternative_minus_coin": 0.06692348486645242,
+      "largest_feature_shifts": [
+        {
+          "feature": "BOMB_POSSIBLE",
+          "value": 1.0,
+          "baseline_contribution": 0.6376028547778869,
+          "candidate_contribution": -0.02409311557509286,
+          "shift_toward_alternative": -0.6616959703529798
+        },
+        {
+          "feature": "COIN_DIR_UP",
+          "value": 1.0,
+          "baseline_contribution": -0.29638265375872114,
+          "candidate_contribution": 0.2113528439786436,
+          "shift_toward_alternative": 0.5077354977373647
+        },
+        {
+          "feature": "OPP_DIR_DOWN",
+          "value": 1.0,
+          "baseline_contribution": 0.06035041921789808,
+          "candidate_contribution": 0.31497905793700826,
+          "shift_toward_alternative": 0.2546286387191102
+        },
+        {
+          "feature": "CRATE_DIR_NONE",
+          "value": 1.0,
+          "baseline_contribution": 0.1586478891512268,
+          "candidate_contribution": 0.36324653036223,
+          "shift_toward_alternative": 0.20459864121100318
+        },
+        {
+          "feature": "OPP_DIST",
+          "value": 1.0,
+          "baseline_contribution": 0.05707938797740608,
+          "candidate_contribution": 0.2007155097796478,
+          "shift_toward_alternative": 0.14363612180224172
+        },
+        {
+          "feature": "WALL_RIGHT",
+          "value": 1.0,
+          "baseline_contribution": 0.014584274343943611,
+          "candidate_contribution": -0.11696253159001499,
+          "shift_toward_alternative": -0.1315468059339586
+        },
+        {
+          "feature": "SAFE_DIR_NONE",
+          "value": 1.0,
+          "baseline_contribution": -1.0853225894514735,
+          "candidate_contribution": -1.0030177470946775,
+          "shift_toward_alternative": 0.08230484235679603
+        },
+        {
+          "feature": "COIN_DIST",
+          "value": 0.5,
+          "baseline_contribution": -0.09431794002560873,
+          "candidate_contribution": -0.014040813660369078,
+          "shift_toward_alternative": 0.08027712636523965
+        }
+      ]
+    },
+    {
+      "driver": "candidate",
+      "seed": 28001,
+      "step": 126,
+      "coin_actions": [
+        "UP"
+      ],
+      "baseline_greedy": [
+        "UP"
+      ],
+      "candidate_greedy": [
+        "DOWN"
+      ],
+      "baseline_alternative_minus_coin": -0.2814771116311824,
+      "candidate_alternative_minus_coin": 0.06472275921782708,
+      "largest_feature_shifts": [
+        {
+          "feature": "BOMB_POSSIBLE",
+          "value": 1.0,
+          "baseline_contribution": 0.6376028547778869,
+          "candidate_contribution": -0.02409311557509286,
+          "shift_toward_alternative": -0.6616959703529798
+        },
+        {
+          "feature": "COIN_DIR_UP",
+          "value": 1.0,
+          "baseline_contribution": -0.29638265375872114,
+          "candidate_contribution": 0.2113528439786436,
+          "shift_toward_alternative": 0.5077354977373647
+        },
+        {
+          "feature": "COIN_DIST",
+          "value": 0.8500000238418579,
+          "baseline_contribution": -0.16034050254096469,
+          "candidate_contribution": -0.0238693838921456,
+          "shift_toward_alternative": 0.13647111864881908
+        },
+        {
+          "feature": "CRATE_DIR_DOWN",
+          "value": 1.0,
+          "baseline_contribution": 0.2207895553048436,
+          "candidate_contribution": 0.34311445456758327,
+          "shift_toward_alternative": 0.12232489926273968
+        },
+        {
+          "feature": "SAFE_DIR_NONE",
+          "value": 1.0,
+          "baseline_contribution": -1.0853225894514735,
+          "candidate_contribution": -1.0030177470946775,
+          "shift_toward_alternative": 0.08230484235679603
+        },
+        {
+          "feature": "OPP_DIST",
+          "value": 0.550000011920929,
+          "baseline_contribution": 0.031393664068012674,
+          "candidate_contribution": 0.11039353277152163,
+          "shift_toward_alternative": 0.07899986870350895
+        },
+        {
+          "feature": "OPP_DIR_UP",
+          "value": 1.0,
+          "baseline_contribution": 0.24209837208829865,
+          "candidate_contribution": 0.30196427176882074,
+          "shift_toward_alternative": 0.05986589968052208
+        },
+        {
+          "feature": "WALL_LEFT",
+          "value": 1.0,
+          "baseline_contribution": 0.03931270467598143,
+          "candidate_contribution": 0.0772541206611695,
+          "shift_toward_alternative": 0.037941415985188076
+        }
+      ]
+    }
+  ]
+}

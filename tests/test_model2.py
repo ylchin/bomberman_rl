@@ -9,6 +9,7 @@ import torch
 
 import events as e
 from agent_code.our_agent import train
+from agent_code.our_agent.rewards import potential, reward_from_events
 from agent_code.our_agent.features import state_to_channels
 from agent_code.our_agent.model_net import (
     NetQ,
@@ -135,23 +136,40 @@ class Model2Tests(unittest.TestCase):
 
     def test_survivor_final_step_not_duplicated(self):
         phi = np.zeros(INPUT_DIM, dtype=np.float32)
+        successor = board()
+        gamma = 0.9
+        expected_reward = (
+            1.0 + reward_from_events([e.SURVIVED_ROUND]) - gamma * potential(successor)
+        )
         agent = SimpleNamespace(
             traj=[(phi, 0, 1.0)],
             ep_reward=1.0,
-            ep_counts=train.Counter(),
+            ep_counts=train.Counter({e.COIN_COLLECTED: 1}),
             episode=0,
-            t=dict(learn_iters_end=0),
+            t=dict(learn_iters_end=0, gamma=gamma),
+            _last_post_state=successor,
             model=Mock(),
             _weights_path="unused",
         )
         with (
             patch.object(train, "_flush_episode_to_buffer") as flush,
             patch.object(train, "_learn"),
+            patch.object(train, "_save_periodic_candidate"),
             patch.object(train, "_update_best_checkpoint"),
             patch.object(train, "_write_csv_row"),
+            patch.object(train, "_epsilon", return_value=0.0),
+            patch.object(train, "_alpha", return_value=0.0),
         ):
-            flush.side_effect = lambda obj: self.assertEqual(len(obj.traj), 1)
-            train.end_of_round(agent, board(), "UP", [e.SURVIVED_ROUND])
+            def check_final_transition(obj):
+                self.assertEqual(len(obj.traj), 1)
+                self.assertAlmostEqual(obj.traj[0][2], expected_reward)
+                self.assertAlmostEqual(obj.ep_reward, expected_reward)
+                self.assertEqual(obj.ep_counts[e.COIN_COLLECTED], 1)
+                self.assertEqual(obj.ep_counts[e.SURVIVED_ROUND], 1)
+
+            flush.side_effect = check_final_transition
+            train.end_of_round(agent, board(), "UP", [e.COIN_COLLECTED, e.SURVIVED_ROUND])
+            self.assertIsNone(agent._last_post_state)
 
 
 if __name__ == "__main__":

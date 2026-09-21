@@ -1,0 +1,37 @@
+{
+  "checkpoint": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_safety_v2_ep03750_symavg.pkl",
+  "rounds": 100,
+  "guard_kind": "escape",
+  "single_arm": "on",
+  "metrics": {
+    "score": 3.2,
+    "coins": 2.15,
+    "kills": 0.21,
+    "self_kill": 0.0,
+    "win": 0.25,
+    "tie": 0.08,
+    "loss": 0.67,
+    "score_margin": -2.08,
+    "survived": 0.93,
+    "died": 0.07,
+    "steps_survived": 379.24,
+    "fallback_steps": 0.29,
+    "optimistic_fallback_steps": 0.0,
+    "coin_preference_steps": 0.0
+  },
+  "self_kill_count": 0,
+  "deaths_with_each_pattern_overlap": {
+    "observed_interceptions": 0,
+    "riskier_escape_choices_with_alternatives": 0,
+    "new_enemy_bombs_when_routes_lost": 0,
+    "fallback_steps": 0,
+    "bomb_requests_during_fallback": 0,
+    "confirmed_bomb_placements_during_fallback": 0,
+    "actions_outside_nonempty_screen": 0,
+    "optimistic_fallback_steps": 0,
+    "actions_outside_effective_screen": 0,
+    "final_mask_empty": 0
+  },
+  "examples": [],
+  "limits": "Fresh diagnostic games with unseeded opponents, not a replay of previous deaths or an A/B comparison. Last 10 decisions per death; patterns overlap and do not establish causation. Empty screens near death may be consequences of an earlier trap. Final movement outcomes are captured, but new-enemy-bomb route-loss checks require another decision state."
+}

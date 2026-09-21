@@ -1,0 +1,178 @@
+{
+  "guard_kind": "checkpoint",
+  "rounds_per_arm": 300,
+  "metrics": {
+    "win": {
+      "baseline": 0.08666666666666667,
+      "candidate": 0.08,
+      "candidate_minus_baseline": -0.006666666666666667,
+      "paired_bootstrap_95_interval": [
+        -0.05333333333333334,
+        0.04
+      ]
+    },
+    "score": {
+      "baseline": 1.36,
+      "candidate": 1.28,
+      "candidate_minus_baseline": -0.08,
+      "paired_bootstrap_95_interval": [
+        -0.4,
+        0.22666666666666666
+      ]
+    },
+    "coins": {
+      "baseline": 0.76,
+      "candidate": 0.5466666666666666,
+      "candidate_minus_baseline": -0.21333333333333335,
+      "paired_bootstrap_95_interval": [
+        -0.31,
+        -0.12
+      ]
+    },
+    "kills": {
+      "baseline": 0.12,
+      "candidate": 0.14666666666666667,
+      "candidate_minus_baseline": 0.02666666666666667,
+      "paired_bootstrap_95_interval": [
+        -0.03333333333333333,
+        0.08666666666666667
+      ]
+    },
+    "self_kill": {
+      "baseline": 0.0033333333333333335,
+      "candidate": 0.01,
+      "candidate_minus_baseline": 0.006666666666666667,
+      "paired_bootstrap_95_interval": [
+        -0.006666666666666667,
+        0.02
+      ]
+    },
+    "tie": {
+      "baseline": 0.03,
+      "candidate": 0.02666666666666667,
+      "candidate_minus_baseline": -0.0033333333333333335,
+      "paired_bootstrap_95_interval": [
+        -0.03,
+        0.023333333333333334
+      ]
+    },
+    "loss": {
+      "baseline": 0.8833333333333333,
+      "candidate": 0.8933333333333333,
+      "candidate_minus_baseline": 0.01,
+      "paired_bootstrap_95_interval": [
+        -0.04,
+        0.06
+      ]
+    },
+    "score_margin": {
+      "baseline": -4.443333333333333,
+      "candidate": -5.036666666666667,
+      "candidate_minus_baseline": -0.5933333333333334,
+      "paired_bootstrap_95_interval": [
+        -1.1566666666666667,
+        -0.023333333333333334
+      ]
+    },
+    "survived": {
+      "baseline": 0.9333333333333333,
+      "candidate": 0.92,
+      "candidate_minus_baseline": -0.013333333333333334,
+      "paired_bootstrap_95_interval": [
+        -0.05333333333333334,
+        0.02666666666666667
+      ]
+    },
+    "died": {
+      "baseline": 0.06666666666666667,
+      "candidate": 0.08,
+      "candidate_minus_baseline": 0.013333333333333334,
+      "paired_bootstrap_95_interval": [
+        -0.02666666666666667,
+        0.05333333333333334
+      ]
+    },
+    "steps_survived": {
+      "baseline": 381.81666666666666,
+      "candidate": 379.66333333333336,
+      "candidate_minus_baseline": -2.1533333333333333,
+      "paired_bootstrap_95_interval": [
+        -13.536833333333334,
+        9.387083333333328
+      ]
+    },
+    "fallback_steps": {
+      "baseline": 0.23666666666666666,
+      "candidate": 0.25,
+      "candidate_minus_baseline": 0.013333333333333334,
+      "paired_bootstrap_95_interval": [
+        -0.12333333333333334,
+        0.15
+      ]
+    },
+    "optimistic_fallback_steps": {
+      "baseline": 0.0,
+      "candidate": 0.0,
+      "candidate_minus_baseline": 0.0,
+      "paired_bootstrap_95_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    "coin_preference_steps": {
+      "baseline": 0.0,
+      "candidate": 0.0,
+      "candidate_minus_baseline": 0.0,
+      "paired_bootstrap_95_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    "win_or_tie": {
+      "baseline": 0.11666666666666667,
+      "candidate": 0.10666666666666667,
+      "candidate_minus_baseline": -0.01,
+      "paired_bootstrap_95_interval": [
+        -0.06,
+        0.04
+      ]
+    }
+  },
+  "interval_method": "10000 paired world-seed bootstrap resamples; exploratory percentile 95% intervals. Opponent randomness remains unseeded; no multiple-comparison correction.",
+  "diagnostic_counts_overlap": {
+    "observed_interception": 3,
+    "riskier_escape_choice_with_alternative": 0,
+    "new_enemy_bomb_when_routes_lost": 1,
+    "optimistic_fallback_used": 0,
+    "actions_outside_effective_screen": 0,
+    "final_mask_empty": 3
+  },
+  "diagnostic_limit": "Last 10 decisions per self-kill; categories overlap and are observed associations, not proven causes.",
+  "comparison_kind": "checkpoint",
+  "primary_metric": "win",
+  "checkpoints": {
+    "baseline": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_task4_coin_tie_off_seed2.pkl",
+    "candidate": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_task4_coin_tie_on_seed2.pkl"
+  },
+  "checkpoint_hashes": {
+    "baseline": "0498d32495734c4701bda5bf7a45e0cb1915bc2affd0fb62e20fdd13f24ab3ac",
+    "candidate": "257dfe0acb36c52e3dcf6999f8969da99e430d92944067749abcbaefc6da99e2"
+  },
+  "arm_settings": {
+    "baseline": {
+      "bomb_collision_guard": true,
+      "escape_collision_guard": true,
+      "optimistic_fallback": false,
+      "coin_preference": false
+    },
+    "candidate": {
+      "bomb_collision_guard": true,
+      "escape_collision_guard": true,
+      "optimistic_fallback": false,
+      "coin_preference": false
+    }
+  },
+  "baseline_self_kill_count": 1,
+  "candidate_self_kill_count": 3,
+  "diagnostic_arm": "candidate"
+}

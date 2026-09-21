@@ -1,0 +1,143 @@
+{
+  "guard_kind": "fallback",
+  "rounds_per_arm": 300,
+  "metrics": {
+    "score": {
+      "off": 3.216666666666667,
+      "on": 3.1233333333333335,
+      "on_minus_off": -0.09333333333333334,
+      "paired_bootstrap_95_interval": [
+        -0.45666666666666667,
+        0.2833333333333333
+      ]
+    },
+    "coins": {
+      "off": 2.433333333333333,
+      "on": 2.223333333333333,
+      "on_minus_off": -0.21,
+      "paired_bootstrap_95_interval": [
+        -0.36333333333333334,
+        -0.06
+      ]
+    },
+    "kills": {
+      "off": 0.15666666666666668,
+      "on": 0.18,
+      "on_minus_off": 0.023333333333333334,
+      "paired_bootstrap_95_interval": [
+        -0.04,
+        0.09
+      ]
+    },
+    "self_kill": {
+      "off": 0.0,
+      "on": 0.0033333333333333335,
+      "on_minus_off": 0.0033333333333333335,
+      "paired_bootstrap_95_interval": [
+        0.0,
+        0.01
+      ]
+    },
+    "win": {
+      "off": 0.23666666666666666,
+      "on": 0.22333333333333333,
+      "on_minus_off": -0.013333333333333334,
+      "paired_bootstrap_95_interval": [
+        -0.07666666666666666,
+        0.05333333333333334
+      ]
+    },
+    "tie": {
+      "off": 0.13,
+      "on": 0.07333333333333333,
+      "on_minus_off": -0.056666666666666664,
+      "paired_bootstrap_95_interval": [
+        -0.10666666666666667,
+        -0.01
+      ]
+    },
+    "loss": {
+      "off": 0.6333333333333333,
+      "on": 0.7033333333333334,
+      "on_minus_off": 0.07,
+      "paired_bootstrap_95_interval": [
+        0.0,
+        0.13666666666666666
+      ]
+    },
+    "score_margin": {
+      "off": -1.83,
+      "on": -2.223333333333333,
+      "on_minus_off": -0.3933333333333333,
+      "paired_bootstrap_95_interval": [
+        -0.9767499999999999,
+        0.20666666666666667
+      ]
+    },
+    "survived": {
+      "off": 0.87,
+      "on": 0.8833333333333333,
+      "on_minus_off": 0.013333333333333334,
+      "paired_bootstrap_95_interval": [
+        -0.03666666666666667,
+        0.06333333333333334
+      ]
+    },
+    "died": {
+      "off": 0.13,
+      "on": 0.11666666666666667,
+      "on_minus_off": -0.013333333333333334,
+      "paired_bootstrap_95_interval": [
+        -0.06333333333333334,
+        0.03666666666666667
+      ]
+    },
+    "steps_survived": {
+      "off": 361.81333333333333,
+      "on": 366.51,
+      "on_minus_off": 4.696666666666666,
+      "paired_bootstrap_95_interval": [
+        -9.240083333333333,
+        18.696749999999998
+      ]
+    },
+    "fallback_steps": {
+      "off": 0.5,
+      "on": 0.43333333333333335,
+      "on_minus_off": -0.06666666666666667,
+      "paired_bootstrap_95_interval": [
+        -0.25333333333333335,
+        0.11333333333333333
+      ]
+    },
+    "optimistic_fallback_steps": {
+      "off": 0.0,
+      "on": 0.08,
+      "on_minus_off": 0.08,
+      "paired_bootstrap_95_interval": [
+        0.043333333333333335,
+        0.12
+      ]
+    },
+    "win_or_tie": {
+      "off": 0.36666666666666664,
+      "on": 0.2966666666666667,
+      "on_minus_off": -0.07,
+      "paired_bootstrap_95_interval": [
+        -0.13666666666666666,
+        0.0
+      ]
+    }
+  },
+  "interval_method": "10000 paired world-seed bootstrap resamples; exploratory percentile 95% intervals. Opponent randomness remains unseeded; no multiple-comparison correction.",
+  "guard_on_deaths": 1,
+  "diagnostic_counts_overlap": {
+    "observed_interception": 1,
+    "riskier_escape_choice_with_alternative": 0,
+    "new_enemy_bomb_when_routes_lost": 1,
+    "optimistic_fallback_used": 1,
+    "actions_outside_effective_screen": 0,
+    "final_mask_empty": 1
+  },
+  "diagnostic_limit": "Last 10 decisions per self-kill; categories overlap and are observed associations, not proven causes."
+}

@@ -44,6 +44,9 @@ TRAIN = dict(
     bomb_collision_guard=os.environ.get("AGENT_BOMB_COLLISION_GUARD", "1") == "1",
     # Experimental: preserve the validated placement-only baseline by default.
     escape_collision_guard=os.environ.get("AGENT_ESCAPE_COLLISION_GUARD", "0") == "1",
+    optimistic_fallback=os.environ.get("AGENT_OPTIMISTIC_FALLBACK", "0") == "1",
+    # Frozen-policy evaluation experiment; does not alter training behavior.
+    coin_preference=os.environ.get("AGENT_COIN_PREFERENCE", "0") == "1",
     # --- replay ---
     buffer_capacity=100_000,
     batch_size=256,

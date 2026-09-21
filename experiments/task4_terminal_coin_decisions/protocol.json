@@ -1,0 +1,21 @@
+{
+  "checkpoints": {
+    "baseline": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/candidates/linear_model1_safety_v2_seed1/ep_04000.pkl",
+    "candidate": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_task4_terminal_fix_audit_seed1.pkl"
+  },
+  "checkpoint_sha256": {
+    "baseline": "7be4fa91084f831f276520f79e56bf5b8323c3c22762a6c7197e555587336286",
+    "candidate": "8c0270cf11397590c0b90eccae80c6cc8b6f29f51b2d798d709cd42a13229bf4"
+  },
+  "seed_start": 28000,
+  "rounds_per_driver": 10,
+  "stride": 5,
+  "source_sha256": {
+    "experiments/compare_coin_decisions.py": "ea1187b7afe072247289a53f7496216c446c0ddbe4d1d450645cf472ed599d45",
+    "agent_code/our_agent/features.py": "5e8f97535de2d7324b496546488e6d75b2663c18c1b5cb40ad232fe49ffe80d4",
+    "agent_code/our_agent/escape_planner.py": "9099830014af402b76c6d86ff7d97f1a123d7a73fc664286a995d5cdf1f08ecd",
+    "agent_code/our_agent/q_linear.py": "b20c6676440277188008958f22158fe9e4488442c7b39c61e83657ca52a9f0ac",
+    "agent_code/our_agent/callbacks.py": "94a8ec1564ba87a06d9bc6759b989aaf3c9f936af2d35cc3679e113112f9ac66"
+  },
+  "protocol": "Frozen policies; both guards enabled. Compare exact greedy tie sets on identical sampled states. Opponents retain unseeded randomness."
+}

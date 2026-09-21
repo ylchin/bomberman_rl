@@ -20,14 +20,19 @@ STUCK_AFTER = (
 )
 
 
-def action_options(game_state):
+def action_options(game_state, phi=None):
     """Keep Model 2 unchanged; Model 1 can screen known bomb traps."""
     if config.MODEL == "linear" and config.TRAIN.get("survival_filter", False):
-        from .escape_planner import survival_actions
-        return {"action_mask": survival_actions(
+        from .escape_planner import optimistic_fallback_actions, survival_actions
+        mask = survival_actions(
             game_state, bomb_collision_guard=config.TRAIN.get("bomb_collision_guard", True),
             escape_collision_guard=config.TRAIN.get("escape_collision_guard", False)
-        )}
+        )
+        if config.TRAIN.get("optimistic_fallback", False):
+            from .q_linear import LinearQ
+            legal = LinearQ.legal_actions(state_to_features(game_state) if phi is None else phi)
+            mask = optimistic_fallback_actions(game_state, mask, legal)
+        return {"action_mask": mask}
     return {}
 
 
@@ -118,10 +123,12 @@ def setup(self):
 
 
 def act(self, game_state: dict) -> str:
+    self._coin_preference_applied = False
+    self._pre_coin_action = "WAIT"
     phi = self.encode_state(game_state)
     if phi is None:
         return "WAIT"
-    options = action_options(game_state)
+    options = action_options(game_state, phi=phi)
 
     if game_state["step"] == 1:
         # new round -- don't compare across the round boundary
@@ -160,6 +167,16 @@ def act(self, game_state: dict) -> str:
             f"with no effect; selecting alternative {ACTIONS[action_id]!r} instead"
         )
         self._repeat_count = 0
+
+    self._pre_coin_action = ACTIONS[action_id]
+    if (not self.train and self.model_kind == "linear"
+            and config.TRAIN.get("coin_preference", False)):
+        from .coin_navigation import prefer_nearby_coin
+        preferred = prefer_nearby_coin(
+            game_state, phi, action_id, self.model, options.get("action_mask"), self.rng,
+        )
+        self._coin_preference_applied = preferred != action_id
+        action_id = preferred
 
     self._last_pos = pos
     self._last_action_id = action_id

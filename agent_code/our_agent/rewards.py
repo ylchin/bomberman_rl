@@ -9,6 +9,9 @@ scalar training reward.
   3. potential_shaping(old, new, gamma)  potential-based shaping term F = gamma*phi(s') - phi(s)
 """
 
+import math
+import os
+
 import events as e
 from .features import (
     DIRECTIONS,
@@ -42,6 +45,14 @@ SAFE_BOMB_TRAPS_OPPONENT = "SAFE_BOMB_TRAPS_OPPONENT"
 # Keep the true game rewards (COIN_COLLECTED=1, KILLED_OPPONENT=5) roughly at
 # their real scale so shaped and true return stay comparable.
 # ---------------------------------------------------------------------------
+ESCAPE_REWARD_SCALE = float(os.environ.get("AGENT_ESCAPE_REWARD_SCALE", "1"))
+if not math.isfinite(ESCAPE_REWARD_SCALE) or ESCAPE_REWARD_SCALE < 0:
+    raise ValueError("AGENT_ESCAPE_REWARD_SCALE must be finite and non-negative")
+
+# Experimental training-only correction: reward every shortest coin move,
+# including directions that lose the BFS traversal-order tie-break.
+COIN_TIE_REWARD = os.environ.get("AGENT_COIN_TIE_REWARD", "0") == "1"
+
 GAME_REWARDS = {
     # --- real objective (matches settings.py REWARD_COIN / REWARD_KILL) ---
     e.COIN_COLLECTED: 1.0,
@@ -59,10 +70,10 @@ GAME_REWARDS = {
     # --- custom (see detect_custom_events) ---
     MOVED_TOWARD_COIN: 0.06,
     MOVED_AWAY_FROM_COIN: -0.07,  # slightly harsher than the reward: no oscillation gain
-    MOVED_TOWARD_SAFETY: 0.30,
+    MOVED_TOWARD_SAFETY: 0.30 * ESCAPE_REWARD_SCALE,
     MOVED_INTO_DANGER: -0.35,
     STAYED_IN_DANGER: -0.25,
-    ESCAPED_DANGER: 0.30,
+    ESCAPED_DANGER: 0.30 * ESCAPE_REWARD_SCALE,
     BOMB_NEXT_TO_CRATE: 0.05,
     USELESS_BOMB: -0.10,
     BOMB_WITH_NO_ESCAPE: -0.55,
@@ -173,11 +184,20 @@ def detect_custom_events(old_state, self_action, new_state, framework_events=())
         # --- coin seeking (only when safe and coins are visible) ---
         coins = old_state["coins"]
         if coins:
-            coin_dir, _ = bfs_direction(old_state, coins)
+            coin_dir, coin_dist = bfs_direction(old_state, coins)
             moved = _moved_action(self_action, old_state, new_state)
             if moved is not None and coin_dir is not None:
+                toward_coin = moved == coin_dir
+                if COIN_TIE_REWARD and not toward_coin:
+                    # Compare distances on the SAME board to the SAME coins.
+                    # Collection or another bomb clearing a crate this turn
+                    # must not change whether our move made progress.
+                    after_move = dict(old_state)
+                    after_move["self"] = (*old_state["self"][:3], new_pos)
+                    _, remaining = bfs_direction(after_move, coins)
+                    toward_coin = remaining == coin_dist - 1
                 ev.append(
-                    MOVED_TOWARD_COIN if moved == coin_dir else MOVED_AWAY_FROM_COIN
+                    MOVED_TOWARD_COIN if toward_coin else MOVED_AWAY_FROM_COIN
                 )
 
     # --- bomb quality, judged only after a SUCCESSFUL placement ---

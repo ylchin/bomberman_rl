@@ -1,0 +1,15 @@
+{
+  "source_checkpoint": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/candidates/linear_model1_safety_v2_seed1/ep_03750.pkl",
+  "output_checkpoint": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_safety_v2_ep03750_symavg.pkl",
+  "source_sha256": "ce89563466f5be66d38e41a1523b107949bcd0805b9ce6a7458f5d7e53fe4ea1",
+  "output_sha256": "96f798415c953f2ef3d0760fd081ab1571fe301faed4025ce36053d5891e84cb",
+  "source_files_sha256": {
+    "experiments/average_linear_symmetry.py": "440126be5658df66b2d92a586128d0b95b90dceedeb8f874d990ae8885cc8e02",
+    "agent_code/our_agent/symmetry.py": "a51dbcbb1edec4ac311ab8e5fc961979ba0f3fa18aae3ea47c724b6eb09613dd",
+    "agent_code/our_agent/features.py": "5e8f97535de2d7324b496546488e6d75b2663c18c1b5cb40ad232fe49ffe80d4",
+    "agent_code/our_agent/q_linear.py": "b20c6676440277188008958f22158fe9e4488442c7b39c61e83657ca52a9f0ac"
+  },
+  "max_ensemble_identity_error": 5.329070518200751e-15,
+  "trained": false,
+  "limitations": "Averages feature-permuted Q values, not raw-board predictions. Feature-extraction tie-breaking may still cause raw-board asymmetry. Floating-point arithmetic can affect exact ties. No game-performance improvement is established by this transformation."
+}

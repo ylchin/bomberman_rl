@@ -1,0 +1,38 @@
+{
+  "source_folder": "/Users/ylchin/Documents/bomberman_rl/experiments/task4_scoring_audit",
+  "checkpoint": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_safety_v2_symavg.pkl",
+  "checkpoint_sha256": "c5671d5e806e8d563fd1b21832eaee8d01a54e86ba592a4a5898273c553d973f",
+  "source_protocol": {
+    "checkpoint": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_safety_v2_symavg.pkl",
+    "checkpoint_sha256": "c5671d5e806e8d563fd1b21832eaee8d01a54e86ba592a4a5898273c553d973f",
+    "seed_start": 32000,
+    "rounds": 20,
+    "wait_streak_minimum": 3,
+    "source_sha256": {
+      "experiments/audit_task4_scoring.py": "152fead90adf3c676683c067cebe9117333414d9fad77a96934825b5b0014721",
+      "experiments/compare_coin_decisions.py": "ea1187b7afe072247289a53f7496216c446c0ddbe4d1d450645cf472ed599d45",
+      "agent_code/our_agent/callbacks.py": "04444c60e2b08232abe01d4c620792ec3cc0196e342b468c783bab4fe7faaaca",
+      "agent_code/our_agent/config.py": "bca0dfb44f42df8214295d44fd96728cd7034336200230abefc07f0c772b1e2f",
+      "agent_code/our_agent/escape_planner.py": "2664bf86a2b2608283b71dc13bcc400db12281e485b8d098fb4b8e4e730fc686",
+      "agent_code/our_agent/features.py": "5e8f97535de2d7324b496546488e6d75b2663c18c1b5cb40ad232fe49ffe80d4",
+      "agent_code/our_agent/q_linear.py": "b20c6676440277188008958f22158fe9e4488442c7b39c61e83657ca52a9f0ac"
+    },
+    "policy": "Frozen linear checkpoint; both guards on; optimistic fallback off; no training.",
+    "sampling": "Every own decision; analysis after each game. Opponents remain unseeded."
+  },
+  "filter": {
+    "max_clear_walking_distance": 6,
+    "no_bombs_anywhere": true,
+    "no_active_fire_anywhere": true,
+    "minimum_consecutive_waits": 3
+  },
+  "source_sha256": {
+    "experiments/analyze_task4_nearby_coins.py": "d746055ae2cadc368225153669a6a8b7714925e40e01b1e2e51754c1b2bc80a6",
+    "experiments/audit_task4_scoring.py": "38c04b12e6b6ef3ba131759da59c71adc2bcf46a348b2e2e1779dac4922dc12b",
+    "experiments/compare_coin_decisions.py": "ea1187b7afe072247289a53f7496216c446c0ddbe4d1d450645cf472ed599d45",
+    "experiments/analyze_task4_guard.py": "76d157d923c733deb46addc9a565d4dc8026191aa88f2e26c0655c705d693b21",
+    "agent_code/our_agent/features.py": "5e8f97535de2d7324b496546488e6d75b2663c18c1b5cb40ad232fe49ffe80d4",
+    "agent_code/our_agent/escape_planner.py": "2664bf86a2b2608283b71dc13bcc400db12281e485b8d098fb4b8e4e730fc686",
+    "agent_code/our_agent/q_linear.py": "b20c6676440277188008958f22158fe9e4488442c7b39c61e83657ca52a9f0ac"
+  }
+}

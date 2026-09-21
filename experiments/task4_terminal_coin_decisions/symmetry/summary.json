@@ -1,0 +1,208 @@
+{
+  "states": 126,
+  "nonidentity_transforms_per_state": 7,
+  "raw_feature_mismatches": 180,
+  "raw_action_mask_mismatches": 0,
+  "feature_mismatch_counts": {
+    "CRATE_DIR_UP": 66,
+    "CRATE_DIR_RIGHT": 64,
+    "CRATE_DIR_DOWN": 62,
+    "CRATE_DIR_LEFT": 62,
+    "OPP_DIR_UP": 28,
+    "OPP_DIR_LEFT": 28,
+    "OPP_DIR_RIGHT": 28,
+    "OPP_DIR_DOWN": 28,
+    "COIN_DIR_UP": 20,
+    "COIN_DIR_LEFT": 20,
+    "COIN_DIR_RIGHT": 20,
+    "COIN_DIR_DOWN": 20
+  },
+  "models": {
+    "baseline": {
+      "comparisons": 882,
+      "raw_exact_match_rate": 0.8219954648526077,
+      "raw_disjoint_rate": 0.17800453514739228,
+      "feature_only_exact_match_rate": 0.844671201814059,
+      "feature_only_disjoint_rate": 0.15532879818594103,
+      "comparisons_without_feature_or_mask_changes": 702,
+      "raw_exact_match_rate_without_feature_or_mask_changes": 0.8447293447293447
+    },
+    "candidate": {
+      "comparisons": 882,
+      "raw_exact_match_rate": 0.7687074829931972,
+      "raw_disjoint_rate": 0.23129251700680273,
+      "feature_only_exact_match_rate": 0.7981859410430839,
+      "feature_only_disjoint_rate": 0.2018140589569161,
+      "comparisons_without_feature_or_mask_changes": 702,
+      "raw_exact_match_rate_without_feature_or_mask_changes": 0.7991452991452992
+    }
+  },
+  "by_driver": {
+    "baseline": {
+      "baseline": {
+        "comparisons": 357,
+        "raw_exact_match_rate": 0.8823529411764706,
+        "raw_disjoint_rate": 0.11764705882352941,
+        "feature_only_exact_match_rate": 0.8991596638655462,
+        "feature_only_disjoint_rate": 0.10084033613445378,
+        "comparisons_without_feature_or_mask_changes": 270,
+        "raw_exact_match_rate_without_feature_or_mask_changes": 0.9
+      },
+      "candidate": {
+        "comparisons": 357,
+        "raw_exact_match_rate": 0.8543417366946778,
+        "raw_disjoint_rate": 0.14565826330532214,
+        "feature_only_exact_match_rate": 0.8907563025210085,
+        "feature_only_disjoint_rate": 0.1092436974789916,
+        "comparisons_without_feature_or_mask_changes": 270,
+        "raw_exact_match_rate_without_feature_or_mask_changes": 0.9
+      }
+    },
+    "candidate": {
+      "baseline": {
+        "comparisons": 525,
+        "raw_exact_match_rate": 0.780952380952381,
+        "raw_disjoint_rate": 0.21904761904761905,
+        "feature_only_exact_match_rate": 0.8076190476190476,
+        "feature_only_disjoint_rate": 0.19238095238095237,
+        "comparisons_without_feature_or_mask_changes": 432,
+        "raw_exact_match_rate_without_feature_or_mask_changes": 0.8101851851851852
+      },
+      "candidate": {
+        "comparisons": 525,
+        "raw_exact_match_rate": 0.7104761904761905,
+        "raw_disjoint_rate": 0.2895238095238095,
+        "feature_only_exact_match_rate": 0.7352380952380952,
+        "feature_only_disjoint_rate": 0.26476190476190475,
+        "comparisons_without_feature_or_mask_changes": 432,
+        "raw_exact_match_rate_without_feature_or_mask_changes": 0.7361111111111112
+      }
+    }
+  },
+  "action_probabilities_over_all_8_orientations": {
+    "baseline": {
+      "UP": 0.18154761904761904,
+      "RIGHT": 0.1498015873015873,
+      "DOWN": 0.19345238095238096,
+      "LEFT": 0.1865079365079365,
+      "WAIT": 0.1865079365079365,
+      "BOMB": 0.10218253968253968
+    },
+    "candidate": {
+      "UP": 0.1597222222222222,
+      "RIGHT": 0.16170634920634921,
+      "DOWN": 0.22718253968253968,
+      "LEFT": 0.17956349206349206,
+      "WAIT": 0.22123015873015872,
+      "BOMB": 0.050595238095238096
+    }
+  },
+  "examples": [
+    {
+      "model": "candidate",
+      "op": [
+        false,
+        3
+      ],
+      "raw_exact_match": false,
+      "raw_disjoint": true,
+      "feature_only_exact_match": false,
+      "feature_only_disjoint": true,
+      "same_feature_vector": true,
+      "same_action_mask": true,
+      "original_greedy": [
+        "UP"
+      ],
+      "raw_greedy_mapped_back": [
+        "BOMB"
+      ],
+      "feature_only_greedy_mapped_back": [
+        "BOMB"
+      ],
+      "changed_features": [],
+      "driver": "baseline",
+      "seed": 28000,
+      "step": 41
+    },
+    {
+      "model": "baseline",
+      "op": [
+        true,
+        3
+      ],
+      "raw_exact_match": false,
+      "raw_disjoint": true,
+      "feature_only_exact_match": false,
+      "feature_only_disjoint": true,
+      "same_feature_vector": true,
+      "same_action_mask": true,
+      "original_greedy": [
+        "UP"
+      ],
+      "raw_greedy_mapped_back": [
+        "BOMB"
+      ],
+      "feature_only_greedy_mapped_back": [
+        "BOMB"
+      ],
+      "changed_features": [],
+      "driver": "baseline",
+      "seed": 28000,
+      "step": 41
+    },
+    {
+      "model": "baseline",
+      "op": [
+        false,
+        2
+      ],
+      "raw_exact_match": false,
+      "raw_disjoint": true,
+      "feature_only_exact_match": false,
+      "feature_only_disjoint": true,
+      "same_feature_vector": true,
+      "same_action_mask": true,
+      "original_greedy": [
+        "BOMB"
+      ],
+      "raw_greedy_mapped_back": [
+        "RIGHT"
+      ],
+      "feature_only_greedy_mapped_back": [
+        "RIGHT"
+      ],
+      "changed_features": [],
+      "driver": "candidate",
+      "seed": 28000,
+      "step": 21
+    },
+    {
+      "model": "baseline",
+      "op": [
+        false,
+        3
+      ],
+      "raw_exact_match": false,
+      "raw_disjoint": true,
+      "feature_only_exact_match": false,
+      "feature_only_disjoint": true,
+      "same_feature_vector": true,
+      "same_action_mask": true,
+      "original_greedy": [
+        "BOMB"
+      ],
+      "raw_greedy_mapped_back": [
+        "RIGHT"
+      ],
+      "feature_only_greedy_mapped_back": [
+        "RIGHT"
+      ],
+      "changed_features": [],
+      "driver": "candidate",
+      "seed": 28000,
+      "step": 21
+    }
+  ],
+  "source_files_changed_since_capture": [],
+  "limits": "Offline, correlated states from two policies. Consistency is not a performance metric. Pure feature permutations can differ from freshly extracted features because of target/path tie-breaking; feature-only results isolate weight asymmetry on those inputs. The history-dependent stuck-action override is excluded. No random tie-breaking is sampled."
+}
