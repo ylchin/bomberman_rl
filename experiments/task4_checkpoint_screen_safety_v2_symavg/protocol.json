@@ -1,0 +1,38 @@
+{
+  "checkpoint": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_safety_v2_symavg.pkl",
+  "checkpoint_sha256": "c5671d5e806e8d563fd1b21832eaee8d01a54e86ba592a4a5898273c553d973f",
+  "source_sha256": {
+    "environment.py": "45c631e4d7c1ad20fedf205211fe3186981c3291d9834a94b8b6cf1c1cfb4b2f",
+    "items.py": "41652d92c3b0977568fe63480fd1b127fd9d3a52e92aa38ba4e59c685d1a8a96",
+    "settings.py": "2c7ad8016615eba8db68811782545bb49f404c1d0e59c1bd69762bfea464506c",
+    "evaluate.py": "acf79c52322e6cdf8e304a141b877e7db1876a5c27c28f6019a921272b8dfd35",
+    "experiments/compare_task4_guard.py": "5dae63ad1dce4b257d705a0926a48e7d5e00bd4eb9c6e8b277ca2dee0c0d19e4",
+    "agent_code/our_agent/callbacks.py": "99795026e7874f4fb6ef32de6051802ce68bd19256267d87382cc9bd24d867b5",
+    "agent_code/our_agent/config.py": "f4b5db81e4c30faf50318019124631ca99984d522cf2528dbb62a145f50b4850",
+    "agent_code/our_agent/escape_planner.py": "2664bf86a2b2608283b71dc13bcc400db12281e485b8d098fb4b8e4e730fc686",
+    "agent_code/our_agent/features.py": "5e8f97535de2d7324b496546488e6d75b2663c18c1b5cb40ad232fe49ffe80d4",
+    "agent_code/our_agent/q_linear.py": "b20c6676440277188008958f22158fe9e4488442c7b39c61e83657ca52a9f0ac",
+    "agent_code/our_agent/coin_navigation.py": "b0ed37af984b253be80e1f3ed1c3393721d1cb0f87da9d5636e810c11b55c4a2"
+  },
+  "seed_start": 34000,
+  "rounds_per_arm": 100,
+  "guard_kind": "escape",
+  "single_arm": "on",
+  "coin_preference_max_distance": 6,
+  "arm_settings": {
+    "off": {
+      "bomb_collision_guard": true,
+      "escape_collision_guard": false,
+      "optimistic_fallback": false,
+      "coin_preference": false
+    },
+    "on": {
+      "bomb_collision_guard": true,
+      "escape_collision_guard": true,
+      "optimistic_fallback": false,
+      "coin_preference": false
+    }
+  },
+  "survival_definition": "survived=1 iff our_agent remains alive at round end; died includes all explosion deaths, not just self-kills",
+  "protocol": "Fresh agents and worlds per game; unchanged unseeded opponents; original game settings; no training. Both-arm runs alternate off/on order by seed; single-arm runs are diagnostics, not A/B comparisons."
+}

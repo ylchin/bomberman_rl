@@ -10,7 +10,7 @@ into inputs a model can consume. Two consumers:
 Both are built on top of `danger_map`, which is also imported by Yi Ling Chin's
 rewards.py (so bomb-danger logic lives in exactly one place).
 
-ACTIONS ORDER IS LAW. Every index below (in ACTIONS, in one-hot blocks, in
+Every index below (in ACTIONS, in one-hot blocks, in
 symmetry.py) assumes this exact order. Do not reorder without updating
 symmetry.py and every trained checkpoint.
 

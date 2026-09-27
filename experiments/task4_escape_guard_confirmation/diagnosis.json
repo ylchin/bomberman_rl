@@ -1,0 +1,24 @@
+[
+  {
+    "seed": 27090,
+    "death_step": 290,
+    "own_bomb_placement_step": 286,
+    "observed_interceptions": [
+      288
+    ],
+    "riskier_escape_choices_with_alternatives": [],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 27163,
+    "death_step": 87,
+    "own_bomb_placement_step": 82,
+    "observed_interceptions": [],
+    "riskier_escape_choices_with_alternatives": [],
+    "new_enemy_bombs_when_routes_lost": [
+      84
+    ],
+    "final_mask_empty": true
+  }
+]

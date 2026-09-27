@@ -21,7 +21,7 @@ if MODEL not in ("linear", "net"):
 # path (relative to the agent dir -- cwd is set there by the framework) where
 # act() loads weights from when self.train is False.
 WEIGHTS_FILE = {
-    "linear": "weights/q_linear.pkl",
+    "linear": "weights/q_linear_safety_v2_symavg.pkl",
     "net": "weights/q_net.pt",
     "forest": "weights/q_forest.pkl",
 }
@@ -42,6 +42,11 @@ TRAIN = dict(
     # Model 1 only: screen known bomb traps in actions and bootstrap targets.
     survival_filter=os.environ.get("AGENT_SURVIVAL_FILTER", "1") == "1",
     bomb_collision_guard=os.environ.get("AGENT_BOMB_COLLISION_GUARD", "1") == "1",
+    # Task 4 submission: use the validated placement and escape guards.
+    escape_collision_guard=os.environ.get("AGENT_ESCAPE_COLLISION_GUARD", "1") == "1",
+    optimistic_fallback=os.environ.get("AGENT_OPTIMISTIC_FALLBACK", "0") == "1",
+    # Frozen-policy evaluation experiment; does not alter training behavior.
+    coin_preference=os.environ.get("AGENT_COIN_PREFERENCE", "0") == "1",
     # --- replay ---
     buffer_capacity=100_000,
     batch_size=256,

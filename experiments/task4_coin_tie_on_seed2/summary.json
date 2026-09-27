@@ -1,0 +1,121 @@
+{
+  "episodes": 100,
+  "coin_tie_reward": true,
+  "mean_game_score": 1.51,
+  "mean_training_reward": 22.598587499999976,
+  "mean_potential": {
+    "calls": 386.26,
+    "net": -5.645912500000006,
+    "positive": 71.51379583333335,
+    "negative": -77.15970833333331,
+    "terminal_calls": 1.0,
+    "terminal_net": -0.22733416666666664
+  },
+  "events": {
+    "MOVED_TOWARD_SAFETY": {
+      "mean_count": 61.91,
+      "mean_reward": 18.57300000000002
+    },
+    "ESCAPED_DANGER": {
+      "mean_count": 47.62,
+      "mean_reward": 14.286000000000017
+    },
+    "WAITED": {
+      "mean_count": 147.69,
+      "mean_reward": -2.9538000000000024
+    },
+    "USELESS_BOMB": {
+      "mean_count": 26.62,
+      "mean_reward": -2.6620000000000004
+    },
+    "STAYED_IN_DANGER": {
+      "mean_count": 8.59,
+      "mean_reward": -2.1475
+    },
+    "MOVED_INTO_DANGER": {
+      "mean_count": 5.86,
+      "mean_reward": -2.0509999999999984
+    },
+    "CRATE_DESTROYED": {
+      "mean_count": 20.41,
+      "mean_reward": 2.0409999999999995
+    },
+    "KILLED_OPPONENT": {
+      "mean_count": 0.16,
+      "mean_reward": 0.8
+    },
+    "COIN_COLLECTED": {
+      "mean_count": 0.71,
+      "mean_reward": 0.71
+    },
+    "SAFE_BOMB_THREATENS_OPPONENT": {
+      "mean_count": 6.83,
+      "mean_reward": 0.6830000000000003
+    },
+    "MOVED_TOWARD_COIN": {
+      "mean_count": 11.02,
+      "mean_reward": 0.6612000000000003
+    },
+    "SURVIVED_ROUND": {
+      "mean_count": 0.95,
+      "mean_reward": 0.475
+    },
+    "BOMB_NEXT_TO_CRATE": {
+      "mean_count": 9.35,
+      "mean_reward": 0.4675000000000001
+    },
+    "MOVED_AWAY_FROM_COIN": {
+      "mean_count": 5.47,
+      "mean_reward": -0.3829000000000004
+    },
+    "GOT_KILLED": {
+      "mean_count": 0.05,
+      "mean_reward": -0.25
+    },
+    "COIN_FOUND": {
+      "mean_count": 1.6,
+      "mean_reward": 0.07999999999999993
+    },
+    "INVALID_ACTION": {
+      "mean_count": 0.69,
+      "mean_reward": -0.069
+    },
+    "BOMB_WITH_NO_ESCAPE": {
+      "mean_count": 0.04,
+      "mean_reward": -0.022000000000000002
+    },
+    "SAFE_BOMB_TRAPS_OPPONENT": {
+      "mean_count": 0.03,
+      "mean_reward": 0.006000000000000001
+    },
+    "MOVED_DOWN": {
+      "mean_count": 44.73,
+      "mean_reward": 0.0
+    },
+    "BOMB_DROPPED": {
+      "mean_count": 42.36,
+      "mean_reward": 0.0
+    },
+    "MOVED_UP": {
+      "mean_count": 50.25,
+      "mean_reward": 0.0
+    },
+    "MOVED_RIGHT": {
+      "mean_count": 52.27,
+      "mean_reward": 0.0
+    },
+    "BOMB_EXPLODED": {
+      "mean_count": 41.88,
+      "mean_reward": 0.0
+    },
+    "MOVED_LEFT": {
+      "mean_count": 47.32,
+      "mean_reward": 0.0
+    },
+    "OPPONENT_ELIMINATED": {
+      "mean_count": 1.71,
+      "mean_reward": 0.0
+    }
+  },
+  "limits": "Undiscounted per-episode attribution during learning and exploration; large reward contributions alone do not prove exploitation. Terminal shaping is observed as implemented, not corrected by this runner."
+}

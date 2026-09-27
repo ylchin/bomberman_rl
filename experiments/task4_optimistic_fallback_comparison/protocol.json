@@ -1,0 +1,34 @@
+{
+  "checkpoint": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_safety_v2_symavg.pkl",
+  "checkpoint_sha256": "c5671d5e806e8d563fd1b21832eaee8d01a54e86ba592a4a5898273c553d973f",
+  "source_sha256": {
+    "environment.py": "45c631e4d7c1ad20fedf205211fe3186981c3291d9834a94b8b6cf1c1cfb4b2f",
+    "items.py": "41652d92c3b0977568fe63480fd1b127fd9d3a52e92aa38ba4e59c685d1a8a96",
+    "settings.py": "2c7ad8016615eba8db68811782545bb49f404c1d0e59c1bd69762bfea464506c",
+    "evaluate.py": "acf79c52322e6cdf8e304a141b877e7db1876a5c27c28f6019a921272b8dfd35",
+    "experiments/compare_task4_guard.py": "fb9586f5a4571d3583f4209c6ce439a4ae966bbbe21cf859a381cee9acfb710b",
+    "agent_code/our_agent/callbacks.py": "04444c60e2b08232abe01d4c620792ec3cc0196e342b468c783bab4fe7faaaca",
+    "agent_code/our_agent/config.py": "bca0dfb44f42df8214295d44fd96728cd7034336200230abefc07f0c772b1e2f",
+    "agent_code/our_agent/escape_planner.py": "2664bf86a2b2608283b71dc13bcc400db12281e485b8d098fb4b8e4e730fc686",
+    "agent_code/our_agent/features.py": "5e8f97535de2d7324b496546488e6d75b2663c18c1b5cb40ad232fe49ffe80d4",
+    "agent_code/our_agent/q_linear.py": "b20c6676440277188008958f22158fe9e4488442c7b39c61e83657ca52a9f0ac"
+  },
+  "seed_start": 31000,
+  "rounds_per_arm": 300,
+  "guard_kind": "fallback",
+  "single_arm": null,
+  "arm_settings": {
+    "off": {
+      "bomb_collision_guard": true,
+      "escape_collision_guard": true,
+      "optimistic_fallback": false
+    },
+    "on": {
+      "bomb_collision_guard": true,
+      "escape_collision_guard": true,
+      "optimistic_fallback": true
+    }
+  },
+  "survival_definition": "survived=1 iff our_agent remains alive at round end; died includes all explosion deaths, not just self-kills",
+  "protocol": "Fresh agents and worlds per game; unchanged unseeded opponents; original game settings; no training. Both-arm runs alternate off/on order by seed; single-arm runs are diagnostics, not A/B comparisons."
+}

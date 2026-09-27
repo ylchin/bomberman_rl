@@ -1,0 +1,56 @@
+[
+  {
+    "seed": 29029,
+    "death_step": 304,
+    "own_bomb_placement_step": 300,
+    "observed_interceptions": [
+      302
+    ],
+    "riskier_escape_choices_with_alternatives": [],
+    "new_enemy_bombs_when_routes_lost": [],
+    "fallback_steps": [
+      303,
+      304
+    ],
+    "bomb_requests_during_fallback": [],
+    "confirmed_bomb_placements_during_fallback": [],
+    "actions_outside_nonempty_screen": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 29045,
+    "death_step": 240,
+    "own_bomb_placement_step": 236,
+    "observed_interceptions": [
+      238
+    ],
+    "riskier_escape_choices_with_alternatives": [],
+    "new_enemy_bombs_when_routes_lost": [],
+    "fallback_steps": [
+      239,
+      240
+    ],
+    "bomb_requests_during_fallback": [],
+    "confirmed_bomb_placements_during_fallback": [],
+    "actions_outside_nonempty_screen": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 29061,
+    "death_step": 335,
+    "own_bomb_placement_step": 331,
+    "observed_interceptions": [
+      333
+    ],
+    "riskier_escape_choices_with_alternatives": [],
+    "new_enemy_bombs_when_routes_lost": [],
+    "fallback_steps": [
+      334,
+      335
+    ],
+    "bomb_requests_during_fallback": [],
+    "confirmed_bomb_placements_during_fallback": [],
+    "actions_outside_nonempty_screen": [],
+    "final_mask_empty": true
+  }
+]

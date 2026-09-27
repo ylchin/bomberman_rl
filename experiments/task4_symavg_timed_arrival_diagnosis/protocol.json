@@ -1,0 +1,21 @@
+{
+  "checkpoint": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_safety_v2_symavg.pkl",
+  "checkpoint_sha256": "c5671d5e806e8d563fd1b21832eaee8d01a54e86ba592a4a5898273c553d973f",
+  "source_sha256": {
+    "environment.py": "45c631e4d7c1ad20fedf205211fe3186981c3291d9834a94b8b6cf1c1cfb4b2f",
+    "items.py": "41652d92c3b0977568fe63480fd1b127fd9d3a52e92aa38ba4e59c685d1a8a96",
+    "settings.py": "2c7ad8016615eba8db68811782545bb49f404c1d0e59c1bd69762bfea464506c",
+    "evaluate.py": "acf79c52322e6cdf8e304a141b877e7db1876a5c27c28f6019a921272b8dfd35",
+    "experiments/compare_task4_guard.py": "b6577c469d2dc7352a6098d3c95d9ac3f2e33a5068b3cd168d348480b0d2f4f3",
+    "agent_code/our_agent/callbacks.py": "94a8ec1564ba87a06d9bc6759b989aaf3c9f936af2d35cc3679e113112f9ac66",
+    "agent_code/our_agent/config.py": "52d90d61cfdd6db68d7853fe669163889c3f53bf0375c3c338d33e80e4febca9",
+    "agent_code/our_agent/escape_planner.py": "2b44ad2a168c7bdb027f0468451c14343e739b1b6fdf17ac8ff1f6e944f30b3c",
+    "agent_code/our_agent/features.py": "5e8f97535de2d7324b496546488e6d75b2663c18c1b5cb40ad232fe49ffe80d4",
+    "agent_code/our_agent/q_linear.py": "b20c6676440277188008958f22158fe9e4488442c7b39c61e83657ca52a9f0ac"
+  },
+  "seed_start": 29000,
+  "rounds_per_arm": 100,
+  "guard_kind": "escape",
+  "single_arm": "on",
+  "protocol": "Fresh agents and worlds per game; unchanged unseeded opponents; original game settings; no training. Both-arm runs alternate off/on order by seed; single-arm runs are diagnostics, not A/B comparisons."
+}

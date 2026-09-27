@@ -1,0 +1,3474 @@
+{
+  "rounds": 20,
+  "game_metrics": {
+    "score": 4.05,
+    "coins": 3.05,
+    "kills": 0.2,
+    "self_kill": 0.0,
+    "win": 0.3,
+    "tie": 0.1,
+    "loss": 0.6
+  },
+  "overall": {
+    "decisions": 7247,
+    "categories": {
+      "safe_no_visible_coins": 4486,
+      "in_known_danger": 1563,
+      "safe_no_clear_coin_route": 485,
+      "safe_coin_opportunity": 713
+    },
+    "coin_opportunities": 713,
+    "actual_nonprogress_coin_choices": 245,
+    "actual_coin_progress_fraction": 0.6563814866760168,
+    "mean_greedy_coin_probability": 0.6563814866760168,
+    "nonprogress_actions": {
+      "WAIT": 178,
+      "BOMB": 44,
+      "DOWN": 9,
+      "UP": 3,
+      "LEFT": 8,
+      "RIGHT": 3
+    },
+    "safe_wait_decisions": 2356,
+    "safe_wait_categories": {
+      "safe_no_visible_coins": 1898,
+      "safe_no_clear_coin_route": 280,
+      "safe_coin_opportunity": 178
+    },
+    "safe_wait_streaks": 628,
+    "safe_wait_streaks_with_coin_opportunities": 104,
+    "longest_safe_wait_streak": 13,
+    "longest_streak_examples": [
+      {
+        "seed": 32011,
+        "start_step": 137,
+        "end_step": 149,
+        "length": 13,
+        "position": [
+          11,
+          5
+        ],
+        "steps_with_coin_opportunity": 0,
+        "categories": {
+          "safe_no_visible_coins": 13
+        }
+      },
+      {
+        "seed": 32014,
+        "start_step": 275,
+        "end_step": 281,
+        "length": 7,
+        "position": [
+          13,
+          1
+        ],
+        "steps_with_coin_opportunity": 0,
+        "categories": {
+          "safe_no_visible_coins": 7
+        }
+      },
+      {
+        "seed": 32017,
+        "start_step": 330,
+        "end_step": 336,
+        "length": 7,
+        "position": [
+          13,
+          1
+        ],
+        "steps_with_coin_opportunity": 0,
+        "categories": {
+          "safe_no_visible_coins": 7
+        }
+      },
+      {
+        "seed": 32003,
+        "start_step": 78,
+        "end_step": 82,
+        "length": 5,
+        "position": [
+          11,
+          12
+        ],
+        "steps_with_coin_opportunity": 0,
+        "categories": {
+          "safe_no_visible_coins": 5
+        }
+      },
+      {
+        "seed": 32008,
+        "start_step": 107,
+        "end_step": 111,
+        "length": 5,
+        "position": [
+          12,
+          5
+        ],
+        "steps_with_coin_opportunity": 5,
+        "categories": {
+          "safe_coin_opportunity": 5
+        }
+      }
+    ],
+    "longest_streaks_with_coin_opportunities": [
+      {
+        "seed": 32008,
+        "start_step": 107,
+        "end_step": 111,
+        "length": 5,
+        "position": [
+          12,
+          5
+        ],
+        "steps_with_coin_opportunity": 5,
+        "categories": {
+          "safe_coin_opportunity": 5
+        }
+      },
+      {
+        "seed": 32000,
+        "start_step": 46,
+        "end_step": 49,
+        "length": 4,
+        "position": [
+          15,
+          4
+        ],
+        "steps_with_coin_opportunity": 2,
+        "categories": {
+          "safe_coin_opportunity": 2,
+          "safe_no_clear_coin_route": 2
+        }
+      },
+      {
+        "seed": 32000,
+        "start_step": 65,
+        "end_step": 68,
+        "length": 4,
+        "position": [
+          15,
+          6
+        ],
+        "steps_with_coin_opportunity": 1,
+        "categories": {
+          "safe_no_clear_coin_route": 3,
+          "safe_coin_opportunity": 1
+        }
+      },
+      {
+        "seed": 32000,
+        "start_step": 82,
+        "end_step": 85,
+        "length": 4,
+        "position": [
+          15,
+          7
+        ],
+        "steps_with_coin_opportunity": 2,
+        "categories": {
+          "safe_no_visible_coins": 1,
+          "safe_no_clear_coin_route": 1,
+          "safe_coin_opportunity": 2
+        }
+      },
+      {
+        "seed": 32002,
+        "start_step": 21,
+        "end_step": 24,
+        "length": 4,
+        "position": [
+          14,
+          1
+        ],
+        "steps_with_coin_opportunity": 2,
+        "categories": {
+          "safe_no_clear_coin_route": 2,
+          "safe_coin_opportunity": 2
+        }
+      }
+    ]
+  },
+  "by_game": [
+    {
+      "seed": 32000,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 296,
+        "in_known_danger": 60,
+        "safe_no_clear_coin_route": 16,
+        "safe_coin_opportunity": 28
+      },
+      "coin_opportunities": 28,
+      "actual_nonprogress_coin_choices": 11,
+      "actual_coin_progress_fraction": 0.6071428571428572,
+      "mean_greedy_coin_probability": 0.6071428571428571,
+      "nonprogress_actions": {
+        "WAIT": 9,
+        "BOMB": 1,
+        "DOWN": 1
+      },
+      "safe_wait_decisions": 91,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 71,
+        "safe_no_clear_coin_route": 11,
+        "safe_coin_opportunity": 9
+      },
+      "safe_wait_streaks": 25,
+      "safe_wait_streaks_with_coin_opportunities": 6,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32000,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32000,
+          "start_step": 46,
+          "end_step": 49,
+          "length": 4,
+          "position": [
+            15,
+            4
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_coin_opportunity": 2,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32000,
+          "start_step": 65,
+          "end_step": 68,
+          "length": 4,
+          "position": [
+            15,
+            6
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32000,
+          "start_step": 82,
+          "end_step": 85,
+          "length": 4,
+          "position": [
+            15,
+            7
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 2
+          }
+        },
+        {
+          "seed": 32000,
+          "start_step": 93,
+          "end_step": 96,
+          "length": 4,
+          "position": [
+            14,
+            5
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32000,
+          "start_step": 46,
+          "end_step": 49,
+          "length": 4,
+          "position": [
+            15,
+            4
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_coin_opportunity": 2,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32000,
+          "start_step": 65,
+          "end_step": 68,
+          "length": 4,
+          "position": [
+            15,
+            6
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32000,
+          "start_step": 82,
+          "end_step": 85,
+          "length": 4,
+          "position": [
+            15,
+            7
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 2
+          }
+        },
+        {
+          "seed": 32000,
+          "start_step": 14,
+          "end_step": 16,
+          "length": 3,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32000,
+          "start_step": 36,
+          "end_step": 38,
+          "length": 3,
+          "position": [
+            14,
+            3
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32001,
+      "decisions": 177,
+      "categories": {
+        "safe_no_visible_coins": 80,
+        "in_known_danger": 42,
+        "safe_no_clear_coin_route": 26,
+        "safe_coin_opportunity": 29
+      },
+      "coin_opportunities": 29,
+      "actual_nonprogress_coin_choices": 4,
+      "actual_coin_progress_fraction": 0.8620689655172413,
+      "mean_greedy_coin_probability": 0.8620689655172413,
+      "nonprogress_actions": {
+        "BOMB": 1,
+        "WAIT": 3
+      },
+      "safe_wait_decisions": 54,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 37,
+        "safe_no_clear_coin_route": 14,
+        "safe_coin_opportunity": 3
+      },
+      "safe_wait_streaks": 16,
+      "safe_wait_streaks_with_coin_opportunities": 3,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32001,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            2,
+            15
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32001,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            1,
+            14
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 3,
+            "safe_no_clear_coin_route": 1
+          }
+        },
+        {
+          "seed": 32001,
+          "start_step": 35,
+          "end_step": 38,
+          "length": 4,
+          "position": [
+            3,
+            12
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32001,
+          "start_step": 66,
+          "end_step": 69,
+          "length": 4,
+          "position": [
+            7,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32001,
+          "start_step": 73,
+          "end_step": 76,
+          "length": 4,
+          "position": [
+            8,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32001,
+          "start_step": 56,
+          "end_step": 58,
+          "length": 3,
+          "position": [
+            6,
+            3
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32001,
+          "start_step": 141,
+          "end_step": 143,
+          "length": 3,
+          "position": [
+            14,
+            11
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32001,
+          "start_step": 171,
+          "end_step": 173,
+          "length": 3,
+          "position": [
+            8,
+            9
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32002,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 230,
+        "in_known_danger": 98,
+        "safe_no_clear_coin_route": 28,
+        "safe_coin_opportunity": 44
+      },
+      "coin_opportunities": 44,
+      "actual_nonprogress_coin_choices": 13,
+      "actual_coin_progress_fraction": 0.7045454545454546,
+      "mean_greedy_coin_probability": 0.7045454545454546,
+      "nonprogress_actions": {
+        "WAIT": 10,
+        "BOMB": 3
+      },
+      "safe_wait_decisions": 156,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 133,
+        "safe_no_clear_coin_route": 13,
+        "safe_coin_opportunity": 10
+      },
+      "safe_wait_streaks": 41,
+      "safe_wait_streaks_with_coin_opportunities": 6,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32002,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32002,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 3,
+            "safe_no_clear_coin_route": 1
+          }
+        },
+        {
+          "seed": 32002,
+          "start_step": 21,
+          "end_step": 24,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 2
+          }
+        },
+        {
+          "seed": 32002,
+          "start_step": 116,
+          "end_step": 119,
+          "length": 4,
+          "position": [
+            10,
+            3
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32002,
+          "start_step": 162,
+          "end_step": 165,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32002,
+          "start_step": 21,
+          "end_step": 24,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 2
+          }
+        },
+        {
+          "seed": 32002,
+          "start_step": 48,
+          "end_step": 50,
+          "length": 3,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32002,
+          "start_step": 60,
+          "end_step": 62,
+          "length": 3,
+          "position": [
+            13,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32002,
+          "start_step": 74,
+          "end_step": 76,
+          "length": 3,
+          "position": [
+            11,
+            4
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_coin_opportunity": 1,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32002,
+          "start_step": 90,
+          "end_step": 92,
+          "length": 3,
+          "position": [
+            6,
+            5
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32003,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 312,
+        "in_known_danger": 46,
+        "safe_no_clear_coin_route": 18,
+        "safe_coin_opportunity": 24
+      },
+      "coin_opportunities": 24,
+      "actual_nonprogress_coin_choices": 5,
+      "actual_coin_progress_fraction": 0.7916666666666666,
+      "mean_greedy_coin_probability": 0.7916666666666666,
+      "nonprogress_actions": {
+        "WAIT": 3,
+        "UP": 1,
+        "BOMB": 1
+      },
+      "safe_wait_decisions": 50,
+      "safe_wait_categories": {
+        "safe_no_clear_coin_route": 11,
+        "safe_coin_opportunity": 3,
+        "safe_no_visible_coins": 36
+      },
+      "safe_wait_streaks": 15,
+      "safe_wait_streaks_with_coin_opportunities": 2,
+      "longest_safe_wait_streak": 5,
+      "longest_streak_examples": [
+        {
+          "seed": 32003,
+          "start_step": 78,
+          "end_step": 82,
+          "length": 5,
+          "position": [
+            11,
+            12
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 5
+          }
+        },
+        {
+          "seed": 32003,
+          "start_step": 29,
+          "end_step": 32,
+          "length": 4,
+          "position": [
+            5,
+            14
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 1,
+            "safe_no_visible_coins": 3
+          }
+        },
+        {
+          "seed": 32003,
+          "start_step": 62,
+          "end_step": 65,
+          "length": 4,
+          "position": [
+            7,
+            12
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32003,
+          "start_step": 69,
+          "end_step": 72,
+          "length": 4,
+          "position": [
+            8,
+            11
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32003,
+          "start_step": 7,
+          "end_step": 9,
+          "length": 3,
+          "position": [
+            2,
+            15
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 3
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32003,
+          "start_step": 15,
+          "end_step": 17,
+          "length": 3,
+          "position": [
+            1,
+            14
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32003,
+          "start_step": 108,
+          "end_step": 110,
+          "length": 3,
+          "position": [
+            7,
+            2
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 2
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32004,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 294,
+        "in_known_danger": 55,
+        "safe_no_clear_coin_route": 25,
+        "safe_coin_opportunity": 26
+      },
+      "coin_opportunities": 26,
+      "actual_nonprogress_coin_choices": 9,
+      "actual_coin_progress_fraction": 0.6538461538461539,
+      "mean_greedy_coin_probability": 0.6538461538461539,
+      "nonprogress_actions": {
+        "WAIT": 6,
+        "DOWN": 2,
+        "BOMB": 1
+      },
+      "safe_wait_decisions": 77,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 59,
+        "safe_no_clear_coin_route": 12,
+        "safe_coin_opportunity": 6
+      },
+      "safe_wait_streaks": 22,
+      "safe_wait_streaks_with_coin_opportunities": 3,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32004,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            1,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32004,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            2,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_no_visible_coins": 2
+          }
+        },
+        {
+          "seed": 32004,
+          "start_step": 47,
+          "end_step": 50,
+          "length": 4,
+          "position": [
+            4,
+            3
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 2
+          }
+        },
+        {
+          "seed": 32004,
+          "start_step": 66,
+          "end_step": 69,
+          "length": 4,
+          "position": [
+            9,
+            4
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32004,
+          "start_step": 73,
+          "end_step": 76,
+          "length": 4,
+          "position": [
+            10,
+            3
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32004,
+          "start_step": 47,
+          "end_step": 50,
+          "length": 4,
+          "position": [
+            4,
+            3
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 2
+          }
+        },
+        {
+          "seed": 32004,
+          "start_step": 90,
+          "end_step": 92,
+          "length": 3,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32004,
+          "start_step": 162,
+          "end_step": 164,
+          "length": 3,
+          "position": [
+            12,
+            7
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32005,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 223,
+        "in_known_danger": 108,
+        "safe_no_clear_coin_route": 37,
+        "safe_coin_opportunity": 32
+      },
+      "coin_opportunities": 32,
+      "actual_nonprogress_coin_choices": 9,
+      "actual_coin_progress_fraction": 0.71875,
+      "mean_greedy_coin_probability": 0.71875,
+      "nonprogress_actions": {
+        "WAIT": 6,
+        "BOMB": 2,
+        "UP": 1
+      },
+      "safe_wait_decisions": 184,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 161,
+        "safe_no_clear_coin_route": 17,
+        "safe_coin_opportunity": 6
+      },
+      "safe_wait_streaks": 48,
+      "safe_wait_streaks_with_coin_opportunities": 4,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32005,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32005,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32005,
+          "start_step": 37,
+          "end_step": 40,
+          "length": 4,
+          "position": [
+            14,
+            3
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32005,
+          "start_step": 44,
+          "end_step": 47,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32005,
+          "start_step": 55,
+          "end_step": 58,
+          "length": 4,
+          "position": [
+            15,
+            4
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32005,
+          "start_step": 66,
+          "end_step": 68,
+          "length": 3,
+          "position": [
+            14,
+            5
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32005,
+          "start_step": 90,
+          "end_step": 92,
+          "length": 3,
+          "position": [
+            10,
+            11
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32005,
+          "start_step": 102,
+          "end_step": 104,
+          "length": 3,
+          "position": [
+            9,
+            10
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        },
+        {
+          "seed": 32005,
+          "start_step": 138,
+          "end_step": 140,
+          "length": 3,
+          "position": [
+            13,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32006,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 229,
+        "in_known_danger": 74,
+        "safe_no_clear_coin_route": 46,
+        "safe_coin_opportunity": 51
+      },
+      "coin_opportunities": 51,
+      "actual_nonprogress_coin_choices": 21,
+      "actual_coin_progress_fraction": 0.5882352941176471,
+      "mean_greedy_coin_probability": 0.5882352941176471,
+      "nonprogress_actions": {
+        "WAIT": 17,
+        "BOMB": 4
+      },
+      "safe_wait_decisions": 101,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 59,
+        "safe_no_clear_coin_route": 25,
+        "safe_coin_opportunity": 17
+      },
+      "safe_wait_streaks": 29,
+      "safe_wait_streaks_with_coin_opportunities": 8,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32006,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            14,
+            15
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32006,
+          "start_step": 62,
+          "end_step": 65,
+          "length": 4,
+          "position": [
+            14,
+            11
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32006,
+          "start_step": 79,
+          "end_step": 82,
+          "length": 4,
+          "position": [
+            13,
+            6
+          ],
+          "steps_with_coin_opportunity": 4,
+          "categories": {
+            "safe_coin_opportunity": 4
+          }
+        },
+        {
+          "seed": 32006,
+          "start_step": 96,
+          "end_step": 99,
+          "length": 4,
+          "position": [
+            14,
+            5
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_coin_opportunity": 2,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32006,
+          "start_step": 173,
+          "end_step": 176,
+          "length": 4,
+          "position": [
+            13,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32006,
+          "start_step": 79,
+          "end_step": 82,
+          "length": 4,
+          "position": [
+            13,
+            6
+          ],
+          "steps_with_coin_opportunity": 4,
+          "categories": {
+            "safe_coin_opportunity": 4
+          }
+        },
+        {
+          "seed": 32006,
+          "start_step": 96,
+          "end_step": 99,
+          "length": 4,
+          "position": [
+            14,
+            5
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_coin_opportunity": 2,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32006,
+          "start_step": 266,
+          "end_step": 269,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 2
+          }
+        },
+        {
+          "seed": 32006,
+          "start_step": 30,
+          "end_step": 32,
+          "length": 3,
+          "position": [
+            15,
+            10
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32006,
+          "start_step": 42,
+          "end_step": 44,
+          "length": 3,
+          "position": [
+            13,
+            10
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32007,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 290,
+        "in_known_danger": 61,
+        "safe_no_clear_coin_route": 24,
+        "safe_coin_opportunity": 25
+      },
+      "coin_opportunities": 25,
+      "actual_nonprogress_coin_choices": 9,
+      "actual_coin_progress_fraction": 0.64,
+      "mean_greedy_coin_probability": 0.64,
+      "nonprogress_actions": {
+        "WAIT": 7,
+        "BOMB": 1,
+        "LEFT": 1
+      },
+      "safe_wait_decisions": 93,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 77,
+        "safe_no_clear_coin_route": 9,
+        "safe_coin_opportunity": 7
+      },
+      "safe_wait_streaks": 24,
+      "safe_wait_streaks_with_coin_opportunities": 3,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32007,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32007,
+          "start_step": 24,
+          "end_step": 27,
+          "length": 4,
+          "position": [
+            14,
+            3
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32007,
+          "start_step": 53,
+          "end_step": 56,
+          "length": 4,
+          "position": [
+            12,
+            3
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32007,
+          "start_step": 60,
+          "end_step": 63,
+          "length": 4,
+          "position": [
+            13,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32007,
+          "start_step": 157,
+          "end_step": 160,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32007,
+          "start_step": 14,
+          "end_step": 16,
+          "length": 3,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32007,
+          "start_step": 43,
+          "end_step": 45,
+          "length": 3,
+          "position": [
+            13,
+            2
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        },
+        {
+          "seed": 32007,
+          "start_step": 244,
+          "end_step": 246,
+          "length": 3,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32008,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 253,
+        "in_known_danger": 58,
+        "safe_no_clear_coin_route": 22,
+        "safe_coin_opportunity": 67
+      },
+      "coin_opportunities": 67,
+      "actual_nonprogress_coin_choices": 33,
+      "actual_coin_progress_fraction": 0.5074626865671642,
+      "mean_greedy_coin_probability": 0.5074626865671642,
+      "nonprogress_actions": {
+        "WAIT": 23,
+        "RIGHT": 1,
+        "BOMB": 8,
+        "DOWN": 1
+      },
+      "safe_wait_decisions": 92,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 53,
+        "safe_no_clear_coin_route": 16,
+        "safe_coin_opportunity": 23
+      },
+      "safe_wait_streaks": 25,
+      "safe_wait_streaks_with_coin_opportunities": 8,
+      "longest_safe_wait_streak": 5,
+      "longest_streak_examples": [
+        {
+          "seed": 32008,
+          "start_step": 107,
+          "end_step": 111,
+          "length": 5,
+          "position": [
+            12,
+            5
+          ],
+          "steps_with_coin_opportunity": 5,
+          "categories": {
+            "safe_coin_opportunity": 5
+          }
+        },
+        {
+          "seed": 32008,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            2,
+            15
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32008,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            1,
+            14
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32008,
+          "start_step": 98,
+          "end_step": 101,
+          "length": 4,
+          "position": [
+            12,
+            5
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32008,
+          "start_step": 133,
+          "end_step": 136,
+          "length": 4,
+          "position": [
+            12,
+            5
+          ],
+          "steps_with_coin_opportunity": 4,
+          "categories": {
+            "safe_coin_opportunity": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32008,
+          "start_step": 107,
+          "end_step": 111,
+          "length": 5,
+          "position": [
+            12,
+            5
+          ],
+          "steps_with_coin_opportunity": 5,
+          "categories": {
+            "safe_coin_opportunity": 5
+          }
+        },
+        {
+          "seed": 32008,
+          "start_step": 98,
+          "end_step": 101,
+          "length": 4,
+          "position": [
+            12,
+            5
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32008,
+          "start_step": 133,
+          "end_step": 136,
+          "length": 4,
+          "position": [
+            12,
+            5
+          ],
+          "steps_with_coin_opportunity": 4,
+          "categories": {
+            "safe_coin_opportunity": 4
+          }
+        },
+        {
+          "seed": 32008,
+          "start_step": 29,
+          "end_step": 31,
+          "length": 3,
+          "position": [
+            1,
+            10
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        },
+        {
+          "seed": 32008,
+          "start_step": 82,
+          "end_step": 84,
+          "length": 3,
+          "position": [
+            11,
+            6
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32009,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 222,
+        "in_known_danger": 112,
+        "safe_no_clear_coin_route": 29,
+        "safe_coin_opportunity": 37
+      },
+      "coin_opportunities": 37,
+      "actual_nonprogress_coin_choices": 13,
+      "actual_coin_progress_fraction": 0.6486486486486487,
+      "mean_greedy_coin_probability": 0.6486486486486487,
+      "nonprogress_actions": {
+        "WAIT": 10,
+        "BOMB": 3
+      },
+      "safe_wait_decisions": 186,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 159,
+        "safe_no_clear_coin_route": 17,
+        "safe_coin_opportunity": 10
+      },
+      "safe_wait_streaks": 48,
+      "safe_wait_streaks_with_coin_opportunities": 6,
+      "longest_safe_wait_streak": 5,
+      "longest_streak_examples": [
+        {
+          "seed": 32009,
+          "start_step": 286,
+          "end_step": 290,
+          "length": 5,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 5
+          }
+        },
+        {
+          "seed": 32009,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32009,
+          "start_step": 16,
+          "end_step": 19,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32009,
+          "start_step": 25,
+          "end_step": 28,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32009,
+          "start_step": 46,
+          "end_step": 49,
+          "length": 4,
+          "position": [
+            14,
+            3
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32009,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32009,
+          "start_step": 25,
+          "end_step": 28,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32009,
+          "start_step": 36,
+          "end_step": 38,
+          "length": 3,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32009,
+          "start_step": 61,
+          "end_step": 63,
+          "length": 3,
+          "position": [
+            14,
+            11
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        },
+        {
+          "seed": 32009,
+          "start_step": 73,
+          "end_step": 75,
+          "length": 3,
+          "position": [
+            15,
+            8
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32010,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 292,
+        "in_known_danger": 64,
+        "safe_no_clear_coin_route": 24,
+        "safe_coin_opportunity": 20
+      },
+      "coin_opportunities": 20,
+      "actual_nonprogress_coin_choices": 6,
+      "actual_coin_progress_fraction": 0.7,
+      "mean_greedy_coin_probability": 0.7,
+      "nonprogress_actions": {
+        "WAIT": 5,
+        "BOMB": 1
+      },
+      "safe_wait_decisions": 98,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 80,
+        "safe_no_clear_coin_route": 13,
+        "safe_coin_opportunity": 5
+      },
+      "safe_wait_streaks": 27,
+      "safe_wait_streaks_with_coin_opportunities": 2,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32010,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32010,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_no_visible_coins": 1
+          }
+        },
+        {
+          "seed": 32010,
+          "start_step": 43,
+          "end_step": 46,
+          "length": 4,
+          "position": [
+            14,
+            9
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 3,
+            "safe_no_clear_coin_route": 1
+          }
+        },
+        {
+          "seed": 32010,
+          "start_step": 62,
+          "end_step": 65,
+          "length": 4,
+          "position": [
+            14,
+            9
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32010,
+          "start_step": 79,
+          "end_step": 82,
+          "length": 4,
+          "position": [
+            15,
+            4
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32010,
+          "start_step": 96,
+          "end_step": 99,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 4,
+          "categories": {
+            "safe_coin_opportunity": 4
+          }
+        },
+        {
+          "seed": 32010,
+          "start_step": 54,
+          "end_step": 56,
+          "length": 3,
+          "position": [
+            14,
+            9
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32011,
+      "decisions": 155,
+      "categories": {
+        "safe_no_visible_coins": 46,
+        "in_known_danger": 31,
+        "safe_no_clear_coin_route": 31,
+        "safe_coin_opportunity": 47
+      },
+      "coin_opportunities": 47,
+      "actual_nonprogress_coin_choices": 17,
+      "actual_coin_progress_fraction": 0.6382978723404256,
+      "mean_greedy_coin_probability": 0.6382978723404256,
+      "nonprogress_actions": {
+        "LEFT": 4,
+        "WAIT": 12,
+        "BOMB": 1
+      },
+      "safe_wait_decisions": 53,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 27,
+        "safe_no_clear_coin_route": 14,
+        "safe_coin_opportunity": 12
+      },
+      "safe_wait_streaks": 12,
+      "safe_wait_streaks_with_coin_opportunities": 5,
+      "longest_safe_wait_streak": 13,
+      "longest_streak_examples": [
+        {
+          "seed": 32011,
+          "start_step": 137,
+          "end_step": 149,
+          "length": 13,
+          "position": [
+            11,
+            5
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 13
+          }
+        },
+        {
+          "seed": 32011,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32011,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 3,
+            "safe_no_clear_coin_route": 1
+          }
+        },
+        {
+          "seed": 32011,
+          "start_step": 21,
+          "end_step": 24,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32011,
+          "start_step": 40,
+          "end_step": 43,
+          "length": 4,
+          "position": [
+            14,
+            3
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32011,
+          "start_step": 119,
+          "end_step": 122,
+          "length": 4,
+          "position": [
+            12,
+            9
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32011,
+          "start_step": 63,
+          "end_step": 65,
+          "length": 3,
+          "position": [
+            9,
+            13
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        },
+        {
+          "seed": 32011,
+          "start_step": 73,
+          "end_step": 75,
+          "length": 3,
+          "position": [
+            9,
+            12
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        },
+        {
+          "seed": 32011,
+          "start_step": 81,
+          "end_step": 83,
+          "length": 3,
+          "position": [
+            10,
+            13
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        },
+        {
+          "seed": 32011,
+          "start_step": 109,
+          "end_step": 111,
+          "length": 3,
+          "position": [
+            13,
+            10
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32012,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 264,
+        "in_known_danger": 72,
+        "safe_no_clear_coin_route": 27,
+        "safe_coin_opportunity": 37
+      },
+      "coin_opportunities": 37,
+      "actual_nonprogress_coin_choices": 13,
+      "actual_coin_progress_fraction": 0.6486486486486487,
+      "mean_greedy_coin_probability": 0.6486486486486487,
+      "nonprogress_actions": {
+        "WAIT": 9,
+        "BOMB": 4
+      },
+      "safe_wait_decisions": 92,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 65,
+        "safe_no_clear_coin_route": 18,
+        "safe_coin_opportunity": 9
+      },
+      "safe_wait_streaks": 25,
+      "safe_wait_streaks_with_coin_opportunities": 6,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32012,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            1,
+            14
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32012,
+          "start_step": 36,
+          "end_step": 39,
+          "length": 4,
+          "position": [
+            4,
+            13
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32012,
+          "start_step": 59,
+          "end_step": 62,
+          "length": 4,
+          "position": [
+            3,
+            10
+          ],
+          "steps_with_coin_opportunity": 4,
+          "categories": {
+            "safe_coin_opportunity": 4
+          }
+        },
+        {
+          "seed": 32012,
+          "start_step": 144,
+          "end_step": 147,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32012,
+          "start_step": 151,
+          "end_step": 154,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32012,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            1,
+            14
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32012,
+          "start_step": 59,
+          "end_step": 62,
+          "length": 4,
+          "position": [
+            3,
+            10
+          ],
+          "steps_with_coin_opportunity": 4,
+          "categories": {
+            "safe_coin_opportunity": 4
+          }
+        },
+        {
+          "seed": 32012,
+          "start_step": 24,
+          "end_step": 26,
+          "length": 3,
+          "position": [
+            2,
+            15
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32012,
+          "start_step": 45,
+          "end_step": 47,
+          "length": 3,
+          "position": [
+            3,
+            12
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32012,
+          "start_step": 53,
+          "end_step": 55,
+          "length": 3,
+          "position": [
+            2,
+            9
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32013,
+      "decisions": 115,
+      "categories": {
+        "safe_no_visible_coins": 47,
+        "in_known_danger": 34,
+        "safe_no_clear_coin_route": 13,
+        "safe_coin_opportunity": 21
+      },
+      "coin_opportunities": 21,
+      "actual_nonprogress_coin_choices": 2,
+      "actual_coin_progress_fraction": 0.9047619047619048,
+      "mean_greedy_coin_probability": 0.9047619047619048,
+      "nonprogress_actions": {
+        "WAIT": 2
+      },
+      "safe_wait_decisions": 39,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 29,
+        "safe_no_clear_coin_route": 8,
+        "safe_coin_opportunity": 2
+      },
+      "safe_wait_streaks": 12,
+      "safe_wait_streaks_with_coin_opportunities": 2,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32013,
+          "start_step": 11,
+          "end_step": 14,
+          "length": 4,
+          "position": [
+            4,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32013,
+          "start_step": 18,
+          "end_step": 21,
+          "length": 4,
+          "position": [
+            3,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32013,
+          "start_step": 75,
+          "end_step": 78,
+          "length": 4,
+          "position": [
+            7,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32013,
+          "start_step": 5,
+          "end_step": 7,
+          "length": 3,
+          "position": [
+            3,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 3
+          }
+        },
+        {
+          "seed": 32013,
+          "start_step": 27,
+          "end_step": 29,
+          "length": 3,
+          "position": [
+            4,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32013,
+          "start_step": 27,
+          "end_step": 29,
+          "length": 3,
+          "position": [
+            4,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32013,
+          "start_step": 55,
+          "end_step": 57,
+          "length": 3,
+          "position": [
+            3,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32014,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 257,
+        "in_known_danger": 122,
+        "safe_no_clear_coin_route": 13,
+        "safe_coin_opportunity": 8
+      },
+      "coin_opportunities": 8,
+      "actual_nonprogress_coin_choices": 1,
+      "actual_coin_progress_fraction": 0.875,
+      "mean_greedy_coin_probability": 0.875,
+      "nonprogress_actions": {
+        "WAIT": 1
+      },
+      "safe_wait_decisions": 186,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 177,
+        "safe_no_clear_coin_route": 8,
+        "safe_coin_opportunity": 1
+      },
+      "safe_wait_streaks": 47,
+      "safe_wait_streaks_with_coin_opportunities": 1,
+      "longest_safe_wait_streak": 7,
+      "longest_streak_examples": [
+        {
+          "seed": 32014,
+          "start_step": 275,
+          "end_step": 281,
+          "length": 7,
+          "position": [
+            13,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 7
+          }
+        },
+        {
+          "seed": 32014,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            1,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32014,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            2,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32014,
+          "start_step": 51,
+          "end_step": 54,
+          "length": 4,
+          "position": [
+            5,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32014,
+          "start_step": 60,
+          "end_step": 63,
+          "length": 4,
+          "position": [
+            6,
+            3
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32014,
+          "start_step": 39,
+          "end_step": 41,
+          "length": 3,
+          "position": [
+            7,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32015,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 229,
+        "in_known_danger": 92,
+        "safe_no_clear_coin_route": 21,
+        "safe_coin_opportunity": 58
+      },
+      "coin_opportunities": 58,
+      "actual_nonprogress_coin_choices": 20,
+      "actual_coin_progress_fraction": 0.6551724137931034,
+      "mean_greedy_coin_probability": 0.6551724137931034,
+      "nonprogress_actions": {
+        "WAIT": 13,
+        "UP": 1,
+        "BOMB": 6
+      },
+      "safe_wait_decisions": 139,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 112,
+        "safe_no_clear_coin_route": 14,
+        "safe_coin_opportunity": 13
+      },
+      "safe_wait_streaks": 38,
+      "safe_wait_streaks_with_coin_opportunities": 10,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32015,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            1,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32015,
+          "start_step": 110,
+          "end_step": 113,
+          "length": 4,
+          "position": [
+            6,
+            3
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32015,
+          "start_step": 124,
+          "end_step": 127,
+          "length": 4,
+          "position": [
+            8,
+            5
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 2
+          }
+        },
+        {
+          "seed": 32015,
+          "start_step": 173,
+          "end_step": 176,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32015,
+          "start_step": 188,
+          "end_step": 191,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32015,
+          "start_step": 124,
+          "end_step": 127,
+          "length": 4,
+          "position": [
+            8,
+            5
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 2
+          }
+        },
+        {
+          "seed": 32015,
+          "start_step": 14,
+          "end_step": 16,
+          "length": 3,
+          "position": [
+            2,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32015,
+          "start_step": 44,
+          "end_step": 46,
+          "length": 3,
+          "position": [
+            4,
+            3
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32015,
+          "start_step": 64,
+          "end_step": 66,
+          "length": 3,
+          "position": [
+            3,
+            4
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32015,
+          "start_step": 73,
+          "end_step": 75,
+          "length": 3,
+          "position": [
+            5,
+            4
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32016,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 230,
+        "in_known_danger": 111,
+        "safe_no_clear_coin_route": 24,
+        "safe_coin_opportunity": 35
+      },
+      "coin_opportunities": 35,
+      "actual_nonprogress_coin_choices": 14,
+      "actual_coin_progress_fraction": 0.6,
+      "mean_greedy_coin_probability": 0.6,
+      "nonprogress_actions": {
+        "WAIT": 13,
+        "BOMB": 1
+      },
+      "safe_wait_decisions": 174,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 145,
+        "safe_no_clear_coin_route": 16,
+        "safe_coin_opportunity": 13
+      },
+      "safe_wait_streaks": 45,
+      "safe_wait_streaks_with_coin_opportunities": 8,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32016,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            1,
+            14
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32016,
+          "start_step": 24,
+          "end_step": 27,
+          "length": 4,
+          "position": [
+            2,
+            11
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32016,
+          "start_step": 31,
+          "end_step": 34,
+          "length": 4,
+          "position": [
+            1,
+            10
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_clear_coin_route": 4
+          }
+        },
+        {
+          "seed": 32016,
+          "start_step": 58,
+          "end_step": 61,
+          "length": 4,
+          "position": [
+            1,
+            4
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32016,
+          "start_step": 91,
+          "end_step": 94,
+          "length": 4,
+          "position": [
+            10,
+            3
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32016,
+          "start_step": 58,
+          "end_step": 61,
+          "length": 4,
+          "position": [
+            1,
+            4
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32016,
+          "start_step": 14,
+          "end_step": 16,
+          "length": 3,
+          "position": [
+            2,
+            15
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32016,
+          "start_step": 40,
+          "end_step": 42,
+          "length": 3,
+          "position": [
+            3,
+            10
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32016,
+          "start_step": 52,
+          "end_step": 54,
+          "length": 3,
+          "position": [
+            2,
+            5
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32016,
+          "start_step": 81,
+          "end_step": 83,
+          "length": 3,
+          "position": [
+            11,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32017,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 219,
+        "in_known_danger": 110,
+        "safe_no_clear_coin_route": 31,
+        "safe_coin_opportunity": 40
+      },
+      "coin_opportunities": 40,
+      "actual_nonprogress_coin_choices": 21,
+      "actual_coin_progress_fraction": 0.475,
+      "mean_greedy_coin_probability": 0.475,
+      "nonprogress_actions": {
+        "WAIT": 10,
+        "RIGHT": 2,
+        "DOWN": 4,
+        "LEFT": 2,
+        "BOMB": 3
+      },
+      "safe_wait_decisions": 173,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 142,
+        "safe_no_clear_coin_route": 21,
+        "safe_coin_opportunity": 10
+      },
+      "safe_wait_streaks": 45,
+      "safe_wait_streaks_with_coin_opportunities": 8,
+      "longest_safe_wait_streak": 7,
+      "longest_streak_examples": [
+        {
+          "seed": 32017,
+          "start_step": 330,
+          "end_step": 336,
+          "length": 7,
+          "position": [
+            13,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 7
+          }
+        },
+        {
+          "seed": 32017,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            2,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32017,
+          "start_step": 24,
+          "end_step": 27,
+          "length": 4,
+          "position": [
+            5,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32017,
+          "start_step": 31,
+          "end_step": 34,
+          "length": 4,
+          "position": [
+            6,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 3
+          }
+        },
+        {
+          "seed": 32017,
+          "start_step": 46,
+          "end_step": 49,
+          "length": 4,
+          "position": [
+            10,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_coin_opportunity": 1,
+            "safe_no_clear_coin_route": 3
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32017,
+          "start_step": 46,
+          "end_step": 49,
+          "length": 4,
+          "position": [
+            10,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_coin_opportunity": 1,
+            "safe_no_clear_coin_route": 3
+          }
+        },
+        {
+          "seed": 32017,
+          "start_step": 169,
+          "end_step": 172,
+          "length": 4,
+          "position": [
+            12,
+            9
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_coin_opportunity": 1,
+            "safe_no_visible_coins": 3
+          }
+        },
+        {
+          "seed": 32017,
+          "start_step": 14,
+          "end_step": 16,
+          "length": 3,
+          "position": [
+            1,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32017,
+          "start_step": 57,
+          "end_step": 59,
+          "length": 3,
+          "position": [
+            12,
+            1
+          ],
+          "steps_with_coin_opportunity": 2,
+          "categories": {
+            "safe_coin_opportunity": 2,
+            "safe_no_clear_coin_route": 1
+          }
+        },
+        {
+          "seed": 32017,
+          "start_step": 117,
+          "end_step": 119,
+          "length": 3,
+          "position": [
+            12,
+            3
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32018,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 228,
+        "in_known_danger": 114,
+        "safe_no_clear_coin_route": 18,
+        "safe_coin_opportunity": 40
+      },
+      "coin_opportunities": 40,
+      "actual_nonprogress_coin_choices": 15,
+      "actual_coin_progress_fraction": 0.625,
+      "mean_greedy_coin_probability": 0.625,
+      "nonprogress_actions": {
+        "WAIT": 11,
+        "BOMB": 2,
+        "LEFT": 1,
+        "DOWN": 1
+      },
+      "safe_wait_decisions": 168,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 142,
+        "safe_no_clear_coin_route": 15,
+        "safe_coin_opportunity": 11
+      },
+      "safe_wait_streaks": 44,
+      "safe_wait_streaks_with_coin_opportunities": 7,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32018,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 2,
+            "safe_no_clear_coin_route": 2
+          }
+        },
+        {
+          "seed": 32018,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32018,
+          "start_step": 31,
+          "end_step": 34,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32018,
+          "start_step": 58,
+          "end_step": 61,
+          "length": 4,
+          "position": [
+            15,
+            8
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32018,
+          "start_step": 149,
+          "end_step": 152,
+          "length": 4,
+          "position": [
+            3,
+            2
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32018,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            15,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32018,
+          "start_step": 31,
+          "end_step": 34,
+          "length": 4,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 3,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32018,
+          "start_step": 58,
+          "end_step": 61,
+          "length": 4,
+          "position": [
+            15,
+            8
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32018,
+          "start_step": 25,
+          "end_step": 27,
+          "length": 3,
+          "position": [
+            13,
+            2
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32018,
+          "start_step": 42,
+          "end_step": 44,
+          "length": 3,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        }
+      ]
+    },
+    {
+      "seed": 32019,
+      "decisions": 400,
+      "categories": {
+        "safe_no_visible_coins": 245,
+        "in_known_danger": 99,
+        "safe_no_clear_coin_route": 12,
+        "safe_coin_opportunity": 44
+      },
+      "coin_opportunities": 44,
+      "actual_nonprogress_coin_choices": 9,
+      "actual_coin_progress_fraction": 0.7954545454545454,
+      "mean_greedy_coin_probability": 0.7954545454545454,
+      "nonprogress_actions": {
+        "WAIT": 8,
+        "BOMB": 1
+      },
+      "safe_wait_decisions": 150,
+      "safe_wait_categories": {
+        "safe_no_visible_coins": 134,
+        "safe_no_clear_coin_route": 8,
+        "safe_coin_opportunity": 8
+      },
+      "safe_wait_streaks": 40,
+      "safe_wait_streaks_with_coin_opportunities": 6,
+      "longest_safe_wait_streak": 4,
+      "longest_streak_examples": [
+        {
+          "seed": 32019,
+          "start_step": 5,
+          "end_step": 8,
+          "length": 4,
+          "position": [
+            14,
+            15
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32019,
+          "start_step": 12,
+          "end_step": 15,
+          "length": 4,
+          "position": [
+            15,
+            14
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 3,
+            "safe_no_clear_coin_route": 1
+          }
+        },
+        {
+          "seed": 32019,
+          "start_step": 47,
+          "end_step": 50,
+          "length": 4,
+          "position": [
+            14,
+            13
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32019,
+          "start_step": 54,
+          "end_step": 57,
+          "length": 4,
+          "position": [
+            15,
+            12
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        },
+        {
+          "seed": 32019,
+          "start_step": 76,
+          "end_step": 79,
+          "length": 4,
+          "position": [
+            15,
+            6
+          ],
+          "steps_with_coin_opportunity": 0,
+          "categories": {
+            "safe_no_visible_coins": 4
+          }
+        }
+      ],
+      "longest_streaks_with_coin_opportunities": [
+        {
+          "seed": 32019,
+          "start_step": 21,
+          "end_step": 23,
+          "length": 3,
+          "position": [
+            14,
+            11
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32019,
+          "start_step": 37,
+          "end_step": 39,
+          "length": 3,
+          "position": [
+            15,
+            14
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32019,
+          "start_step": 70,
+          "end_step": 72,
+          "length": 3,
+          "position": [
+            14,
+            7
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_clear_coin_route": 2,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32019,
+          "start_step": 108,
+          "end_step": 110,
+          "length": 3,
+          "position": [
+            14,
+            1
+          ],
+          "steps_with_coin_opportunity": 1,
+          "categories": {
+            "safe_no_visible_coins": 1,
+            "safe_no_clear_coin_route": 1,
+            "safe_coin_opportunity": 1
+          }
+        },
+        {
+          "seed": 32019,
+          "start_step": 131,
+          "end_step": 133,
+          "length": 3,
+          "position": [
+            11,
+            2
+          ],
+          "steps_with_coin_opportunity": 3,
+          "categories": {
+            "safe_coin_opportunity": 3
+          }
+        }
+      ]
+    }
+  ],
+  "limits": "Correlated decisions from a small trajectory sample. Safe means outside currently known blast/fire paths, not guaranteed safety. Coin paths exclude all known danger and current occupancy; reachable refers only to visible coins under that conservative reference. Nonprogress includes strategic bombing or detours and is not proof of a mistake. Wait streaks without visible reachable coins are reported separately. Greedy ties exclude the stuck-action override; actual choices include it. No comparison or performance improvement is established."
+}

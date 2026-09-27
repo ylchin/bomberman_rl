@@ -1,0 +1,95 @@
+{
+  "rounds_per_arm": 300,
+  "metrics": {
+    "score": {
+      "off": 3.3266666666666667,
+      "on": 3.4833333333333334,
+      "on_minus_off": 0.15666666666666668,
+      "paired_bootstrap_95_interval": [
+        -0.24333333333333335,
+        0.5566666666666666
+      ]
+    },
+    "coins": {
+      "off": 2.31,
+      "on": 2.35,
+      "on_minus_off": 0.04,
+      "paired_bootstrap_95_interval": [
+        -0.12,
+        0.2
+      ]
+    },
+    "kills": {
+      "off": 0.20333333333333334,
+      "on": 0.22666666666666666,
+      "on_minus_off": 0.023333333333333334,
+      "paired_bootstrap_95_interval": [
+        -0.04666666666666667,
+        0.09333333333333334
+      ]
+    },
+    "self_kill": {
+      "off": 0.17333333333333334,
+      "on": 0.08666666666666667,
+      "on_minus_off": -0.08666666666666667,
+      "paired_bootstrap_95_interval": [
+        -0.14,
+        -0.03333333333333333
+      ]
+    },
+    "win": {
+      "off": 0.25333333333333335,
+      "on": 0.29,
+      "on_minus_off": 0.03666666666666667,
+      "paired_bootstrap_95_interval": [
+        -0.03,
+        0.10666666666666667
+      ]
+    },
+    "tie": {
+      "off": 0.08333333333333333,
+      "on": 0.06666666666666667,
+      "on_minus_off": -0.016666666666666666,
+      "paired_bootstrap_95_interval": [
+        -0.06,
+        0.02666666666666667
+      ]
+    },
+    "loss": {
+      "off": 0.6633333333333333,
+      "on": 0.6433333333333333,
+      "on_minus_off": -0.02,
+      "paired_bootstrap_95_interval": [
+        -0.09333333333333334,
+        0.05333333333333334
+      ]
+    },
+    "score_margin": {
+      "off": -1.8033333333333332,
+      "on": -1.9433333333333334,
+      "on_minus_off": -0.14,
+      "paired_bootstrap_95_interval": [
+        -0.7534166666666665,
+        0.49341666666666545
+      ]
+    },
+    "win_or_tie": {
+      "off": 0.33666666666666667,
+      "on": 0.3566666666666667,
+      "on_minus_off": 0.02,
+      "paired_bootstrap_95_interval": [
+        -0.05333333333333334,
+        0.09333333333333334
+      ]
+    }
+  },
+  "interval_method": "10000 paired world-seed bootstrap resamples; exploratory percentile 95% intervals. Opponent randomness remains unseeded; no multiple-comparison correction.",
+  "guard_on_deaths": 26,
+  "diagnostic_counts_overlap": {
+    "observed_interception": 22,
+    "riskier_escape_choice_with_alternative": 25,
+    "new_enemy_bomb_when_routes_lost": 2,
+    "final_mask_empty": 26
+  },
+  "diagnostic_limit": "Last 10 decisions per self-kill; categories overlap and are observed associations, not proven causes."
+}

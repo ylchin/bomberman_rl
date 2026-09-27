@@ -1,0 +1,15 @@
+{
+  "source_folder": "/Users/ylchin/Documents/bomberman_rl/experiments/task4_terminal_coin_decisions",
+  "checkpoint_sha256": {
+    "baseline": "7be4fa91084f831f276520f79e56bf5b8323c3c22762a6c7197e555587336286",
+    "candidate": "8c0270cf11397590c0b90eccae80c6cc8b6f29f51b2d798d709cd42a13229bf4"
+  },
+  "states_sha256": "73c00639817d99bfa3d8ab952e98d70da49788869e70d725d70966e8ce4d1a63",
+  "source_sha256": {
+    "experiments/check_policy_symmetry.py": "f156bfb3d69e11627fca819b22d8e54fb6c4d5f42d441d1b291a4e9e6243c22a",
+    "agent_code/our_agent/symmetry.py": "a51dbcbb1edec4ac311ab8e5fc961979ba0f3fa18aae3ea47c724b6eb09613dd",
+    "agent_code/our_agent/features.py": "5e8f97535de2d7324b496546488e6d75b2663c18c1b5cb40ad232fe49ffe80d4",
+    "agent_code/our_agent/escape_planner.py": "9099830014af402b76c6d86ff7d97f1a123d7a73fc664286a995d5cdf1f08ecd",
+    "agent_code/our_agent/q_linear.py": "b20c6676440277188008958f22158fe9e4488442c7b39c61e83657ca52a9f0ac"
+  }
+}

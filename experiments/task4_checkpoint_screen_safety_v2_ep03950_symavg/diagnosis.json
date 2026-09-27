@@ -1,0 +1,25 @@
+[
+  {
+    "seed": 34076,
+    "death_step": 116,
+    "own_bomb_placement_step": 111,
+    "observed_interceptions": [
+      110,
+      115
+    ],
+    "riskier_escape_choices_with_alternatives": [],
+    "new_enemy_bombs_when_routes_lost": [
+      113
+    ],
+    "fallback_steps": [
+      114,
+      116
+    ],
+    "bomb_requests_during_fallback": [],
+    "confirmed_bomb_placements_during_fallback": [],
+    "actions_outside_nonempty_screen": [],
+    "optimistic_fallback_steps": [],
+    "actions_outside_effective_screen": [],
+    "final_mask_empty": true
+  }
+]

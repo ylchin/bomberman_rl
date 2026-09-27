@@ -1,0 +1,19 @@
+{
+  "checkpoint": "agent_code/our_agent/weights/candidates/linear_model1_safety_v2_seed1/ep_04000.pkl",
+  "checkpoint_sha256": "7be4fa91084f831f276520f79e56bf5b8323c3c22762a6c7197e555587336286",
+  "source_sha256": {
+    "environment.py": "45c631e4d7c1ad20fedf205211fe3186981c3291d9834a94b8b6cf1c1cfb4b2f",
+    "items.py": "41652d92c3b0977568fe63480fd1b127fd9d3a52e92aa38ba4e59c685d1a8a96",
+    "settings.py": "2c7ad8016615eba8db68811782545bb49f404c1d0e59c1bd69762bfea464506c",
+    "evaluate.py": "27f9708280665fc80acd6cc3d57750c7da91b530a6138defb15bd84448461152",
+    "experiments/compare_task4_guard.py": "b51582df60ab4ea02727b0dfef92bbf095b307b262276cf34b42a5125343716a",
+    "agent_code/our_agent/callbacks.py": "a5589ddf77a8beb930a3ad1649114dfcf51377c083a731ecef0dfd22dd856407",
+    "agent_code/our_agent/config.py": "7905e0432e3760321d0e7ae0949157b2b8ffce1f82e442112240cd17e60f387e",
+    "agent_code/our_agent/escape_planner.py": "fda9dbd9c8fda01b03c92215875eaf5f6a7159dad5e83b73847b91716c037a8a",
+    "agent_code/our_agent/features.py": "0c8f9d22ef489a4d17a9aaaaf678a5605469821d7dcb06909fd028e2a708b45b",
+    "agent_code/our_agent/q_linear.py": "b20c6676440277188008958f22158fe9e4488442c7b39c61e83657ca52a9f0ac"
+  },
+  "seed_start": 26000,
+  "rounds_per_arm": 300,
+  "protocol": "Alternate guard off/on order by seed; fresh agents and worlds per game; unchanged unseeded opponents; original game settings; no training."
+}

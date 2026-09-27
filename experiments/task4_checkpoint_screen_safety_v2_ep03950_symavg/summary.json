@@ -1,0 +1,61 @@
+{
+  "checkpoint": "/Users/ylchin/Documents/bomberman_rl/agent_code/our_agent/weights/q_linear_safety_v2_ep03950_symavg.pkl",
+  "rounds": 100,
+  "guard_kind": "escape",
+  "single_arm": "on",
+  "metrics": {
+    "score": 4.0,
+    "coins": 2.5,
+    "kills": 0.3,
+    "self_kill": 0.01,
+    "win": 0.34,
+    "tie": 0.08,
+    "loss": 0.58,
+    "score_margin": -0.88,
+    "survived": 0.92,
+    "died": 0.08,
+    "steps_survived": 375.41,
+    "fallback_steps": 0.31,
+    "optimistic_fallback_steps": 0.0,
+    "coin_preference_steps": 0.0
+  },
+  "self_kill_count": 1,
+  "deaths_with_each_pattern_overlap": {
+    "observed_interceptions": 1,
+    "riskier_escape_choices_with_alternatives": 0,
+    "new_enemy_bombs_when_routes_lost": 1,
+    "fallback_steps": 1,
+    "bomb_requests_during_fallback": 0,
+    "confirmed_bomb_placements_during_fallback": 0,
+    "actions_outside_nonempty_screen": 0,
+    "optimistic_fallback_steps": 0,
+    "actions_outside_effective_screen": 0,
+    "final_mask_empty": 1
+  },
+  "examples": [
+    {
+      "seed": 34076,
+      "death_step": 116,
+      "own_bomb_placement_step": 111,
+      "observed_interceptions": [
+        110,
+        115
+      ],
+      "riskier_escape_choices_with_alternatives": [],
+      "new_enemy_bombs_when_routes_lost": [
+        113
+      ],
+      "fallback_steps": [
+        114,
+        116
+      ],
+      "bomb_requests_during_fallback": [],
+      "confirmed_bomb_placements_during_fallback": [],
+      "actions_outside_nonempty_screen": [],
+      "optimistic_fallback_steps": [],
+      "actions_outside_effective_screen": [],
+      "final_mask_empty": true
+    }
+  ],
+  "limits": "Fresh diagnostic games with unseeded opponents, not a replay of previous deaths or an A/B comparison. Last 10 decisions per death; patterns overlap and do not establish causation. Empty screens near death may be consequences of an earlier trap. Final movement outcomes are captured, but new-enemy-bomb route-loss checks require another decision state."
+}

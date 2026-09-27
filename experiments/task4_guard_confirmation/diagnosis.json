@@ -1,0 +1,494 @@
+[
+  {
+    "seed": 26007,
+    "death_step": 81,
+    "own_bomb_placement_step": 77,
+    "observed_interceptions": [
+      79
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 78,
+        "chosen": "UP",
+        "alternatives": [
+          "DOWN"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26009,
+    "death_step": 262,
+    "own_bomb_placement_step": 258,
+    "observed_interceptions": [
+      261
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 259,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26021,
+    "death_step": 173,
+    "own_bomb_placement_step": 169,
+    "observed_interceptions": [
+      172
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 170,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26024,
+    "death_step": 122,
+    "own_bomb_placement_step": 118,
+    "observed_interceptions": [
+      120
+    ],
+    "riskier_escape_choices_with_alternatives": [],
+    "new_enemy_bombs_when_routes_lost": [
+      120
+    ],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26035,
+    "death_step": 140,
+    "own_bomb_placement_step": 136,
+    "observed_interceptions": [
+      138
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 137,
+        "chosen": "DOWN",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26037,
+    "death_step": 287,
+    "own_bomb_placement_step": 283,
+    "observed_interceptions": [
+      286
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 284,
+        "chosen": "UP",
+        "alternatives": [
+          "RIGHT",
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26046,
+    "death_step": 364,
+    "own_bomb_placement_step": 360,
+    "observed_interceptions": [
+      363
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 361,
+        "chosen": "UP",
+        "alternatives": [
+          "DOWN"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26067,
+    "death_step": 157,
+    "own_bomb_placement_step": 153,
+    "observed_interceptions": [
+      156
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 154,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26069,
+    "death_step": 184,
+    "own_bomb_placement_step": 180,
+    "observed_interceptions": [
+      183
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 181,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26075,
+    "death_step": 250,
+    "own_bomb_placement_step": 246,
+    "observed_interceptions": [],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 247,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26078,
+    "death_step": 101,
+    "own_bomb_placement_step": 97,
+    "observed_interceptions": [
+      99
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 98,
+        "chosen": "UP",
+        "alternatives": [
+          "DOWN"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26086,
+    "death_step": 43,
+    "own_bomb_placement_step": 39,
+    "observed_interceptions": [
+      41
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 40,
+        "chosen": "UP",
+        "alternatives": [
+          "RIGHT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26094,
+    "death_step": 55,
+    "own_bomb_placement_step": 51,
+    "observed_interceptions": [
+      53
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 52,
+        "chosen": "DOWN",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26131,
+    "death_step": 105,
+    "own_bomb_placement_step": 101,
+    "observed_interceptions": [
+      103
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 102,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26146,
+    "death_step": 208,
+    "own_bomb_placement_step": 204,
+    "observed_interceptions": [],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 205,
+        "chosen": "UP",
+        "alternatives": [
+          "DOWN",
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26148,
+    "death_step": 146,
+    "own_bomb_placement_step": 142,
+    "observed_interceptions": [
+      145
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 143,
+        "chosen": "UP",
+        "alternatives": [
+          "RIGHT",
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26155,
+    "death_step": 117,
+    "own_bomb_placement_step": 113,
+    "observed_interceptions": [
+      116
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 114,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26201,
+    "death_step": 129,
+    "own_bomb_placement_step": 125,
+    "observed_interceptions": [],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 126,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26208,
+    "death_step": 56,
+    "own_bomb_placement_step": 52,
+    "observed_interceptions": [
+      55
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 53,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26213,
+    "death_step": 102,
+    "own_bomb_placement_step": 98,
+    "observed_interceptions": [
+      100
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 99,
+        "chosen": "UP",
+        "alternatives": [
+          "DOWN",
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26230,
+    "death_step": 192,
+    "own_bomb_placement_step": 187,
+    "observed_interceptions": [
+      184,
+      186
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 189,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [
+      189
+    ],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26238,
+    "death_step": 242,
+    "own_bomb_placement_step": 238,
+    "observed_interceptions": [
+      240
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 239,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT",
+          "WAIT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26264,
+    "death_step": 110,
+    "own_bomb_placement_step": 106,
+    "observed_interceptions": [
+      109
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 107,
+        "chosen": "UP",
+        "alternatives": [
+          "RIGHT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26266,
+    "death_step": 132,
+    "own_bomb_placement_step": 128,
+    "observed_interceptions": [
+      131
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 129,
+        "chosen": "UP",
+        "alternatives": [
+          "RIGHT",
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26274,
+    "death_step": 82,
+    "own_bomb_placement_step": 78,
+    "observed_interceptions": [],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 79,
+        "chosen": "RIGHT",
+        "alternatives": [
+          "LEFT",
+          "WAIT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  },
+  {
+    "seed": 26290,
+    "death_step": 239,
+    "own_bomb_placement_step": 235,
+    "observed_interceptions": [
+      238
+    ],
+    "riskier_escape_choices_with_alternatives": [
+      {
+        "step": 236,
+        "chosen": "UP",
+        "alternatives": [
+          "RIGHT",
+          "DOWN",
+          "LEFT"
+        ]
+      }
+    ],
+    "new_enemy_bombs_when_routes_lost": [],
+    "final_mask_empty": true
+  }
+]
