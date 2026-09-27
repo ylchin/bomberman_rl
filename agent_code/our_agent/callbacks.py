@@ -161,7 +161,10 @@ def act(self, game_state: dict) -> str:
             if alternatives.any():
                 action_id = self.model.act(phi, rng=self.rng, action_mask=alternatives)
         else:
-            action_id = int(self.rng.integers(len(ACTIONS)))
+            # dont let fallback pick bomb
+            action_id = _NET_FALLBACK_ACTIONS[
+                int(self.rng.integers(len(_NET_FALLBACK_ACTIONS)))
+            ]
         self.logger.warning(
             f"step {game_state['step']}: stuck at {pos} repeating {stuck_on!r} "
             f"with no effect; selecting alternative {ACTIONS[action_id]!r} instead"
